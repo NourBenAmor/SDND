@@ -1,0 +1,6 @@
+@Sdnd_api_HostAddress = http://localhost:5261
+
+GET {{Sdnd_api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
