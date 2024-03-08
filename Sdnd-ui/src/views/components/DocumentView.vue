@@ -1,16 +1,16 @@
 <template>
   <div class="document-view-container">
-    <pdf-annotate
+    <PdfAnnotate
       :file="documentUrl"
       v-if="documentUrl"
       @update-annotations="handleAnnotationUpdate"
-    ></pdf-annotate>
-    <div v-else>Loading...</div>
+    />
+    <div v-else>Loading...</div> 
   </div>
 </template>
 
 <script>
-import PdfAnnotate from 'pdf-annotate';
+import PdfAnnotate from './PdfAnnotate';
 export default {
   components: {
     PdfAnnotate
