@@ -57,8 +57,9 @@ onBeforeUnmount(() => {
                     <argon-switch id="rememberMe" name="remember-me">Remember me</argon-switch>
 
                     <div class="text-center">
+                      <router-link class="nav-link me-2" to="/dashboard-default">
                       <argon-button class="mt-4" variant="gradient" color="success" fullWidth size="lg">Sign in
-                      </argon-button> 
+                      </argon-button> </router-link>
 
                     </div>
                   </form>

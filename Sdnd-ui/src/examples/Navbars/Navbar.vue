@@ -28,7 +28,7 @@ const closeMenu = () => {
 };
 </script>
 <template>
-  <nav
+<nav
     class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl"
     :class="isRTL ? 'top-0 position-sticky z-index-sticky' : ''"
     v-bind="$attrs"
@@ -62,17 +62,16 @@ const closeMenu = () => {
           </div>
         </div>
         <ul class="navbar-nav justify-content-end">
-          <li class="nav-item d-flex align-items-center">
-            <router-link
-              :to="{ name: 'Signin' }"
-              class="px-0 nav-link font-weight-bold text-white"
-              target="_blank"
-            >
-              <i class="fa fa-user" :class="isRTL ? 'ms-sm-2' : 'me-sm-2'"></i>
-              <span v-if="isRTL" class="d-sm-inline d-none">يسجل دخول</span>
-              <span v-else class="d-sm-inline d-none">Sign In</span>
-            </router-link>
-          </li>
+      <li class="nav-item d-flex align-items-center">
+        <router-link
+          :to="{ name: 'Signin' }"
+          class="px-0 nav-link font-weight-bold text-white"
+        >
+          <i class="fa fa-user" :class="isRTL ? 'ms-sm-2' : 'me-sm-2'"></i>
+          <span v-if="isRTL" class="d-sm-inline d-none">يسجل دخول</span>
+          <span v-else class="d-sm-inline d-none">Sign Out</span>
+        </router-link>
+      </li>
           <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
             <a
               href="#"

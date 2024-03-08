@@ -1,12 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Dashboard from "../views/Dashboard.vue";
 import Tables from "../views/Tables.vue";
-import Billing from "../views/Billing.vue";
-import VirtualReality from "../views/VirtualReality.vue";
-import RTL from "../views/Rtl.vue";
 import Profile from "../views/Profile.vue";
 import Signup from "../views/Signup.vue";
 import Signin from "../views/Signin.vue";
+import EditViewVue from "../views/components/EditView.vue";
+import DocumentViewVue from "../views/components/DocumentView.vue";
 
 const routes = [
   {
@@ -24,21 +23,7 @@ const routes = [
     name: "Tables",
     component: Tables,
   },
-  {
-    path: "/billing",
-    name: "Billing",
-    component: Billing,
-  },
-  {
-    path: "/virtual-reality",
-    name: "Virtual Reality",
-    component: VirtualReality,
-  },
-  {
-    path: "/rtl-page",
-    name: "RTL",
-    component: RTL,
-  },
+
   {
     path: "/profile",
     name: "Profile",
@@ -53,7 +38,9 @@ const routes = [
     path: "/signup",
     name: "Signup",
     component: Signup,
-  }
+  },
+  { path: "/edit-view", name: "edit-view", component: EditViewVue },
+  { path: "/document-view", name: "document-view", component: DocumentViewVue },
 ];
 
 const router = createRouter({
