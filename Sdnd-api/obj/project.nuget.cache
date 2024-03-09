@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8yDd8izpbjU+cdF0pFw1qNsYnlMycO9Pht3nx9kWX5JqpPR+0F8IoxcIpIkMOe+pZ3J9zCCj5Bpw8jf07bOo2Q==",
+  "dgSpecHash": "T0w0K603W2VlhqmcrMFO0M6qYykjmOqVWzoOXxzW8Ij7XBVC39GUiHbgX47d77z24AtcNPwAXlQ0IMDA8IeKag==",
   "success": true,
-  "projectFilePath": "/home/mainuser/RiderProjects/sdnd-api/Sdnd-api/Sdnd-api.csproj",
+  "projectFilePath": "/home/mainuser/RiderProjects/Sdnd/Sdnd-api/Sdnd-api.csproj",
   "expectedPackageFiles": [
     "/home/mainuser/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/home/mainuser/.nuget/packages/microsoft.aspnetcore.authentication.jwtbearer/8.0.0/microsoft.aspnetcore.authentication.jwtbearer.8.0.0.nupkg.sha512",

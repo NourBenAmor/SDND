@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Identity;
-namespace Sdnd_api.Models;
+using System;
+using System.Collections.Generic;
 
-public class User : IdentityUser
+namespace Sdnd_api.Models
 {
-    public string ProfilePictureUrl { get; set; } = string.Empty;
-    public ICollection<Document> Documents { get; set; }
+    public class User : IdentityUser<Guid>
+    {
+        public string ProfilePictureUrl { get; set; } = string.Empty;
+    }
 }

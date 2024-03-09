@@ -6,14 +6,13 @@ public class Document : BaseEntity
 {
     [Required]
     public string Name { get; set; }
-    public string contentType { get; set; }
-    public string Description { get; set; }
-    public string ocrText { get; set; } = string.Empty;
-    public int fileSize { get; set; }
-    public Guid ownerId { get; set; }
-    public string filePath { get; set; }
-    public State documentState { get; set; } = State.Uploaded;
-    public User Owner { get; }
+    public string ContentType { get; set; }
+    public string Description { get; set; } = "";
+    public string OcrText { get; set; } = string.Empty;
+    public int FileSize { get; set; }
+    public Guid OwnerId { get; set; }
+    public string FilePath { get; set; }
+    public State DocumentState { get; set; } = State.Uploaded;
 }
     public enum State
     {

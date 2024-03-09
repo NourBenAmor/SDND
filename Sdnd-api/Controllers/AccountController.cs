@@ -86,7 +86,7 @@ public class AccountController : ControllerBase
         if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect");
         return Ok(new NewUserDto
         {
-            Id = Guid.Parse(user.Id),
+            Id = user.Id,
             Username = user.UserName,
             Email = user.Email,
             Token = _tokenService.CreateToken(user)

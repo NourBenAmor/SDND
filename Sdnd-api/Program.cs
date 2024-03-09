@@ -15,11 +15,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 
 // Add services to the container.
-builder.Services.AddIdentity<User, IdentityRole>(options =>
+builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
     {
         options.Password.RequireDigit = true;
-        options.Password.RequireLowercase = true;
-        options.Password.RequiredLength = 8;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequiredLength = 6;
     })
     .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddControllers().AddNewtonsoftJson();
