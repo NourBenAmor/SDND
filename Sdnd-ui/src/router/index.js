@@ -6,7 +6,9 @@ import Signup from "../views/Signup.vue";
 import Signin from "../views/Signin.vue";
 import EditViewVue from "../views/components/EditView.vue";
 import DocumentViewVue from "../views/components/DocumentView.vue";
-
+import AddDocument from "../views/components/AddDocument.vue";
+import Permissions from "../views/components/Permissions.vue";
+import SharedDocuments from "../views/components/SharedDocuments.vue";
 const routes = [
   {
     path: "/",
@@ -39,8 +41,12 @@ const routes = [
     name: "Signup",
     component: Signup,
   },
+  { path: "/add-view", name: "add-view", component:AddDocument},
   { path: "/edit-view", name: "edit-view", component: EditViewVue },
   { path: "/document-view", name: "document-view", component: DocumentViewVue },
+  { path: "/permissions", name: "permissions", component:Permissions},
+  { path: "/shared-documents", name: "shared-documents", component:SharedDocuments},
+
 ];
 
 const router = createRouter({
