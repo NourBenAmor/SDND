@@ -23,11 +23,31 @@ public class DocumentController : ControllerBase
         var Documents =  _context.Documents.ToList();
         return Ok(Documents);
     }
+    
+    [HttpGet("{id}")]
+    public ActionResult<Document> GetDocumentById(Guid id)
+    {
+        if (string.IsNullOrEmpty(id.ToString()))
+        {
+            return NotFound("Document ID invalid");
+        }
+
+        var document = _context.Documents.FirstOrDefault(e => e.Id == id);
+        if (document == null)
+        {
+            return NotFound($"Document with ID {id} not found.");
+        }
+
+        return Ok(document);
+    }
+
 
 
     [HttpPost("upload")]
     public async Task<IActionResult> Upload([FromForm] FileUploadModel model)
     {
+        if (!ModelState.IsValid)            
+            return BadRequest(ModelState);
         var result = await UploadFile(model.File);
         if (result == "file not selected" || result =="file Already Exists")
             return BadRequest("File Not Uploaded");
@@ -36,17 +56,18 @@ public class DocumentController : ControllerBase
             Name = model.Name,
             Description = model.Description,
             FilePath = result,
+            FileSize = (int)model.File.Length,    
             OwnerId = model.ownerId,
-            ContentType = model.contentType
+            ContentType = model.contentType,
+            Status = 1,
         };
 
-        var document =  _context.Documents.Add(newDocument);
+        _context.Documents.Add(newDocument);
         await _context.SaveChangesAsync();
 
-        return Ok(document);
+        return CreatedAtAction(nameof(GetDocumentById), new { id = newDocument.Id }, newDocument);
 
     }
-
 
     private async Task<string> UploadFile(IFormFile file)
     {
@@ -55,7 +76,7 @@ public class DocumentController : ControllerBase
             return "file not selected";
         }
 
-        var folderName = Path.Combine("Resource", "AllFiles ");
+        var folderName = Path.Combine("Resource", "AllFiles");
         var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
         if (!Directory.Exists(pathToSave))
             Directory.CreateDirectory(pathToSave);
