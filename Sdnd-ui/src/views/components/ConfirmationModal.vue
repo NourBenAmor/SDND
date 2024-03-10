@@ -10,25 +10,28 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    show: Boolean,
-    message: {
-      type: String,
-      default: 'Are you sure?'
-    }
-  },
-  methods: {
-    confirm() {
-      this.$emit('confirm');
-    },
-    cancel() {
-      this.$emit('cancel');
-    }
+<script setup>
+import { defineProps, defineEmits } from 'vue';
+
+const { show, message } = defineProps({
+  show: Boolean,
+  message: {
+    type: String,
+    default: 'Are you sure?'
   }
+});
+
+const emit = defineEmits(['confirm', 'cancel']);
+
+const confirm = () => {
+  emit('confirm');
+};
+
+const cancel = () => {
+  emit('cancel');
 };
 </script>
+
 
 <style scoped>
 .modal {
