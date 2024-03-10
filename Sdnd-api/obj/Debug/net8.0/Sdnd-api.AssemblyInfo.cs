@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Sdnd-api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+832fb4edda5fd1ae74462d734ef6bbaff142e8da")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d195e4cfed4457c06fb4f41de7b32db8b37334c7")]
 [assembly: System.Reflection.AssemblyProductAttribute("Sdnd-api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Sdnd-api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

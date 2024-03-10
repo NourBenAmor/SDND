@@ -11,8 +11,8 @@ using Sdnd_api.Data;
 namespace Sdnd_api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240309152514_Initial migration")]
-    partial class Initialmigration
+    [Migration("20240310144445_Initial Migration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
