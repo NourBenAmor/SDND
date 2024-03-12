@@ -1,25 +1,24 @@
 <template>
   <div class="add-new-document-container">
     <div class="form-group">
-      <label for="title" class="label">Title:</label>
-      <input type="text" class="form-control" id="title" v-model="newDocument.title" required>
+      <label for="name" class="label">Name:</label>
+      <input type="text" class="form-control" id="name" v-model="newDocument.name" required>
     </div>
     <div class="form-group">
-      <label for="type" class="label">Type:</label>
-      <input type="text" class="form-control" id="type" v-model="newDocument.type" required>
+      <label for="contentType" class="label">Type:</label>
+      <input type="text" class="form-control" id="contentType" v-model="newDocument.contentType" required>
     </div>
     <div class="form-group">
-      <label for="status" class="label">Status:</label>
-      <input type="text" class="form-control" id="status" v-model="newDocument.status" required>
+      <label for="description" class="label">Description:</label>
+      <input type="text" class="form-control" id="description" v-model="newDocument.description" required>
     </div>
     <div class="form-group">
-      <label for="creationDate" class="label">Creation Date:</label>
-      <input type="text" class="form-control" id="creationDate" v-model="newDocument.creationDate" required>
+      <label for="ownerId" class="label">Owner Id:</label>
+      <input type="text" class="form-control" id="ownerId" v-model="newDocument.ownerId" required>
     </div>
     <div class="form-group">
       <label for="file" class="label">Upload File:</label>
-      <div> <input type="file" class="form-control-file" id="file" @change="handleFileUpload">
-      </div>
+      <input type="file" class="form-control-file" id="file" @change="handleFileUpload">
     </div>
     <div class="button-container">
       <button class="btn btn-primary" @click="addDocument">Add Document</button>
@@ -30,14 +29,13 @@
 </template>
 
 <script setup>
-import { defineEmits, ref, reactive } from 'vue';
+import { ref } from 'vue';
+import axios from 'axios';
 
-const emit = defineEmits(['document-added']);
-
-const newDocument = reactive({
-  title: '',
-  type: '',
-  status: '',
+const newDocument = ref({
+  name: '',
+  contentType: '',
+  description: '',
   creationDate: '',
   file: null
 });
@@ -45,17 +43,32 @@ const newDocument = reactive({
 const saved = ref(false);
 const error = ref(false);
 
-const addDocument = () => {
-  setTimeout(() => {
+const addDocument = async () => {
+  const formData = new FormData();
+  formData.append('name', newDocument.value.name);
+  formData.append('contentType', newDocument.value.contentType);
+  formData.append('description', newDocument.value.description);
+  formData.append('ownerId', newDocument.value.ownerId);
+
+  formData.append('file', newDocument.value.file);
+
+  try {
+    const response = await axios.post('https://localhost:7278/api/Document/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    console.log('Response:', response.data);
     saved.value = true;
-    error.value = false;
-    emit('document-added', { ...newDocument });
-  }, 1000);
+  } catch (error) {
+    console.error('Error adding document:', error);
+    error.value = true;
+  }
 };
 
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
-  newDocument.file = file;
+  newDocument.value.file = file;
 };
 </script>
 

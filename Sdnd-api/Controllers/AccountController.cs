@@ -24,7 +24,6 @@ public class AccountController : ControllerBase
         _signInManager = signInManager;
     }
 
-    // registering a new user 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto registeruser)
     {
@@ -32,12 +31,13 @@ public class AccountController : ControllerBase
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
             var newUser = new User
             {
                 UserName = registeruser.Username,
                 Email = registeruser.Email
-
             };
+
             if (string.IsNullOrEmpty(registeruser.Password))
             {
                 return BadRequest("Password is invalid");
@@ -50,13 +50,19 @@ public class AccountController : ControllerBase
                 var roleResult = await _userManager.AddToRoleAsync(newUser, "USER");
                 if (roleResult.Succeeded)
                 {
-                    NewUserDto UserResponse = new NewUserDto
+                    var sessionToken = Guid.NewGuid().ToString(); 
+
+                    newUser.SessionToken = sessionToken;
+                    await _userManager.UpdateAsync(newUser); 
+
+                    NewUserDto userResponse = new NewUserDto
                     {
                         Username = newUser.UserName,
                         Email = newUser.Email,
-                        Token = _tokenService.CreateToken(newUser)
+                        Token = sessionToken
                     };
-                    return Ok(UserResponse);
+
+                    return Ok(userResponse);
                 }
                 else
                 {
@@ -72,8 +78,8 @@ public class AccountController : ControllerBase
         {
             return StatusCode(500, e);
         }
-        
     }
+
 
     [HttpPost("login")]
     public async Task<IActionResult> login(LoginDto loginDto)

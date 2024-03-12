@@ -18,18 +18,20 @@
             <thead>
               <tr>
                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                  Title
+                  Name
                 </th>
                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                  Type
+                  Content Type
                 </th>
-                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                  Status
+                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                  File Size
+                </th>
+                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                  Description
                 </th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                   Creation Date
                 </th>
-                <th class="text-secondary opacity-7"></th>
               </tr>
             </thead>
             <tbody>
@@ -37,19 +39,21 @@
                 <td>
                   <div class="d-flex px-2 py-1">
                     <div class="d-flex flex-column justify-content-center">
-                      <h6 class="mb-0 text-sm">{{ document.title }}</h6>
+                      <h6 class="mb-0 text-sm">{{ document.name }}</h6>
                     </div>
                   </div>
                 </td>
-
                 <td>
-                  <p class="text-xs font-weight-bold mb-0">{{ document.type }}</p>
+                  <p class="text-xs font-weight-bold mb-0">{{ document.contentType }}</p>
                 </td>
-                <td class="align-middle text-center text-sm">
-                  <span class="badge badge-sm bg-gradient-success">{{ document.status }}</span>
+                <td class="align-middle text-center ">
+                  <span class="text-xs font-weight-bold mb-0">{{ document.fileSize }}</span>
+                </td>
+                <td class="align-middle text-center ">
+                  <span class="text-xs font-weight-bold mb-0">{{ document.description }}</span>
                 </td>
                 <td class="align-middle text-center">
-                  <span class="text-secondary text-xs font-weight-bold">{{ document.creationDate }}</span>
+                  <span class="text-secondary text-xs font-weight-bold">{{ formatDate(document.addedDate) }}</span>
                 </td>
                 <td class="align-middle">
                   <div class="ms-auto text-end">
@@ -69,12 +73,9 @@
               </tr>
             </tbody>
           </table>
-
         </div>
       </div>
     </div>
-
-  
 
     <!-- Confirmation modal -->
     <ConfirmationModalVue :show="showModal" message="Are you sure you want to delete this document?"
@@ -85,36 +86,39 @@
 <script setup>
 import ConfirmationModalVue from './ConfirmationModal.vue';
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 
+const documents = ref([]); 
 const filterText = ref('');
 const showModal = ref(false);
 const documentIndexToDelete = ref(null);
-const documents = ref([
-  {
-    title: 'John Michael',
-    type: 'PDF',
-    status: 'Online',
-    creationDate: '23/04/18',
-  },
-  {
-    title: 'Jane Doe',
-    type: 'JPG',
-    status: 'Offline',
-    creationDate: '25/04/18',
-  }
-]);
 
+const fetchDocuments = async () => {
+  try {
+    const response = await axios.get('https://localhost:7278/api/Document');
+    documents.value = response.data;
+  } catch (error) {
+    console.error('Error fetching documents:', error);
+  }
+};
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString();
+};
+onMounted(() => {
+  fetchDocuments();
+});
 
 const router = useRouter();
 
 const openEditView = (document) => {
   router.push({ name: 'edit-view', params: { documentData: document } })
 };
+
 const openAddDocumentView = (document) => {
   router.push({ name: 'add-view', params: { documentData: document } })
 };
-
 
 const openDocumentView = (document) => {
   router.push({ name: 'document-view', params: { documentData: document } });
@@ -126,12 +130,10 @@ const showConfirmModal = (index) => {
 };
 
 const handleConfirm = () => {
-  // Perform actions on confirmation (e.g., delete document)
   showModal.value = false;
 };
 
 const hideModal = () => {
-  // Handle closing the modal
   showModal.value = false;
 };
 </script>
