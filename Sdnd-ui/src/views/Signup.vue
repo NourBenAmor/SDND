@@ -8,7 +8,6 @@ import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonCheckbox from "@/components/ArgonCheckbox.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
 const body = document.getElementsByTagName("body")[0];
-
 const store = useStore();
 onBeforeMount(() => {
   store.state.hideConfigButton = true;
