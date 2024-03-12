@@ -1,7 +1,10 @@
-namespace Sdnd_api.Models;
+using System;
 
-public class SharedDocument : BaseEntity 
+namespace Sdnd_api.Models
 {
-    public Guid DocumentId { get; set; }
-    public Guid SharedWithUserId { get; set;}
+    public class SharedDocument : BaseEntity
+    {
+        public Guid DocumentId { get; set; }
+        public Guid SharedWithUserId { get; set; }
+    }
 }

@@ -10,7 +10,7 @@ using Sdnd_api.Models;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlite((builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer((builder.Configuration.GetConnectionString("DefaultConnection")));
 });
 
 
@@ -77,6 +77,16 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("VueCorsPolicy", builder =>
+    {
+        builder
+            .WithOrigins("http://localhost:8080") 
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
@@ -94,5 +104,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseCors("VueCorsPolicy");
 
 app.Run();

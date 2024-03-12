@@ -2,13 +2,17 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Sdnd_api.Models;
-namespace Sdnd_api.Data;
+using System;
+using System.Collections.Generic;
 
-public class AppDbContext : IdentityDbContext<User,IdentityRole<Guid>,Guid>
+namespace Sdnd_api.Data
 {
-    public AppDbContext(DbContextOptions options) :base(options)
+    public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
-    }
+        public AppDbContext(DbContextOptions options) : base(options)
+        {
+        }
+
         public virtual DbSet<Document> Documents { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Annotation> Annotations { get; set; }
@@ -50,18 +54,26 @@ public class AppDbContext : IdentityDbContext<User,IdentityRole<Guid>,Guid>
                     .HasForeignKey(e => e.userId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
-            
+
             builder.Entity<Document>(entity =>
             {
-                
+
                 entity.HasMany<Annotation>()
                     .WithOne()
                     .HasForeignKey(e => e.documentId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.NoAction);
                 entity.HasMany<SharedDocument>()
                     .WithOne()
                     .HasForeignKey(e => e.DocumentId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.SetNull);
             });
+
+            builder.Entity<SharedDocument>()
+    .HasOne<Document>()
+    .WithMany()
+    .HasForeignKey(sd => sd.DocumentId)
+    .OnDelete(DeleteBehavior.SetNull);
+
         }
+    }
 }
