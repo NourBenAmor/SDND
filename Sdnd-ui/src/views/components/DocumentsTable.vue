@@ -5,11 +5,11 @@
       <!-- Documents Table -->
       <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0">Documents Table</h6>
-        <div class="d-flex">
-          <input type="text" v-model="filterText" class="form-control me-2" placeholder="Search By...">
-          <a class="btn btn-link text-green px-3 mb-0" @click="openAddDocumentView(document)" href="javascript:;">
-            <i class="fas fa-add text-green ms-2" aria-hidden="true"></i>Add Document
-          </a>
+        <div class="d-flex align-items-center">
+          <input type="text" v-model="filterText" class="form-control me-2" style="height: 38px;" placeholder="Search By...">
+          <button class="btn btn-primary px-0 mb-0 d-flex align-items-center text-nowrap px-2 mx-2" @click="openAddDocumentView(document)" href="javascript:;">
+            <i class="fas fa-add  me-2" aria-hidden="true"></i> Add New Document
+          </button>
         </div>
       </div>
       <div class="card-body px-0 pt-0 pb-2">
@@ -31,6 +31,9 @@
                 </th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                   Creation Date
+                </th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -57,17 +60,18 @@
                 </td>
                 <td class="align-middle">
                   <div class="ms-auto text-end">
+                    <a class="btn btn-link text-green px-3 mb-0" @click="openDocumentView(document)"
+                      href="javascript:;">
+                      <i class="fas fa-eye text-green ms-2" aria-hidden="true"></i>{{ " " }}View
+                    </a>  
+                    <a class="btn btn-link text-dark px-3 mb-0" @click="openEditView(document)">
+                      <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit
+                    </a>
                     <a class="btn btn-link text-danger text-gradient px-3 mb-0" @click="showConfirmModal(index)"
                       href="javascript:;">
                       <i class="far fa-trash-alt me-2" aria-hidden="true"></i>Delete
                     </a>
-                    <a class="btn btn-link text-dark px-3 mb-0" @click="openEditView(document)">
-                      <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit
-                    </a>
-                    <a class="btn btn-link text-green px-3 mb-0" @click="openDocumentView(document)"
-                      href="javascript:;">
-                      <i class="fas fa-eye text-green ms-2" aria-hidden="true"></i>View
-                    </a>
+                  
                   </div>
                 </td>
               </tr>
@@ -77,7 +81,7 @@
       </div>
     </div>
 
-    <!-- Confirmation modal -->
+  
     <ConfirmationModalVue :show="showModal" message="Are you sure you want to delete this document?"
       @confirm="handleConfirm" @cancel="hideModal" />
   </div>
@@ -87,7 +91,8 @@
 import ConfirmationModalVue from './ConfirmationModal.vue';
 import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import axios from "axios";
+
 
 const documents = ref([]); 
 const filterText = ref('');
@@ -96,7 +101,7 @@ const documentIndexToDelete = ref(null);
 
 const fetchDocuments = async () => {
   try {
-    const response = await axios.get('https://localhost:7278/api/Document');
+    const response = await axios.get('http://localhost:7278/api/Document');
     documents.value = response.data;
   } catch (error) {
     console.error('Error fetching documents:', error);
