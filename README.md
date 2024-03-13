@@ -1,7 +1,6 @@
 ## Solution de Numerisation de Documents : 
 ##### Description
-Ce projet illustre une application full-stack avec une API ASP.NET Core en tant que backend et une application mobile Flutter en tant que frontend. Les utilisateurs peuvent effectuer diverses tâches, telles que récupérer des données depuis l’API, les afficher dans l’application mobile et interagir avec le serveur.
-
+Ce projet vise à créer une application de gestion de documents complète. Il permettra aux utilisateurs d’annoter facilement des documents au format PDF, de créer de nouveaux documents, de les partager avec d’autres utilisateurs et de rédiger une description pour chacun d’eux. De plus, l’application permettra également d’ajouter des annotations aux documents existants. L’idée principale du projet est de numériser de nouveaux documents et de les intégrer à la solution via l’application mobile développée en Flutter.
 ###### Technologies utilisées
 * Backend (API) :
 ASP.NET Core : Sert de base pour l’API Web.
@@ -22,4 +21,4 @@ Démarrez l’API : * dotnet run.
 Configuration du frontend web:
 Ouvrez la solution sous Sdnd/Sdnd-ui
     * npm install 
-    * npm run 
+    * npm run serve
