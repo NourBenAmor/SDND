@@ -10,7 +10,7 @@ Swagger : Permet la documentation et les tests de l’API.
 Vue js :  Framework JavaScript Évolutif, accessible, performant et polyvalent. pour construire des interfaces utilisateur. 
 * Frontend (Mobile) :
 Flutter : Framework multiplateforme pour la création d’applications mobiles.
-##### Pour commencer
+
 ## Installation et exécution de l'application Sdnd
 
 ##### Prérequis
@@ -58,3 +58,5 @@ npm install
 npm run serve
 ```
 
+## Lien Jira de Project 
+suivre l'avancement de project [Ici](https://jassersoftware.atlassian.net/jira/software/projects/SDND/boards/4?atlOrigin=eyJpIjoiZmViZTljN2JjZjc4NDJlMmI5ZjA5OWVjZTkzZGNmNjQiLCJwIjoiaiJ9)
