@@ -63,10 +63,7 @@ onBeforeUnmount(() => {
   <main class="main-content mt-0">
     <div
       class="page-header align-items-start min-vh-50 pt-5 pb-11 m-3 border-radius-lg"
-      style="
-        background-image: url(&quot;https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signup-cover.jpg&quot;);
-        background-position: top;
-      "
+      
     >
       <span class="mask bg-gradient-dark opacity-6"></span>
       <div class="container">

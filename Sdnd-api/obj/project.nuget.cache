@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "psd++fQag+e6PNshWij8vl3t6gYvUXJiSJtKI8eZIQ2XpuEJD8A+aA1nipduj67shj9+B+UBBRguJX7A/7niqw==",
+  "dgSpecHash": "GcIZiJcrfH+LM6pNam0QJcCwWKFut73o2pwKGEt67Z1+L8ERzW5DJiKjQt+xA8OJR3piIpVzIMNSmfoA8OGJtQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\utilisateur\\Desktop\\yess\\Sdnd-api\\Sdnd-api.csproj",
+  "projectFilePath": "C:\\Users\\utilisateur\\Desktop\\hhh\\Sdnd-api\\Sdnd-api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\utilisateur\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\utilisateur\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",

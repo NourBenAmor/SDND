@@ -64,6 +64,7 @@ onBeforeUnmount(() => {
                 </label>
                 <input type="file" id="profile-image-upload" hidden @change="uploadImage" />
               </div>
+              
             </div>
             <div class="col-auto my-auto">
               <div class="h-100">

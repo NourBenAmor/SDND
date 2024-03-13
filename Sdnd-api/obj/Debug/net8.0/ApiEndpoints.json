@@ -69,6 +69,38 @@
   },
   {
     "ContainingType": "Sdnd_api.Controllers.DocumentController",
+    "Method": "DeleteDocument",
+    "RelativePath": "api/Document/Delete/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sdnd_api.Controllers.DocumentController",
+    "Method": "FilterByName",
+    "RelativePath": "api/Document/filterByName",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Name",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sdnd_api.Controllers.DocumentController",
     "Method": "Upload",
     "RelativePath": "api/Document/upload",
     "HttpMethod": "POST",

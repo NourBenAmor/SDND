@@ -58,7 +58,6 @@ const selectedDocument = ref(null);
 const selectedUser = ref(null);
 
 const savePermissions = () => {
-  // Save permissions logic
   console.log('Permissions saved:', documentPermissions.value);
 };
 </script>

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using  Sdnd_api.Models;
 using Sdnd_api.Data;
 using Sdnd_api.Dtos.Requests;
+using System.Net.Mime;
 
 
 namespace Sdnd_api.Controllers;
@@ -93,6 +94,52 @@ public class DocumentController : ControllerBase
 
         return dbPath;
     }
+    [HttpDelete("Delete/{id}")]
+    public async Task<IActionResult> DeleteDocument(Guid id)
+    {
+        try
+        {
+            var document = await _context.Documents.FindAsync(id);
+            if (document == null)
+            {
+                return NotFound($"Document with ID {id} not found.");
+            }
 
-    
+            
+            string filePath = document.FilePath; 
+
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+
+            _context.Documents.Remove(document);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while deleting the document: {ex.Message}");
+        }
+    }
+
+
+    [HttpGet("filterByName")]
+    public IActionResult FilterByName([FromQuery] string Name)
+    {
+        if (string.IsNullOrEmpty(Name))
+        {
+            return BadRequest("Name filter parameter is required.");
+        }
+
+        var filteredDocuments = _context.Documents
+            .Where(d => d.Name.Contains(Name))
+            .ToList();
+
+        return Ok(filteredDocuments);
+    }
+
+
+
 }

@@ -12,10 +12,7 @@
       <label for="description" class="label">Description:</label>
       <input type="text" class="form-control" id="description" v-model="newDocument.description" required>
     </div>
-    <div class="form-group">
-      <label for="ownerId" class="label">Owner Id:</label>
-      <input type="text" class="form-control" id="ownerId" v-model="newDocument.ownerId" required>
-    </div>
+    
     <div class="form-group">
       <label for="file" class="label">Upload File:</label>
       <input type="file" class="form-control-file" id="file" @change="handleFileUpload">
@@ -48,10 +45,11 @@ const addDocument = async () => {
   formData.append('name', newDocument.value.name);
   formData.append('contentType', newDocument.value.contentType);
   formData.append('description', newDocument.value.description);
-  formData.append('ownerId', newDocument.value.ownerId);
+
+  const ownerId = localStorage.getItem('userId');
+  formData.append('ownerId', ownerId);
 
   formData.append('file', newDocument.value.file);
-
   try {
     const response = await axios.post('https://localhost:7278/api/Document/upload', formData, {
       headers: {
@@ -71,6 +69,7 @@ const handleFileUpload = (event) => {
   newDocument.value.file = file;
 };
 </script>
+
 
 <style scoped>
 .add-new-document-container {
