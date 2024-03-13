@@ -21,7 +21,7 @@ const registerForm = ref({
 
 const registerUser = async () => {
   try {
-    const response = await axios.post('https://localhost:7278/api/Account/register', {
+    const response = await axios.post('http://localhost:7278/api/Account/register', {
       Username: registerForm.value.username,
       Email: registerForm.value.email,
       Password: registerForm.value.password
