@@ -11,14 +11,50 @@ Vue js :  Framework JavaScript Évolutif, accessible, performant et polyvalent. 
 * Frontend (Mobile) :
 Flutter : Framework multiplateforme pour la création d’applications mobiles.
 ##### Pour commencer
-Configuration du backend :
+## Installation et exécution de l'application Sdnd
 
-Ouvrez la solution Sdnd/Sdnd-api dans IDE préféré et executer : * dotnet restore 
-Configurez la chaîne de connexion à la base de données dans appsettings.json.
-Exécutez les migrations pour créer le schéma de la base de données: 
-    * dotnet ef database update.
-Démarrez l’API : * dotnet run.
-Configuration du frontend web:
-Ouvrez la solution sous Sdnd/Sdnd-ui
-    * npm install 
-    * npm run serve
+##### Prérequis
+
+Avant de commencer, assurez-vous d'avoir les éléments suivants installés sur votre machine :
+
+* .NET 8 SDK
+* Node.js
+* NPM
+
+##### Étapes
+
+1. **Ouvrez la solution Sdnd/Sdnd-api dans votre IDE préféré.**
+2. **Restaurez les packages NuGet:**
+
+```
+dotnet restore
+```
+
+3. **Configurez la chaîne de connexion à la base de données dans le fichier appsettings.json.**
+4. **Exécutez les migrations pour créer le schéma de la base de données:**
+
+```
+dotnet ef database update
+```
+
+5. **Démarrez l'API:**
+
+```
+dotnet run
+```
+
+6. **Configurez le frontend web:**
+
+    * Ouvrez la solution Sdnd/Sdnd-ui.
+    * Installez les packages NPM:
+
+```
+npm install
+```
+
+    * Démarrez le serveur web:
+
+```
+npm run serve
+```
+
