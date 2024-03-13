@@ -52,7 +52,7 @@ dotnet run
 npm install
 ```
 
-    * Démarrez le serveur web:
+8. **Démarrez le serveur web:**
 
 ```
 npm run serve
