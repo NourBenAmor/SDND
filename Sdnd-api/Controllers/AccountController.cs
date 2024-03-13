@@ -50,16 +50,13 @@ public class AccountController : ControllerBase
                 var roleResult = await _userManager.AddToRoleAsync(newUser, "USER");
                 if (roleResult.Succeeded)
                 {
-                    var sessionToken = Guid.NewGuid().ToString(); 
-
-                    newUser.SessionToken = sessionToken;
+                    
                     await _userManager.UpdateAsync(newUser); 
 
                     NewUserDto userResponse = new NewUserDto
                     {
                         Username = newUser.UserName,
                         Email = newUser.Email,
-                        Token = sessionToken
                     };
 
                     return Ok(userResponse);
