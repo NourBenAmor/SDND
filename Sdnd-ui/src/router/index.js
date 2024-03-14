@@ -41,12 +41,16 @@ const routes = [
     name: "Signup",
     component: Signup,
   },
-  { path: "/add-view", name: "add-view", component:AddDocument},
+  { path: "/add-view", name: "add-view", component: AddDocument },
   { path: "/edit-view", name: "edit-view", component: EditViewVue },
-  { path: "/document-view", name: "document-view", component: DocumentViewVue },
-  { path: "/permissions", name: "permissions", component:Permissions},
-  { path: "/shared-documents", name: "shared-documents", component:SharedDocuments},
-
+  {
+    path: "/documents/:id",component: DocumentViewVue,name: "document-view"},
+  { path: "/permissions", name: "permissions", component: Permissions },
+  {
+    path: "/shared-documents",
+    name: "shared-documents",
+    component: SharedDocuments,
+  },
 ];
 
 const router = createRouter({

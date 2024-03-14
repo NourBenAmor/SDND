@@ -32,13 +32,11 @@ public class DocumentController : ControllerBase
         {
             return NotFound("Document ID invalid");
         }
-
         var document = _context.Documents.FirstOrDefault(e => e.Id == id);
         if (document == null)
         {
             return NotFound($"Document with ID {id} not found.");
         }
-
         return Ok(document);
     }
 
@@ -49,20 +47,19 @@ public class DocumentController : ControllerBase
     {
         if (!ModelState.IsValid)            
             return BadRequest(ModelState);
-        var result = await UploadFile(model.File);
-        if (result == "file not selected" || result =="file Already Exists")
-            return BadRequest("File Not Uploaded");
         var newDocument = new Document
         {
             Name = model.Name,
             Description = model.Description,
-            FilePath = result,
             FileSize = (int)model.File.Length,    
             OwnerId = model.ownerId,
             ContentType = model.contentType,
             Status = 1,
         };
-
+        var result = await UploadFile(model.File,newDocument.Id);
+        if (result == "file not selected" || result =="file Already Exists")
+            return BadRequest("File Not Uploaded");
+        newDocument.FilePath = result; 
         _context.Documents.Add(newDocument);
         await _context.SaveChangesAsync();
 
@@ -70,7 +67,7 @@ public class DocumentController : ControllerBase
 
     }
 
-    private async Task<string> UploadFile(IFormFile file)
+    private async Task<string> UploadFile(IFormFile file,Guid DocumentId)
     {
         if (file == null && file.Length == 0)
         {
@@ -81,7 +78,7 @@ public class DocumentController : ControllerBase
         var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
         if (!Directory.Exists(pathToSave))
             Directory.CreateDirectory(pathToSave);
-        var fileName = file.FileName;
+        var fileName = DocumentId.ToString();
         var fullPath = Path.Combine(pathToSave, fileName);
         var dbPath = Path.Combine(folderName, fileName);
 
@@ -141,5 +138,13 @@ public class DocumentController : ControllerBase
     }
 
 
+
+    [HttpGet("pdf/{id}")]
+    public IActionResult Get(Guid id)
+    {
+        var stream = new FileStream($"Resource/AllFiles/{id.ToString()}", FileMode.Open);
+        return File(stream, "application/pdf");
+    }
+    
 
 }

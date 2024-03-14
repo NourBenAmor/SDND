@@ -101,6 +101,22 @@
   },
   {
     "ContainingType": "Sdnd_api.Controllers.DocumentController",
+    "Method": "Get",
+    "RelativePath": "api/Document/pdf/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sdnd_api.Controllers.DocumentController",
     "Method": "Upload",
     "RelativePath": "api/Document/upload",
     "HttpMethod": "POST",

@@ -40,6 +40,9 @@
                     </div>
                   </button>
                 </th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody v-if="paginatedAndFilteredDocuments.length > 0">
@@ -65,17 +68,18 @@
                 </td>
                 <td class="align-middle">
                   <div class="ms-auto text-end">
+                    <a class="btn btn-link text-green px-3 mb-0" @click="openDocumentView(document.id)"
+                      href="javascript:;">
+                      <i class="fas fa-eye text-green ms-2" aria-hidden="true"></i>{{ " " }}View
+                    </a>  
+                    <a class="btn btn-link text-dark px-3 mb-0" @click="openEditView(document)">
+                      <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit
+                    </a>
                     <a class="btn btn-link text-danger text-gradient px-3 mb-0" @click="showConfirmModal(index)"
                       href="javascript:;">
                       <i class="far fa-trash-alt me-2" aria-hidden="true"></i>Delete
                     </a>
-                    <a class="btn btn-link text-dark px-3 mb-0" @click="openEditView(document)">
-                      <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit
-                    </a>
-                    <a class="btn btn-link text-green px-3 mb-0" @click="openDocumentView(document)"
-                      href="javascript:;">
-                      <i class="fas fa-eye text-green ms-2" aria-hidden="true"></i>View
-                    </a>
+                  
                   </div>
                 </td>
               </tr>
@@ -90,6 +94,8 @@
       </div>
     </div>
 
+
+  
     <ConfirmationModalVue :show="showModal" message="Are you sure you want to delete this document?"
       @confirm="handleConfirm" @cancel="hideModal" />
   </div>
@@ -115,8 +121,11 @@
 <script setup>
 import ConfirmationModalVue from './ConfirmationModal.vue';
 import { useRouter } from 'vue-router';
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted} from 'vue'; 
+
 import axios from 'axios';
+
+
 
 const documents = ref([]);
 const filterText = ref('');
@@ -124,12 +133,11 @@ const showModal = ref(false);
 const documentIndexToDelete = ref(null);
 const currentPage = ref(1);
 const documentsPerPage = 3;
-const sortBy = ref('asc'); 
+const sortBy = ref('asc');
+const router = useRouter();
 
 const totalDocuments = computed(() => documents.value.length);
 const totalPages = computed(() => Math.ceil(totalDocuments.value / documentsPerPage));
-
-
 
 const changePage = (page) => {
   currentPage.value = page;
@@ -175,8 +183,6 @@ onMounted(() => {
   fetchDocuments();
 });
 
-const router = useRouter();
-
 const openEditView = (document) => {
   router.push({ name: 'edit-view', params: { documentData: document } });
 };
@@ -184,9 +190,8 @@ const openEditView = (document) => {
 const openAddDocumentView = () => {
   router.push({ name: 'add-view' });
 };
-
-const openDocumentView = (document) => {
-  router.push({ name: 'document-view', params: { documentData: document } });
+const openDocumentView = (documentId) => {
+  router.push({ name: 'document-view', params: { id: documentId } });
 };
 
 const showConfirmModal = (index) => {
@@ -225,6 +230,8 @@ const sortByDate = () => {
   documents.value = sortedDocuments;
 };
 </script>
+
+
 
 <style scoped>
 .sorting-icons {

@@ -1,80 +1,37 @@
 <template>
-  <div class="document-view-container">
-    <div class="pdf-container">
-      <pdf-annotate :file="documentUrl" v-if="documentUrl"></pdf-annotate>
-      <div v-else>Loading...</div>
-    </div>
-    <button class="share-btn" @click="shareDocument">
-      <i class="fas fa-share"></i>
-      <span class="share-text">Share Document</span>
-    </button>
-
-  </div>
+  <main>
+    <pdf
+      class="viewer"
+      :src="src"
+      :page="1"
+    >
+      <slot>
+        loading content here...
+      </slot>
+    </pdf>
+  </main>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+  import { ref } from 'vue';
+  import pdf from 'pdfvuer';
+  import { useRoute } from 'vue-router';
 
-const documentUrl = ref(null);
-
-const shareDocument = () => {
-  console.log('Document shared!');
-};
-
-
+  const route = useRoute();
+  const documentId = ref(route.params.id);
+  const src = ref(`https://localhost:7278/api/Document/pdf/${documentId.value}`);
+  console.log(route); // Log the route object to inspect its contents
 
 </script>
 
 <style scoped>
-.document-view-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  width: 80%;
-  height: 600px;
-  margin: auto;
-}
-
-.pdf-container {
-  flex: 1;
-  margin-bottom: 20px;
-}
-
-.share-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.share-btn:hover {
-  animation: pulse 0.5s infinite alternate;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
+  html, body {
+    margin: 0;
+    padding: 0;
   }
-  100% {
-    transform: scale(1.1);
+  .viewer {
+    height: 100vh;
+    margin: 20px auto;
+    width: 120dvh;
   }
-}
-
-.share-btn .fas {
-  font-size: 24px;
-  color: #007bff;
-  margin-right: 5px;
-}
-
-.share-text {
-  font-size: 16px;
-  color: #007bff;
-}
 </style>
-
