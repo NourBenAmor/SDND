@@ -6,10 +6,12 @@ using Microsoft.OpenApi.Models;
 using Sdnd_api.Data;
 using Sdnd_api.Interfaces;
 using Sdnd_api.Models;
+using Sdnd_api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
+    //options.UseSqlite((builder.Configuration.GetConnectionString("SqliteConnection")));
     options.UseSqlServer((builder.Configuration.GetConnectionString("DefaultConnection")));
 });
 
@@ -48,6 +50,7 @@ builder.Services.AddAuthentication(options =>
     });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>

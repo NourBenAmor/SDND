@@ -10,19 +10,23 @@ namespace Sdnd_api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+
 public class AccountController : ControllerBase
 {
     private readonly UserManager<User> _userManager;
 
     private readonly ITokenService _tokenService;
 
+    private readonly IUserAccessor _userAccessor;
+
     private readonly SignInManager<User> _signInManager;
 
-    public AccountController(UserManager<User> userManager,ITokenService tokenService, SignInManager<User> signInManager)
+    public AccountController(UserManager<User> userManager,IUserAccessor userAccessor,ITokenService tokenService, SignInManager<User> signInManager)
     {
         _userManager = userManager;
         _tokenService = tokenService;
         _signInManager = signInManager;
+        _userAccessor = userAccessor;
     }
 
     [HttpPost("register")]
@@ -95,10 +99,16 @@ public class AccountController : ControllerBase
             Email = user.Email,
             Token = _tokenService.CreateToken(user)
         });
+    }
 
+
+    [HttpGet("me")]
+    public async Task<IActionResult> GetcurrentUser()
+    {
+        var user = _userAccessor.GetCurrentUser();
+        return Ok(user);
     }
-  
-    }
+}
 
 
 

@@ -91,6 +91,8 @@ public class DocumentController : ControllerBase
 
         return dbPath;
     }
+    
+    
     [HttpDelete("Delete/{id}")]
     public async Task<IActionResult> DeleteDocument(Guid id)
     {
@@ -101,8 +103,6 @@ public class DocumentController : ControllerBase
             {
                 return NotFound($"Document with ID {id} not found.");
             }
-
-            
             string filePath = document.FilePath; 
 
             if (System.IO.File.Exists(filePath))
