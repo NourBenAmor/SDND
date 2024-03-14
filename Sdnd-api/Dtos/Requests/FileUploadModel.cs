@@ -9,5 +9,4 @@ public class FileUploadModel
     public IFormFile File { get; set; }
     public string contentType { get; set; }
     public string Description { get; set; }
-    public Guid ownerId{ get; set; }
 }
