@@ -4,6 +4,8 @@ using  Sdnd_api.Models;
 using Sdnd_api.Data;
 using Sdnd_api.Dtos.Requests;
 using System.Net.Mime;
+using Sdnd_api.Interfaces;
+using Sdnd_api.Services;
 
 
 namespace Sdnd_api.Controllers;
@@ -13,9 +15,12 @@ namespace Sdnd_api.Controllers;
 public class DocumentController : ControllerBase
 {
     private readonly AppDbContext _context;
-    public DocumentController(AppDbContext context)
+
+    private readonly IUserAccessor _userAccessor;
+    public DocumentController(AppDbContext context,IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
     [HttpGet]
@@ -24,6 +29,22 @@ public class DocumentController : ControllerBase
         var Documents =  _context.Documents.ToList();
         return Ok(Documents);
     }
+    
+    
+    
+    [HttpGet("me")]
+    public  IActionResult Get()
+    {   
+        var user = _userAccessor.GetCurrentUser();
+
+        if (user == null)
+            return BadRequest("Login first");
+        var userDocuments = _context.Documents
+            .Where(d => d.OwnerId == user.Id)
+            .ToList();
+        return Ok(userDocuments);
+    }
+    
     
     [HttpGet("{id}")]
     public ActionResult<Document> GetDocumentById(Guid id)
@@ -47,19 +68,25 @@ public class DocumentController : ControllerBase
     {
         if (!ModelState.IsValid)            
             return BadRequest(ModelState);
+        var user = _userAccessor.GetCurrentUser();
+        if (user == null)
+            return BadRequest("Login First");
         var newDocument = new Document
         {
             Name = model.Name,
             Description = model.Description,
             FileSize = (int)model.File.Length,    
-            OwnerId = model.ownerId,
             ContentType = model.contentType,
             Status = 1,
         };
         var result = await UploadFile(model.File,newDocument.Id);
         if (result == "file not selected" || result =="file Already Exists")
             return BadRequest("File Not Uploaded");
+        
+        
         newDocument.FilePath = result; 
+        //get the current user id and assign it to the document model
+        newDocument.OwnerId = user.Id;
         _context.Documents.Add(newDocument);
         await _context.SaveChangesAsync();
 
@@ -67,6 +94,8 @@ public class DocumentController : ControllerBase
 
     }
 
+    
+    
     private async Task<string> UploadFile(IFormFile file,Guid DocumentId)
     {
         if (file == null && file.Length == 0)
@@ -120,8 +149,9 @@ public class DocumentController : ControllerBase
             return StatusCode(500, $"An error occurred while deleting the document: {ex.Message}");
         }
     }
-
-
+        
+    
+    
     [HttpGet("filterByName")]
     public IActionResult FilterByName([FromQuery] string Name)
     {
@@ -138,7 +168,7 @@ public class DocumentController : ControllerBase
     }
 
 
-
+    // pdf sous forme de url
     [HttpGet("pdf/{id}")]
     public IActionResult Get(Guid id)
     {
