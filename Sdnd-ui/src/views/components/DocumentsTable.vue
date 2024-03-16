@@ -5,12 +5,14 @@
       <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0">Documents Table</h6>
         <div class="d-flex align-items-center">
-          <input type="text" v-model="filterText" class="form-control me-2" style="height: 38px;" placeholder="Enter Name">
-          <button class="btn btn-primary px-0 mb-0 d-flex align-items-center text-nowrap px-2 mx-2" @click="openAddDocumentView(document)" href="javascript:;">
+          <input type="text" v-model="filterText" class="form-control me-2" style="height: 38px;"
+            placeholder="Enter Name">
+          <button class="btn btn-primary px-0 mb-0 d-flex align-items-center text-nowrap px-2 mx-2"
+            @click="openAddDocumentView(document)" href="javascript:;">
             <i class="fas fa-add  me-2" aria-hidden="true"></i> Add New Document
           </button>
         </div>
-        
+
 
       </div>
 
@@ -26,7 +28,7 @@
                   Content Type
                 </th>
                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                  File Size
+                  Document State
                 </th>
                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                   Description
@@ -57,8 +59,12 @@
                 <td>
                   <p class="text-xs font-weight-bold mb-0">{{ document.contentType }}</p>
                 </td>
-                <td class="align-middle text-center">
-                  <span class="text-xs font-weight-bold mb-0">{{ document.fileSize }}</span>
+              
+              <td class="align-middle text-center text-sm">
+
+                  <p class="badge badge-sm bg-gradient-success">
+                    {{ getDocumentStateString(document.documentState) }}
+                  </p>
                 </td>
                 <td class="align-middle text-center">
                   <span class="text-xs font-weight-bold mb-0">{{ document.description }}</span>
@@ -71,15 +77,16 @@
                     <a class="btn btn-link text-green px-3 mb-0" @click="openDocumentView(document.id)"
                       href="javascript:;">
                       <i class="fas fa-eye text-green ms-2" aria-hidden="true"></i>{{ " " }}View
-                    </a>  
-                    <a class="btn btn-link text-dark px-3 mb-0" @click="openEditView(document)">
+                    </a>
+                    <a class="btn btn-link text-dark px-3 mb-0" @click="openEditView(document.id)">
                       <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit
                     </a>
+
                     <a class="btn btn-link text-danger text-gradient px-3 mb-0" @click="showConfirmModal(index)"
                       href="javascript:;">
                       <i class="far fa-trash-alt me-2" aria-hidden="true"></i>Delete
                     </a>
-                  
+
                   </div>
                 </td>
               </tr>
@@ -95,7 +102,7 @@
     </div>
 
 
-  
+
     <ConfirmationModalVue :show="showModal" message="Are you sure you want to delete this document?"
       @confirm="handleConfirm" @cancel="hideModal" />
   </div>
@@ -121,7 +128,7 @@
 <script setup>
 import ConfirmationModalVue from './ConfirmationModal.vue';
 import { useRouter } from 'vue-router';
-import { computed, ref, onMounted} from 'vue'; 
+import { computed, ref, onMounted } from 'vue';
 
 import axios from 'axios';
 
@@ -183,9 +190,11 @@ onMounted(() => {
   fetchDocuments();
 });
 
-const openEditView = (document) => {
-  router.push({ name: 'edit-view', params: { documentData: document } });
+const openEditView = (documentId) => {
+  router.push({ name: 'EditView', params: { id: documentId } });
 };
+
+
 
 const openAddDocumentView = () => {
   router.push({ name: 'add-view' });
@@ -198,7 +207,18 @@ const showConfirmModal = (index) => {
   showModal.value = true;
   documentIndexToDelete.value = index;
 };
-
+const getDocumentStateString = (documentState) => {
+  switch (documentState) {
+    case 0:
+      return 'Uploaded';
+    case 1:
+      return 'OCR Pending';
+    case 2:
+      return 'Signed';
+    default:
+      return 'Unknown';
+  }
+};
 const handleConfirm = async () => {
   try {
     const documentId = documents.value[documentIndexToDelete.value].id;
@@ -238,6 +258,4 @@ const sortByDate = () => {
   display: flex;
   flex-direction: column;
 }
-
-
 </style>

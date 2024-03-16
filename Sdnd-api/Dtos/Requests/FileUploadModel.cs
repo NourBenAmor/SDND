@@ -10,4 +10,5 @@ public class FileUploadModel
     public string contentType { get; set; }
     public string Description { get; set; }
     public Guid ownerId{ get; set; }
+
 }

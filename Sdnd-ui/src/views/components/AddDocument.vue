@@ -5,7 +5,7 @@
       <input type="text" class="form-control" id="name" v-model="newDocument.name" required>
     </div>
     <div class="form-group">
-      <label for="contentType" class="label">Type:</label>
+      <label for="contentType" class="label">Content Type:</label>
       <input type="text" class="form-control" id="contentType" v-model="newDocument.contentType" required>
     </div>
     <div class="form-group">
@@ -14,8 +14,8 @@
     </div>
     
     <div class="form-group">
-      <label for="file" class="label">Upload File:</label>
-      <input type="file" class="form-control-file" id="file" @change="handleFileUpload">
+      <label for="fileInput" class="label">Update File:</label>
+      <input type="file" class="form-control" id="file" @change="handleFileUpload">
     </div>
     <div class="button-container">
       <button class="btn btn-primary" @click="addDocument">Add Document</button>

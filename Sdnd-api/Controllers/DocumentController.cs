@@ -145,6 +145,69 @@ public class DocumentController : ControllerBase
         var stream = new FileStream($"Resource/AllFiles/{id.ToString()}", FileMode.Open);
         return File(stream, "application/pdf");
     }
-    
+
+    [HttpPut("Update/{id}")]
+    public async Task<IActionResult> UpdateDocument(Guid id, [FromForm] DocumentUpdateModelDto model)
+    {
+        var document = await _context.Documents.FindAsync(id);
+
+        if (document == null)
+        {
+            return NotFound($"Document with ID {id} not found.");
+        }
+
+        document.Name = model.Name;
+        document.Description = model.Description;
+        document.OwnerId = model.OwnerId;
+        document.ContentType = model.ContentType;
+        document.DocumentState = model.DocumentState;
+
+        if (HttpContext.Request.Form.Files.Count > 0) // Check if any files are uploaded
+        {
+            var uploadedFile = HttpContext.Request.Form.Files[0]; // Get the first uploaded file
+            if (uploadedFile.Length > 0) // Check if file has content
+            {
+                if (!string.IsNullOrEmpty(document.FilePath) && System.IO.File.Exists(document.FilePath))
+                {
+                    System.IO.File.Delete(document.FilePath);
+                }
+
+                document.FileSize = (int)uploadedFile.Length;
+                var result = await UploadFile(uploadedFile, id);
+                if (result == "file not selected" || result == "file Already Exists")
+                {
+                    return BadRequest("File Not Uploaded");
+                }
+                document.FilePath = result;
+            }
+        }
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!DocumentExists(id))
+            {
+                return NotFound($"Document with ID {id} not found.");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        return NoContent();
+    }
+
+
+
+    private bool DocumentExists(Guid id)
+    {
+        return _context.Documents.Any(e => e.Id == id);
+    }
+
+
 
 }

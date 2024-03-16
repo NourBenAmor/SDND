@@ -16,6 +16,8 @@ namespace Sdnd_api.Models
         public State DocumentState { get; set; } = State.Uploaded;
     }
 
+
+
     public enum State
     {
         Uploaded,
