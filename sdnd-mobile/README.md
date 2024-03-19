@@ -1,4 +1,4 @@
-# airsafe
+# InnoScan
 
 A new Flutter project.
 
