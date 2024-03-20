@@ -9,6 +9,7 @@ import AddDocument from "../views/components/AddDocument.vue";
 import Permissions from "../views/components/Permissions.vue";
 import SharedDocuments from "../views/components/SharedDocuments.vue";
 import DocumentEdit from "../views/components/DocumentEdit.vue";
+
 const routes = [
   {
     path: "/",
@@ -62,5 +63,17 @@ const router = createRouter({
   routes,
   linkActiveClass: "active",
 });
+router.beforeEach((to, from, next) => {
+  const publicPages = ["/signin", "/signup"];
+  const authRequired = !publicPages.includes(to.path);
+  const loggedIn = localStorage.getItem("user");
 
+  // trying to access a restricted page + not logged in
+  // redirect to login page
+  if (authRequired && !loggedIn) {
+    next("/signin");
+  } else {
+    next();
+  }
+});
 export default router;

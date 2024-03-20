@@ -4,12 +4,14 @@ using  Sdnd_api.Models;
 using Sdnd_api.Data;
 using Sdnd_api.Dtos.Requests;
 using System.Net.Mime;
+using Microsoft.AspNetCore.Authorization;
 using Sdnd_api.Interfaces;
 using Sdnd_api.Services;
 
 
 namespace Sdnd_api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class DocumentController : ControllerBase
@@ -24,13 +26,12 @@ public class DocumentController : ControllerBase
     }
 
     [HttpGet]
+
     public  IActionResult GetAll()
     {
         var Documents =  _context.Documents.ToList();
         return Ok(Documents);
     }
-    
-    
     
     [HttpGet("me")]
     public  IActionResult Get()
@@ -60,9 +61,8 @@ public class DocumentController : ControllerBase
         }
         return Ok(document);
     }
-
-
-
+    
+    
     [HttpPost("upload")]
     public async Task<IActionResult> Upload([FromForm] FileUploadModel model)
     {
@@ -169,6 +169,8 @@ public class DocumentController : ControllerBase
 
 
     // pdf sous forme de url
+    
+    [AllowAnonymous]
     [HttpGet("pdf/{id}")]
     public IActionResult Get(Guid id)
     {

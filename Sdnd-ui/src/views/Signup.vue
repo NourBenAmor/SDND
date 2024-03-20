@@ -1,8 +1,7 @@
 <script setup>
-import { onBeforeUnmount, onBeforeMount } from "vue";
+import { onBeforeUnmount, onBeforeMount ,onMounted,computed } from "vue";
 import { useStore } from "vuex";
 import { ref } from 'vue';
-import axios from 'axios';
 import { useRouter } from 'vue-router';
 import Navbar from "@/examples/PageLayout/Navbar.vue";
 import AppFooter from "@/examples/PageLayout/Footer.vue";
@@ -18,18 +17,62 @@ const registerForm = ref({
   email: '',
   password: ''
 });
+const successful = ref(false);
+const loading = ref(false);
+const message = ref("");
 
+const loggedIn = computed(() => {
+  return useStore().state.auth.status.loggedIn;
+});
+
+// const handleRegister = async (user) => {
+//   message.value = "";
+//   successful.value = false;
+//   loading.value = true;
+
+//   try {
+//     const response = await store.dispatch("auth/register", user);
+//     message.value = response.message;
+//     successful.value = true;
+//   } catch (error) {
+//     message.value =
+//       (error.response && error.response.data && error.response.data.message) ||
+//       error.message ||
+//       error.toString();
+//   } finally {
+//     loading.value = false;
+//   }
+// };
+
+onMounted(() => {
+  if (loggedIn.value) {
+    router.push("/profile");
+  }
+});
 const registerUser = async () => {
+  message.value = "";
+  successful.value = false;
+  loading.value = true;
   try {
-    const response = await axios.post('http://localhost:7278/api/Account/register', {
-      Username: registerForm.value.username,
-      Email: registerForm.value.email,
-      Password: registerForm.value.password
-    });
+    const newUser = { 
+      username: registerForm.value.username,
+      email: registerForm.value.email,
+      password: registerForm.value.password
+    }
+    console.log(newUser);
+    const response = await store.dispatch("auth/register", newUser);
+
     console.log('Registration successful:', response.data);
-    router.push('/dashboard-default');
+    message.value = response.message;
+    successful.value = true;
+    router.push('/signin');
   } catch (error) {
-    console.error('Registration failed:', error.response.data);
+    message.value =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -61,10 +104,7 @@ onBeforeUnmount(() => {
     </div>
   </div>
   <main class="main-content mt-0">
-    <div
-      class="page-header align-items-start min-vh-50 pt-5 pb-11 m-3 border-radius-lg"
-      
-    >
+    <div class="page-header align-items-start min-vh-50 pt-5 pb-11 m-3 border-radius-lg">
       <span class="mask bg-gradient-dark opacity-6"></span>
       <div class="container">
         <div class="row justify-content-center">
@@ -79,64 +119,47 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div class="container">
-        <div class="row mt-lg-n10 mt-md-n11 mt-n10 justify-content-center">
-          <div class="col-xl-4 col-lg-5 col-md-7 mx-auto">
-            <div class="card z-index-0">
-              <div class="card-header text-center pt-4">
-                <h5>Register with</h5>
-              </div>
-              <div class="row px-xl-5 px-sm-4 px-3">
-                <div class="col-12">
-                  <form @submit.prevent="handleSubmit">
-                    <ArgonInput
-                      id="name"
-                      type="text"
-                      placeholder="Name"
-                      aria-label="Name"
-                      v-model="registerForm.username"
-                    />
-                    <ArgonInput
-                      id="email"
-                      type="email"
-                      placeholder="Email"
-                      aria-label="Email"
-                      v-model="registerForm.email"
-                    />
-                    <ArgonInput
-                      id="password"
-                      type="password"
-                      placeholder="Password"
-                      aria-label="Password"
-                      v-model="registerForm.password"
-                    />
-                    <ArgonCheckbox checked>
-                      <label class="form-check-label" for="flexCheckDefault">
-                        I agree the
-                        <a href="javascript:;" class="text-dark font-weight-bolder"
-                          >Terms and Conditions</a
-                        >
-                      </label>
-                    </ArgonCheckbox>
-                    <div class="text-center">
-                      <ArgonButton
-                        fullWidth
-                        color="dark"
-                        variant="gradient"
-                        class="my-4 mb-2"
-                        type="submit"
-                      >
+      <div class="row mt-lg-n10 mt-md-n11 mt-n10 justify-content-center">
+        <div class="col-xl-4 col-lg-5 col-md-7 mx-auto">
+          <div class="card z-index-0">
+            <div class="card-header text-center pt-4">
+              <h5>Register with</h5>
+            </div>
+            <div class="row px-xl-5 px-sm-4 px-3">
+              <div class="col-12">
+                <form @submit.prevent="handleSubmit">
+                  <ArgonInput id="name" type="text" placeholder="Name" aria-label="Name"
+                    v-model="registerForm.username" />
+                  <ArgonInput id="email" type="email" placeholder="Email" aria-label="Email"
+                    v-model="registerForm.email" />
+                  <ArgonInput id="password" type="password" placeholder="Password" aria-label="Password"
+                    v-model="registerForm.password" />
+                  <ArgonCheckbox checked>
+                    <label class="form-check-label" for="flexCheckDefault">
+                      I agree the
+                      <a href="javascript:;" class="text-dark font-weight-bolder">Terms and Conditions</a>
+                    </label>
+                  </ArgonCheckbox>
+                  <div>{{ message }}</div>
+                  <div class="text-center">
+                    <ArgonButton fullWidth color="dark" variant="gradient" class="my-4 mb-2" type="submit">
+                      <span v-if="loading">
+                        <div class="spinner-border text-secondary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </span>
+                      <span v-else>
                         Sign up
-                      </ArgonButton>
-                    </div>
-                    <!-- Sign in link -->
-                    <p class="text-sm mt-3 mb-0">
-                      Already have an account?
-                      <a href="javascript:;" class="text-dark font-weight-bolder"
-                        >Sign in</a
-                      >
-                    </p>
-                  </form>
+                      </span>
+                    </ArgonButton>
                   </div>
+                  <!-- Sign in link -->
+                  <p class="text-sm mt-3 mb-0">
+                    Already have an account?
+                    <a href="javascript:;" class="text-dark font-weight-bolder">Sign in</a>
+                  </p>
+                </form>
+              </div>
             </div>
           </div>
         </div>
@@ -145,3 +168,4 @@ onBeforeUnmount(() => {
   </main>
   <app-footer />
 </template>
+../services/apiService

@@ -92,18 +92,20 @@ public class AccountController : ControllerBase
         if (user == null) return Unauthorized("Invalid Username");
         var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
         if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect");
+        var token = _tokenService.CreateToken(user);
         return Ok(new NewUserDto
         {
             Id = user.Id,
             Username = user.UserName,
             Email = user.Email,
-            Token = _tokenService.CreateToken(user)
+            Token = token
         });
     }
 
 
+
     [HttpGet("me")]
-    public async Task<IActionResult> GetcurrentUser()
+    public async Task<IActionResult> GetCurrentUser()
     {
         var user = _userAccessor.GetCurrentUser();
         return Ok(user);

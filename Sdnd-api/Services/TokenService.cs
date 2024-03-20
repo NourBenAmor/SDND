@@ -1,6 +1,7 @@
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Sdnd_api.Interfaces;
@@ -23,7 +24,7 @@ public class TokenService : ITokenService
     {
         // Implement logic to retrieve the signing key securely from configuration
         // (e.g., using a dedicated method in Startup.cs)
-        return _config["JWT:SigningKey"];
+        return _config["JWT:AccessTokenSecret"];
     }
 
     public string CreateToken(User user)
@@ -52,7 +53,6 @@ public class TokenService : ITokenService
                 Issuer = _config["JWT:Issuer"],
                 Audience = _config["JWT:Audience"]
             };
-            Console.WriteLine(tokenDescriptor.ToString());
             var tokenHandler = new JwtSecurityTokenHandler();
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -65,4 +65,18 @@ public class TokenService : ITokenService
             throw;
         }
     }
+
+    public string CreateRefreshToken()
+    {
+        var randomNumber = new byte[32];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
+    }
+
+
+    
 }
+
+
+

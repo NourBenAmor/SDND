@@ -12,7 +12,6 @@ const body = document.getElementsByTagName("body")[0];
 const store = useStore();
 function uploadImage(event) {
   const file = event.target.files[0];
-
   const formData = new FormData();
   formData.append("image", file);
 

@@ -37,7 +37,8 @@
     "vue-pdf": "^4.3.0",
     "vue-resize-sensor": "^2.0.0",
     "vue-router": "4.3.0",
-    "vuex": "4.1.0"
+    "vuex": "4.1.0",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "7.23.10",

@@ -11,8 +11,8 @@ using Sdnd_api.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    //options.UseSqlite((builder.Configuration.GetConnectionString("SqliteConnection")));
-    options.UseSqlServer((builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite((builder.Configuration.GetConnectionString("SqliteConnection")));
+    //options.UseSqlServer((builder.Configuration.GetConnectionString("DefaultConnection")));
 });
 
 
@@ -42,9 +42,10 @@ builder.Services.AddAuthentication(options =>
             ValidateIssuer = true,
             ValidIssuer = builder.Configuration["JWT:Issuer"],
             ValidateAudience = true,
+            ValidateLifetime = true,
             ValidAudience = builder.Configuration["JWT:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
+                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:AccessTokenSecret"])
             )
         };
     });
@@ -85,7 +86,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("VueCorsPolicy", builder =>
     {
         builder
-            .WithOrigins("http://localhost:8080") 
+            .AllowAnyOrigin() 
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
