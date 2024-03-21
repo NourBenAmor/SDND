@@ -10,6 +10,10 @@ import Permissions from "../views/components/Permissions.vue";
 import SharedDocuments from "../views/components/SharedDocuments.vue";
 import DocumentEdit from "../views/components/DocumentEdit.vue";
 
+
+
+import EditProfile from "../views/components/EditProfile.vue";
+
 const routes = [
   {
     path: "/",
@@ -41,6 +45,11 @@ const routes = [
     path: "/signup",
     name: "Signup",
     component: Signup,
+  },
+  {
+    path: '/edit-profile/:id',
+    name: 'EditProfile',
+    component: EditProfile
   },
   { path: "/add-view", name: "add-view", component: AddDocument },
   {

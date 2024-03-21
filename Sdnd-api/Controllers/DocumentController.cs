@@ -19,7 +19,7 @@ public class DocumentController : ControllerBase
     private readonly AppDbContext _context;
 
     private readonly IUserAccessor _userAccessor;
-    public DocumentController(AppDbContext context,IUserAccessor userAccessor)
+    public DocumentController(AppDbContext context, IUserAccessor userAccessor)
     {
         _context = context;
         _userAccessor = userAccessor;
@@ -27,15 +27,15 @@ public class DocumentController : ControllerBase
 
     [HttpGet]
 
-    public  IActionResult GetAll()
+    public IActionResult GetAll()
     {
-        var Documents =  _context.Documents.ToList();
+        var Documents = _context.Documents.ToList();
         return Ok(Documents);
     }
-    
+
     [HttpGet("me")]
-    public  IActionResult Get()
-    {   
+    public IActionResult Get()
+    {
         var user = _userAccessor.GetCurrentUser();
 
         if (user == null)
@@ -45,8 +45,8 @@ public class DocumentController : ControllerBase
             .ToList();
         return Ok(userDocuments);
     }
-    
-    
+
+
     [HttpGet("{id}")]
     public ActionResult<Document> GetDocumentById(Guid id)
     {
@@ -61,12 +61,12 @@ public class DocumentController : ControllerBase
         }
         return Ok(document);
     }
-    
-    
+
+
     [HttpPost("upload")]
     public async Task<IActionResult> Upload([FromForm] FileUploadModel model)
     {
-        if (!ModelState.IsValid)            
+        if (!ModelState.IsValid)
             return BadRequest(ModelState);
         var user = _userAccessor.GetCurrentUser();
         if (user == null)
@@ -75,17 +75,17 @@ public class DocumentController : ControllerBase
         {
             Name = model.Name,
             Description = model.Description,
-            FileSize = (int)model.File.Length,    
+            FileSize = (int)model.File.Length,
             ContentType = model.contentType,
             Status = 1,
         };
-        var result = await UploadFile(model.File,newDocument.Id);
-        if (result == "file not selected" || result =="file Already Exists")
+        var result = await UploadFile(model.File, newDocument.Id);
+        if (result == "file not selected" || result == "file Already Exists")
             return BadRequest("File Not Uploaded");
-        
-        
-        newDocument.FilePath = result; 
-        //get the current user id and assign it to the document model
+
+
+        newDocument.FilePath = result;
+
         newDocument.OwnerId = user.Id;
         _context.Documents.Add(newDocument);
         await _context.SaveChangesAsync();
@@ -94,9 +94,9 @@ public class DocumentController : ControllerBase
 
     }
 
-    
-    
-    private async Task<string> UploadFile(IFormFile file,Guid DocumentId)
+
+
+    private async Task<string> UploadFile(IFormFile file, Guid DocumentId)
     {
         if (file == null && file.Length == 0)
         {
@@ -120,8 +120,8 @@ public class DocumentController : ControllerBase
 
         return dbPath;
     }
-    
-    
+
+
     [HttpDelete("Delete/{id}")]
     public async Task<IActionResult> DeleteDocument(Guid id)
     {
@@ -132,7 +132,7 @@ public class DocumentController : ControllerBase
             {
                 return NotFound($"Document with ID {id} not found.");
             }
-            string filePath = document.FilePath; 
+            string filePath = document.FilePath;
 
             if (System.IO.File.Exists(filePath))
             {
@@ -149,9 +149,9 @@ public class DocumentController : ControllerBase
             return StatusCode(500, $"An error occurred while deleting the document: {ex.Message}");
         }
     }
-        
-    
-    
+
+
+
     [HttpGet("filterByName")]
     public IActionResult FilterByName([FromQuery] string Name)
     {
@@ -169,7 +169,7 @@ public class DocumentController : ControllerBase
 
 
     // pdf sous forme de url
-    
+
     [AllowAnonymous]
     [HttpGet("pdf/{id}")]
     public IActionResult Get(Guid id)
@@ -194,10 +194,10 @@ public class DocumentController : ControllerBase
         document.ContentType = model.ContentType;
         document.DocumentState = model.DocumentState;
 
-        if (HttpContext.Request.Form.Files.Count > 0) // Check if any files are uploaded
+        if (HttpContext.Request.Form.Files.Count > 0)
         {
-            var uploadedFile = HttpContext.Request.Form.Files[0]; // Get the first uploaded file
-            if (uploadedFile.Length > 0) // Check if file has content
+            var uploadedFile = HttpContext.Request.Form.Files[0];
+            if (uploadedFile.Length > 0)
             {
                 if (!string.IsNullOrEmpty(document.FilePath) && System.IO.File.Exists(document.FilePath))
                 {
@@ -240,6 +240,51 @@ public class DocumentController : ControllerBase
         return _context.Documents.Any(e => e.Id == id);
     }
 
+    [HttpGet("Download/{id}")]
+    public async Task<IActionResult> DownloadDocument(Guid id)
+    {
+        try
+        {
+            var document = await _context.Documents.FindAsync(id);
+            if (document == null)
+            {
+                return NotFound($"Document with ID {id} not found.");
+            }
 
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), document.FilePath);
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(filePath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+
+            // Determine the content type based on the file extension or document type
+            var contentType = GetContentType(filePath); // Implement GetContentType method
+            var fileName = document.Name + ".pdf"; // Set the filename with .pdf extension
+
+            // Set the content-disposition header with the filename
+            Response.Headers.Add("content-disposition", $"attachment; filename=\"{fileName}\"");
+
+            return File(memory, contentType, fileName);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while downloading the document: {ex.Message}");
+        }
+    }
+
+    private string GetContentType(string filePath)
+    {
+        // Example implementation, you may need to expand this for different file types
+        var extension = Path.GetExtension(filePath).ToLowerInvariant();
+        return extension switch
+        {
+            ".pdf" => "application/pdf",
+            ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            _ => "application/octet-stream",
+        };
+    }
 
 }

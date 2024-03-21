@@ -172,7 +172,6 @@ const paginatedAndFilteredDocuments = computed(() => {
 });
 
 const fetchDocuments = async () => {
-  ///fetch all the documents of all the users document/ , use document/me to fetch the loged in user docuemnts
   try {
     const response = await BaseApiService(`Document/me`).list();
     console.log(response.data);
@@ -224,7 +223,7 @@ const getDocumentStateString = (documentState) => {
 const handleConfirm = async () => {
   try {
     const documentId = documents.value[documentIndexToDelete.value].id;
-    const response = await BaseApiService(`Document/Delete/${documentId}`).remove();
+    const response = await BaseApiService(`Document/Delete`).remove(documentId);
     console.log(response);
     documents.value.splice(documentIndexToDelete.value, 1);
     showModal.value = false;
@@ -239,9 +238,9 @@ const hideModal = () => {
 
 const sortByDate = () => {
   if (sortBy.value === 'asc') {
-    sortBy.value = 'desc';  // Switch to descending order
+    sortBy.value = 'desc';  
   } else {
-    sortBy.value = 'asc';   // Switch to ascending order
+    sortBy.value = 'asc';   
   }
 
   const sortedDocuments = [...documents.value].sort((a, b) => {

@@ -11,8 +11,8 @@ using Sdnd_api.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlite((builder.Configuration.GetConnectionString("SqliteConnection")));
-    //options.UseSqlServer((builder.Configuration.GetConnectionString("DefaultConnection")));
+    //options.UseSqlite((builder.Configuration.GetConnectionString("SqliteConnection")));
+    options.UseSqlServer((builder.Configuration.GetConnectionString("DefaultConnection")));
 });
 
 

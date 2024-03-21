@@ -32,9 +32,9 @@
 </template>
 
 <script setup>
-import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { ref, onMounted } from 'vue';
+import BaseApiService from '../../services/apiService';
 
 const editedDocument = ref({
   name: '',
@@ -48,18 +48,18 @@ const error = ref(false);
 const file = ref(null);
 const route = useRoute();
 
-const userId = localStorage.getItem('userId');
-
 const fetchDocument = async () => {
   try {
     const documentId = route.params.id;
-    const response = await axios.get(`https://localhost:7278/api/Document/${documentId}`);
+    const response = await BaseApiService(`Document`).get(documentId);
     const document = response.data;
     editedDocument.value = { ...document };
   } catch (error) {
     console.error('Error fetching document:', error);
   }
 };
+
+
 
 const updateDocument = async () => {
   try {
@@ -69,13 +69,14 @@ const updateDocument = async () => {
     formData.append('contentType', editedDocument.value.contentType);
     formData.append('description', editedDocument.value.description);
     formData.append('documentState', editedDocument.value.documentState);
-    formData.append('ownerId', userId);
+    formData.append('ownerId', editedDocument.value.ownerId);
+
 
     if (file.value !== null) {
       formData.append('File', file.value);
     }
 
-    const response = await axios.put(`https://localhost:7278/api/Document/Update/${documentId}`, formData, {
+    const response = await BaseApiService(`Document/Update`).update(documentId, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -88,6 +89,7 @@ const updateDocument = async () => {
     error.value = true;
   }
 };
+
 
 const onFileChange = (event) => {
   file.value = event.target.files[0];
