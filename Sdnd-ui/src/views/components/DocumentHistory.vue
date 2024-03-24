@@ -1,10 +1,10 @@
 <template>
     <div>
-      <h2>Historique des Révisions pour {{ document.title }}</h2>
+      <h2>Historique des Annotations pour {{ document.title }}</h2>
       <ul>
-        <li v-for="revision in revisions" :key="revision.id">
-          <div>{{ revision.revisionDate }}</div>
-          <div>{{ revision.content }}</div>
+        <li v-for="annotation in annotations" :key="annotation.id">
+          <div>{{ annotation.annotationDate }}</div>
+          <div>{{ annotation.content }}</div>
         </li>
       </ul>
     </div>
@@ -15,16 +15,16 @@
     props: ['document'],
     data() {
       return {
-        revisions: []
+        annotations: []
       };
     },
     mounted() {
-      this.fetchRevisions();
+      this.fetchannotations();
     },
     methods: {
       async fetchRevisions() {
-        const response = await fetch(`/api/documents/${this.document.id}/revisions`);
-        this.revisions = await response.json();
+        const response = await fetch(`/api/documents/${this.document.id}/annotations`);
+        this.annotations = await response.json();
       }
     }
   };
