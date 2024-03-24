@@ -22,7 +22,7 @@
       this.fetchannotations();
     },
     methods: {
-      async fetchRevisions() {
+      async fetchannotations() {
         const response = await fetch(`/api/documents/${this.document.id}/annotations`);
         this.annotations = await response.json();
       }
