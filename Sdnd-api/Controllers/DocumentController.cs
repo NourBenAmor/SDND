@@ -287,4 +287,28 @@ public class DocumentController : ControllerBase
         };
     }
 
+
+    [HttpPost]
+public async Task<ActionResult<Annotation>> AddAnnotation(Annotation annotation)
+{
+    _context.Annotations.Add(annotation);
+    await _context.SaveChangesAsync();
+
+    return CreatedAtAction(nameof(GetAnnotationsForDocument), new { documentId = annotation.DocumentId }, annotation);
+}
+
+
+[HttpGet("{documentId}")]
+public async Task<ActionResult<IEnumerable<Annotation>>> GetAnnotationsForDocument(string documentId)
+{
+    var annotations = await _context.Annotations.Where(a => a.DocumentId == documentId).ToListAsync();
+
+    if (annotations == null)
+    {
+        return NotFound();
+    }
+
+    return annotations;
+}
+
 }
