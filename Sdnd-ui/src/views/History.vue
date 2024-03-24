@@ -5,7 +5,7 @@
         <li v-for="document in documents" :key="document.id">
           <div>{{ document.title }}</div>
           <div>{{ document.content }}</div>
-          <button @click="showRevisions(document)">Voir Révisions</button>
+          <button @click="showAnnotations(document)">Voir Annotations</button>
         </li>
       </ul>
       <div v-if="selectedDocument">
@@ -15,11 +15,11 @@
   </template>
   
   <script>
-  import DocumentRevisions from './DocumentRevisions.vue';
+  import DocumentAnnotations from './DocumentAnnotations.vue';
   
   export default {
     components: {
-      DocumentRevisions
+      DocumentAnnotations
     },
     data() {
       return {
@@ -35,7 +35,7 @@
         const response = await fetch('/api/documents');
         this.documents = await response.json();
       },
-      showRevisions(document) {
+      showAnnotations(document) {
         this.selectedDocument = document;
       }
     }
