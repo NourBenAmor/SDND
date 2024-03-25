@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sdnd_api.Data;
+using Sdnd_api.Dtos.Requests;
 using Sdnd_api.Dtos.Responses;
 using Sdnd_api.Interfaces;
 using Sdnd_api.Models;
@@ -54,15 +55,15 @@ public class ShareController : ControllerBase
 
 
     [HttpPost("Share")]
-    public async Task<IActionResult> ShareDocument(Guid documentId, string username)
+    public async Task<IActionResult> ShareDocument([FromBody] SharedDocRequestDto sharedDoc)
     {
-        var userToShareTo = await _userManager.FindByNameAsync(userName: username);
-        if (userToShareTo == null)
-            return NotFound("Invalid username");
+        var userToShareTo = await _userManager.FindByNameAsync(userName: sharedDoc.username);
         var currentUser =   _userAccessor.GetCurrentUser();
         if (currentUser == null)
             return BadRequest("Login First");
-        var document = await _context.Documents.FindAsync(documentId);
+        var document = await _context.Documents.FindAsync(sharedDoc.documentId);
+        if (userToShareTo == null || currentUser.Id == userToShareTo.Id )
+            return NotFound("Invalid username");
         if (document == null)
             return NotFound("Document not found.");
         if (document.OwnerId != currentUser.Id)
@@ -72,9 +73,18 @@ public class ShareController : ControllerBase
             DocumentId = document.Id,
             SharedWithUserId = userToShareTo.Id
         };
-        var result = await _context.SharedDocuments.AddAsync(sharedDocument);
-        await _context.SaveChangesAsync();
-        return Ok(result);
+        try
+        {
+            await _context.SharedDocuments.AddAsync(sharedDocument);
+            await _context.SaveChangesAsync();
+            return Ok("Success");
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.ToString());
+        }
+        
+        
     }
 
 
