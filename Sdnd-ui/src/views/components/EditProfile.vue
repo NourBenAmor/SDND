@@ -100,7 +100,7 @@ const updateUser = async () => {
       return;
     }
 
-    const response = await axios.put(`https://localhost:7278/api/Account/update/${userId}`, formData, {
+    const response = await axios.put(`http://localhost:7278/api/Account/update/${userId}`, formData, {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -124,7 +124,7 @@ const updateUser = async () => {
     const formData = new FormData();
     formData.append('imageFile', imageFile);
 
-    const response = await axios.post(`https://localhost:7278/api/Account/upload-profile-picture/${userId}`, formData, {
+    const response = await axios.post(`http://localhost:7278/api/Account/upload-profile-picture/${userId}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -141,7 +141,7 @@ const updateUser = async () => {
 const fetchProfilePicture = async () => {
   try {
     const userId = '519A15D0-7F6B-46FC-7CD0-08DC480F9244'; // Replace with the actual user ID
-    const response = await axios.get(`https://localhost:7278/api/Account/get-profile-picture/${userId}`);
+    const response = await axios.get(`http://localhost:7278/api/Account/get-profile-picture/${userId}`);
     console.log('Response data:', response.data);
     profileImageUrl.value = response.data;
   } catch (error) {

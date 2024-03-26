@@ -1,7 +1,7 @@
 import axios from "axios";
 import authHeader from "./auth-header";
 
-const base = "https://localhost:7278/api";
+const base = "http://localhost:7278/api";
 const axiosInstance = axios.create({
   baseURL: base,
 });

@@ -7,6 +7,9 @@
       <a class="btn btn-link text-primary px-3 mb-0">
         <i class="fas fa-share text-primary me-2" aria-hidden="true"></i>Share
       </a>
+      <a @click="openAnnotationSoftware" class="btn btn-link text-primary px-3 mb-0">
+        <i class="fas fa-pen text-primary me-2" aria-hidden="true"></i>Add Annotations
+      </a>
     </div>
     <pdf
       class="viewer"
@@ -27,13 +30,17 @@
 
   const route = useRoute();
   const documentId = ref(route.params.id);
-  const src = ref(`https://localhost:7278/api/Document/pdf/${documentId.value}`);
+  const src = ref(`http://localhost:7278/api/Document/pdf/${documentId.value}`);
   
   console.log(route); 
 
   const downloadDocument = async () => {
-  
+    
 }
+const openAnnotationSoftware = () => {
+    // Redirect to Markup Hero for annotations
+    window.location.href = 'https://markuphero.com/new';
+  }
 </script>
 
 <style scoped>

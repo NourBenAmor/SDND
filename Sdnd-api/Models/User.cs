@@ -7,5 +7,8 @@ namespace Sdnd_api.Models
     public class User : IdentityUser<Guid>
     {
         public string ProfilePictureUrl { get; set; } = string.Empty;
+       
+
     }
+   
 }

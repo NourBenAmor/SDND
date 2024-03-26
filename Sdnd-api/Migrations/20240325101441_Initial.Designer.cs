@@ -12,7 +12,7 @@ using Sdnd_api.Data;
 namespace Sdnd_api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240321141408_Initial")]
+    [Migration("20240325101441_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -353,6 +353,9 @@ namespace Sdnd_api.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("UserType")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
