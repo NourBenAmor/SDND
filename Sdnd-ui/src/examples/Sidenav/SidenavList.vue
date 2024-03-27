@@ -51,7 +51,14 @@ const getRoute = () => {
 
         </sidenav-item>
       </li>
-
+      <li class="nav-item">
+        <sidenav-item to="/users" :class="getRoute() === 'users' ? 'active' : ''"
+          :navText="isRTL ? 'حساب تعريفي' : 'User List'">
+          <template v-slot:icon>
+            <i class="ni ni-settings-gear-65 text-dark text-sm opacity-10"></i>
+          </template>
+        </sidenav-item>
+      </li>
       <li class="nav-item">
         <sidenav-item to="/profile" :class="getRoute() === 'profile' ? 'active' : ''"
           :navText="isRTL ? 'حساب تعريفي' : 'Profile'">

@@ -117,37 +117,7 @@ const updateUser = async () => {
   }
 };
 
-/*const uploadImage = async (event) => {
-  try {
-    const userId = route.params.id;
-    const imageFile = event.target.files[0];
-    const formData = new FormData();
-    formData.append('imageFile', imageFile);
 
-    const response = await axios.post(`http://localhost:7278/api/Account/upload-profile-picture/${userId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    console.log('Profile image uploaded:', response.data);
-    // Optionally, update the profile image URL after successful upload
-    fetchProfilePicture(userId);
-
-  } catch (error) {
-    console.error('Error uploading profile image:', error);
-  }
-};
-
-const fetchProfilePicture = async () => {
-  try {
-    const userId = '519A15D0-7F6B-46FC-7CD0-08DC480F9244'; // Replace with the actual user ID
-    const response = await axios.get(`http://localhost:7278/api/Account/get-profile-picture/${userId}`);
-    console.log('Response data:', response.data);
-    profileImageUrl.value = response.data;
-  } catch (error) {
-    console.error('Error fetching profile picture:', error);
-  }
-};*/
 
 onMounted(fetchUser);
 </script>

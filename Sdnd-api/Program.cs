@@ -104,10 +104,10 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+app.UseCors("VueCorsPolicy");
 
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseCors("VueCorsPolicy");
 
 app.Run();

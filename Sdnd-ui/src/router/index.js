@@ -9,6 +9,7 @@ import AddDocument from "../views/components/AddDocument.vue";
 import Permissions from "../views/components/Permissions.vue";
 import SharedDocuments from "../views/components/SharedDocuments.vue";
 import DocumentEdit from "../views/components/DocumentEdit.vue";
+import UserTable from "../views/components/UserTable.vue";
 
 
 
@@ -45,6 +46,11 @@ const routes = [
     path: "/signup",
     name: "Signup",
     component: Signup,
+  },
+  {
+    path: "/users",
+    name: "User",
+    component: UserTable,
   },
   {
     path: '/edit-profile/:id',
