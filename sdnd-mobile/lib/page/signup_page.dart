@@ -99,7 +99,7 @@ class _SignupPageState extends State<SignupPage> {
                             const Text('Already have an account ? ', style: TextStyle(fontSize: 13, color: Color(0xff939393), fontWeight: FontWeight.bold),),
                             GestureDetector(
                               onTap: () => {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()))
+                                //Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()))
                               },
                               child: const Text('Log-in', style: TextStyle(fontSize: 15, color: Color(0xff748288), fontWeight: FontWeight.bold),),
                             ),
@@ -125,16 +125,16 @@ class _SignupPageState extends State<SignupPage> {
       );
 
       final userData = {
-        'name': _nameController.text,
-        'email': _emailController.text,
-        'password': _passwordController.text,
+        'Username': _nameController.text,
+        'Email': _emailController.text,
+        'Password': _passwordController.text,
       };
 
       final jsonData = jsonEncode(userData);
 
       try {
         final response = await http.post(
-          Uri.parse('https://10.0.2.2:5261/api/Account/register'),
+          Uri.parse('http://10.0.2.2:7278/api/Account/register'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
@@ -145,7 +145,7 @@ class _SignupPageState extends State<SignupPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Registration successful!')),
           );
-          // Vous pouvez naviguer vers une autre page après une inscription réussie
+          // Navigate to another page after successful registration
           // Navigator.push(context, MaterialPageRoute(builder: (context) => NextPage()));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -160,4 +160,5 @@ class _SignupPageState extends State<SignupPage> {
       }
     }
   }
+
 }

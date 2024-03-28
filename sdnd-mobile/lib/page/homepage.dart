@@ -92,8 +92,7 @@ class HomePage extends StatelessWidget {
                           },
                           child: Text('I\'m Ready To Go'),
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.yellow[700],
-                            onPrimary: Colors.black,
+                            foregroundColor: Colors.black, backgroundColor: Colors.yellow[700],
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18.0),
                               side: BorderSide(color: Colors.black),
@@ -109,8 +108,7 @@ class HomePage extends StatelessWidget {
                           },
                           child: Text('Not Now'),
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.white, // Couleur du bouton "Not Now"
-                            onPrimary: Colors.black,
+                            foregroundColor: Colors.black, backgroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18.0),
                               side: BorderSide(color: Colors.white),

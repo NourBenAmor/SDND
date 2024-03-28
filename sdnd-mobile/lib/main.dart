@@ -1,7 +1,9 @@
 
 import 'package:airsafe/page/document_edit.dart';
 import 'package:airsafe/page/homepage.dart';
+import 'package:airsafe/page/login_page.dart';
 import 'package:airsafe/page/scan.dart';
+import 'package:airsafe/page/signup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:airsafe/page/synchronisation.dart';// Importer la nouvelle page WelcomePage
 
@@ -17,7 +19,7 @@ class AirSafeApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: ScanPage(),
+      home: LoginPage(),
     );
   }
 }
