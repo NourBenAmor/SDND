@@ -8,7 +8,7 @@ namespace Sdnd_api.Controllers;
 
 
 
-//[Authorize(Roles = "ADMIN")]
+//[Authorize(Roles = "Admin")]
 [Route("api/")]
 [ApiController]
 public class AdminController : ControllerBase

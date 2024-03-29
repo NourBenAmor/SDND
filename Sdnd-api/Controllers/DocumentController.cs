@@ -178,8 +178,8 @@ public class DocumentController : ControllerBase
         return File(stream, "application/pdf");
     }
 
-    [HttpPut("Update/{id}")]
-    public async Task<IActionResult> UpdateDocument(Guid id, [FromForm] DocumentUpdateModelDto model)
+    [HttpPut("UpdateData/{id}")]
+    public async Task<IActionResult> UpdateDocumentData(Guid id, [FromBody] DocumentUpdateModelDto model)
     {
         var document = await _context.Documents.FindAsync(id);
 
@@ -187,32 +187,13 @@ public class DocumentController : ControllerBase
         {
             return NotFound($"Document with ID {id} not found.");
         }
+       
 
         document.Name = model.Name;
         document.Description = model.Description;
         document.OwnerId = model.OwnerId;
         document.ContentType = model.ContentType;
         document.DocumentState = model.DocumentState;
-
-        if (HttpContext.Request.Form.Files.Count > 0)
-        {
-            var uploadedFile = HttpContext.Request.Form.Files[0];
-            if (uploadedFile.Length > 0)
-            {
-                if (!string.IsNullOrEmpty(document.FilePath) && System.IO.File.Exists(document.FilePath))
-                {
-                    System.IO.File.Delete(document.FilePath);
-                }
-
-                document.FileSize = (int)uploadedFile.Length;
-                var result = await UploadFile(uploadedFile, id);
-                if (result == "file not selected" || result == "file Already Exists")
-                {
-                    return BadRequest("File Not Uploaded");
-                }
-                document.FilePath = result;
-            }
-        }
 
         try
         {
@@ -234,13 +215,53 @@ public class DocumentController : ControllerBase
     }
 
 
+    [HttpPut("UpdateFile/{id}")]
+    public async Task<IActionResult> UpdateFile(Guid id, [FromForm] FileUpdate model)
+    {
+        var document = await _context.Documents.FindAsync(id);
+
+        if (document == null)
+        {
+            return NotFound($"Document with ID {id} not found.");
+        }
+
+        if (System.IO.File.Exists(document.FilePath))
+        {
+            System.IO.File.Delete(document.FilePath);
+        }
+
+        var result = await UploadFile(model.File, id);
+        if (result == "file not selected" || result == "file Already Exists")
+            return BadRequest("File Not Uploaded");
+
+        document.FilePath = result;
+        document.FileSize = (int)model.File.Length;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!DocumentExists(id))
+            {
+                return NotFound($"Document with ID {id} not found.");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        return NoContent();
+    }
 
     private bool DocumentExists(Guid id)
     {
         return _context.Documents.Any(e => e.Id == id);
     }
 
-    
+
 
 
 }
