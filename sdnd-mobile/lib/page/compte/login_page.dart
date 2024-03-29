@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:airsafe/page/commun/custom_input_field.dart';
-import 'package:airsafe/page/forget_password_page.dart';
-import 'package:airsafe/page/signup_page.dart';
+import 'package:airsafe/page/compte/forget_password_page.dart';
+import 'package:airsafe/page/compte/signup_page.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:airsafe/page/commun/page_heading.dart';
 import 'package:airsafe/page/commun/custom_form_button.dart';
