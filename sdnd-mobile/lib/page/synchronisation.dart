@@ -9,6 +9,7 @@ class SynchronizationPage extends StatelessWidget {
         title: Row(
           children: [
             Text("Back"),
+            SizedBox(width: 10), // Espacement entre les textes
             Text("Synchronization options"),
           ],
         ),
@@ -27,7 +28,7 @@ class SynchronizationPage extends StatelessWidget {
                     top: 0,
                     left: 0,
                     child: Image.asset(
-                      'assets/images/img_2.png',
+                      'images/img_2.png',
                       height: 51.0,
                       width: 47.0,
                       fit: BoxFit.cover,
@@ -37,7 +38,7 @@ class SynchronizationPage extends StatelessWidget {
                     bottom: 0,
                     left: 0,
                     child: Image.asset(
-                      'assets/images/img_14.png',
+                      'images/img_14.png',
                       height: 51.0,
                       width: 47.0,
                       fit: BoxFit.cover,
@@ -70,12 +71,12 @@ class SynchronizationPage extends StatelessWidget {
                           style: TextStyle(fontSize: 16.0),
                         ),
                         SizedBox(height: 10.0),
+                        // Ajout d'un espace supplémentaire entre "Auto sync" et le texte en dessous
                         Text(
-                          "Auto-sync",
+                          "Auto sync",
                           style: TextStyle(fontSize: 24.0),
                         ),
-                        SizedBox(height: 5.0),
-                        // Ajout d'un espace supplémentaire
+                        SizedBox(height:  20.0), // Espacement entre "Auto sync" et le texte en dessous
                       ],
                     ),
                   ),

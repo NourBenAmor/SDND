@@ -1,9 +1,8 @@
 
-import 'package:airsafe/page/document_edit.dart';
 import 'package:airsafe/page/homepage.dart';
-import 'package:airsafe/page/login_page.dart';
-import 'package:airsafe/page/scan.dart';
-import 'package:airsafe/page/signup_page.dart';
+
+
+import 'package:airsafe/page/tab_page.dart';
 import 'package:flutter/material.dart';
 import 'package:airsafe/page/synchronisation.dart';// Importer la nouvelle page WelcomePage
 
@@ -12,14 +11,14 @@ void main() {
 }
 
 class AirSafeApp extends StatelessWidget {
-   @override
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'airsafe',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginPage(),
+      home: homePage(),
     );
   }
 }

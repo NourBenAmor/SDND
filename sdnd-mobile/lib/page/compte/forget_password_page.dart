@@ -2,10 +2,10 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 
 import 'package:airsafe/page/commun/page_heading.dart';
-import 'package:airsafe/page/login_page.dart';
+import 'package:airsafe/page/compte/login_page.dart';
 import 'package:airsafe/page/commun/custom_input_field.dart';
 
-import 'commun/custom_form_button.dart';
+import '../commun/custom_form_button.dart';
 
 class ForgetPasswordPage extends StatefulWidget {
   const ForgetPasswordPage({Key? key}) : super(key: key);
