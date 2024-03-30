@@ -59,7 +59,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                           alignment: Alignment.center,
                           child: GestureDetector(
                             onTap: () => {
-                              //Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()))
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()))
                             },
                             child: const Text(
                               'Back to login',
