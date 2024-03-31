@@ -23,7 +23,7 @@
 
     <!-- Modal -->
     <div class="modal fade" id="exampleModalMessage" tabindex="-1" role="dialog"
-      aria-labelledby="exampleModalMessageTitle" aria-hidden="true">
+      aria-labelledby="exampleModalMessageTitle" aria-hidden="true" data-bs-backdrop="false">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -113,5 +113,8 @@
 .viewer {
   height: 80vh; 
   width: 80%; 
+}
+.modal-backdrop {
+  display: none;
 }
 </style>

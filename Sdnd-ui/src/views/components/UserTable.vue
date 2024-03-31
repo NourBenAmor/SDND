@@ -1,4 +1,5 @@
 <template>
+
   <div class="modal" :class="{ 'is-active': isModalActive }">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
@@ -88,17 +89,23 @@
       </div>
     </div>
   </div>
+
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import BaseApiService from '../../services/apiService';
 import axios from 'axios';
+import authHeader from '../../services/auth-header';
 
 const isModalActive = ref(false);
 const newRole = ref('');
 const selectedUserId = ref(null);
 const users = ref([]);
+
+const isLoggedIn = ref(false);
+const userRole = ref('');
+
 
 const openModal = (userId) => {
   console.log('Opening modal for user ID:', userId);
@@ -116,6 +123,8 @@ const fetchUsers = async () => {
   try {
     const response = await BaseApiService('users').list();
     users.value = response.data;
+    isLoggedIn.value = true;
+    userRole.value = response.data.role;
   } catch (error) {
     console.error('Error fetching users:', error);
   }
@@ -123,32 +132,33 @@ const fetchUsers = async () => {
 
 const updateRole = async () => {
   try {
-    const id = selectedUserId.value;
+    const userId = selectedUserId.value;
     const role = newRole.value;
 
-    const response = await axios.put(
-      `http://localhost:7278/api/addRole/${id}`,
-      `"${role}"`,
-      {
-        headers: {
-          'Content-Type': 'application/json-patch+json',
-          'Accept': '*/*'
-        }
-      }
-    );
+    if (!userId) {
+      console.error('User ID is not selected.');
+      return;
+    }
+
+    const response = await axios.put(`http://localhost:7278/api/addRole/${userId}`, `"${role}"`, {
+      headers: {
+        ...authHeader(), 
+        'Content-Type': 'application/json',
+      },
+    });
 
     if (response.status === 204) {
-      console.log('Role updated successfully!');
+      console.log('User role updated successfully!');
       closeModal();
       fetchUsers();
-
-    } else {
+  } else {
       console.error('Unexpected response:', response);
     }
   } catch (error) {
-    console.error('Error updating role:', error);
+    console.error('Error updating user role:', error);
   }
 };
+
 const removeRole = async (userId, role) => {
   try {
     const response = await axios.put(
@@ -156,6 +166,7 @@ const removeRole = async (userId, role) => {
       `"${role}"`,
       {
         headers: {
+          ...authHeader(), // Include authorization headers
           'Content-Type': 'application/json-patch+json',
           'Accept': '*/*'
         }
@@ -172,6 +183,7 @@ const removeRole = async (userId, role) => {
     console.error('Error removing role:', error);
   }
 };
+
 
 onMounted(() => {
   fetchUsers();

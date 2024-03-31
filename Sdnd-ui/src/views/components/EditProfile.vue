@@ -5,23 +5,7 @@
         <span class="mask bg-gradient opacity-6"></span>
       </div>
 
-      <div class="card shadow-lg mt-n6">
-        <div class="card-body p-3">
-          <div class="row gx-4">
-            <div class="col-auto">
-              <div class="avatar avatar-xl position-relative">
-                <img :src="profileImageUrl" alt="profile_image" class="shadow-sm w-100 border-radius-lg" />
-
-                <label for="profile-image-upload" class="position-absolute top-0 right-0 bottom-0 left-0 cursor-pointer">
-                  <i class="fas fa-pencil-alt text-white opacity-5"></i>
-                </label>
-                <input type="file" id="profile-image-upload" hidden @change="uploadImage" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  </div>
     <div class="py-4 container-fluid">
       <div class="row">
         <div class="col-md-8">
@@ -65,7 +49,6 @@ const editedUser = ref({
   username: '',
   email: ''
 });
-const profileImageUrl = ref('');
 
 
 const fetchUser = async () => {
