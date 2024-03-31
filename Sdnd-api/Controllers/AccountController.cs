@@ -99,7 +99,7 @@ public class AccountController : ControllerBase
         if (user == null) return Unauthorized("Invalid Username");
         var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
         if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect");
-        var token = _tokenService.CreateToken(user);
+        var token = await _tokenService.CreateToken(user);
         return Ok(new NewUserDto
         {
             Id = user.Id,

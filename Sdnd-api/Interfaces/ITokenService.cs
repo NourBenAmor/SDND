@@ -4,6 +4,6 @@ namespace Sdnd_api.Interfaces;
 
 public interface ITokenService
 {
-    string CreateToken(User user);
+    Task<string> CreateToken(User user);
     string CreateRefreshToken();
 }
