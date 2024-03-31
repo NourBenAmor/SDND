@@ -2,7 +2,7 @@ import 'package:airsafe/page/compte/login_page.dart';
 import 'package:airsafe/page/synchronisation.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
-import 'global.dart';
+
 import 'history_page.dart';
 
 import 'about.dart';

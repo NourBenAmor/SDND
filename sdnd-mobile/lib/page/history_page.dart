@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
+import 'package:share_plus/share_plus.dart';
 
 class PDFListPage extends StatefulWidget {
   @override
@@ -10,7 +11,6 @@ class PDFListPage extends StatefulWidget {
 
 class _PDFListPageState extends State<PDFListPage> {
   List<File> pdfFiles = [];
-  Map<String, Image?> thumbnails = {};
 
   @override
   void initState() {
@@ -24,10 +24,6 @@ class _PDFListPageState extends State<PDFListPage> {
       final files = directory!.listSync().whereType<File>().toList();
       setState(() {
         pdfFiles = files;
-        thumbnails.clear();
-        pdfFiles.forEach((file) {
-          thumbnails[file.path] = Image.file(file, width: 100, height: 100, fit: BoxFit.cover);
-        });
       });
     } catch (e) {
       print('Failed to load PDFs: $e');
@@ -39,7 +35,6 @@ class _PDFListPageState extends State<PDFListPage> {
       await pdfFiles[index].delete();
       setState(() {
         pdfFiles.removeAt(index);
-        thumbnails.removeWhere((key, value) => key == pdfFiles[index].path);
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -55,6 +50,19 @@ class _PDFListPageState extends State<PDFListPage> {
     }
   }
 
+  Future<void> sharePDF(int index) async {
+    try {
+      final file = pdfFiles[index];
+      await Share.shareFiles([file.path]);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to share PDF'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,19 +73,52 @@ class _PDFListPageState extends State<PDFListPage> {
         itemCount: pdfFiles.length,
         itemBuilder: (context, index) {
           final pdfFile = pdfFiles[index];
-          final thumbnail = thumbnails[pdfFile.path];
           return ListTile(
-            leading: thumbnail,
             title: Text(pdfFile.path.split('/').last),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () => deletePDF(index),
-            ),
             onTap: () {
-              // Navigate to a page where you can modify the PDF
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SavingPage(pdfFile: pdfFile),
+                ),
+              );
             },
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.share),
+                  onPressed: () => sharePDF(index),
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () => deletePDF(index),
+                ),
+              ],
+            ),
           );
         },
+      ),
+    );
+  }
+}
+
+class SavingPage extends StatelessWidget {
+  final File pdfFile;
+
+  const SavingPage({Key? key, required this.pdfFile}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('View PDF'),
+      ),
+      body: Center(
+        child: PDFView(
+          filePath: pdfFile.path,
+          onViewCreated: (PDFViewController controller) {},
+        ),
       ),
     );
   }
