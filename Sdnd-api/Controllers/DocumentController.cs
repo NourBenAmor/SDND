@@ -261,6 +261,21 @@ public class DocumentController : ControllerBase
         return _context.Documents.Any(e => e.Id == id);
     }
 
+ [HttpPost]
+ public async Task<IActionResult> DownloadFile()
+ {
+     var formCollection = await Request.ReadFormAsync();
+     var file = formCollection.Files.First();
+
+     var filePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", file.FileName));
+
+     using (var stream = new FileStream(filePath, FileMode.Create))
+     {
+         await file.CopyToAsync(stream);
+     }
+
+     return Ok();
+ }
 
 
 
