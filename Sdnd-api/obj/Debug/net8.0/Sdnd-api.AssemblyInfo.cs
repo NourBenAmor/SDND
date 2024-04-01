@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Sdnd-api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5dbbfd1edfce7ae772ef3c53a8e40b3787a579df")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+212b75583abcbeee5a0e5c237107ed5199cf04dc")]
 [assembly: System.Reflection.AssemblyProductAttribute("Sdnd-api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Sdnd-api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
