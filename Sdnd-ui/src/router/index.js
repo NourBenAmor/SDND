@@ -4,14 +4,12 @@ import Tables from "../views/Tables.vue";
 import Profile from "../views/Profile.vue";
 import Signup from "../views/Signup.vue";
 import Signin from "../views/Signin.vue";
-import DocumentViewVue from "../views/components/DocumentView.vue";
+import DocumentViewVue from "../views/components/DocumentViewer/DocumentView.vue";
 import AddDocument from "../views/components/AddDocument.vue";
 import Permissions from "../views/components/Permissions.vue";
 import SharedDocuments from "../views/components/SharedDocuments.vue";
 import DocumentEdit from "../views/components/DocumentEdit.vue";
 import UserTable from "../views/components/UserTable.vue";
-
-
 
 import EditProfile from "../views/components/EditProfile.vue";
 
@@ -53,9 +51,9 @@ const routes = [
     component: UserTable,
   },
   {
-    path: '/edit-profile/:id',
-    name: 'EditProfile',
-    component: EditProfile
+    path: "/edit-profile/:id",
+    name: "EditProfile",
+    component: EditProfile,
   },
   { path: "/add-view", name: "add-view", component: AddDocument },
   {

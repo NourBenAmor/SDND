@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NgrokAspNet;
 using Sdnd_api.Data;
 using Sdnd_api.Interfaces;
 using Sdnd_api.Models;
@@ -11,8 +12,8 @@ using Sdnd_api.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    //options.UseSqlite((builder.Configuration.GetConnectionString("SqliteConnection")));
-    options.UseSqlServer((builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite((builder.Configuration.GetConnectionString("SqliteConnection")));
+    //options.UseSqlServer((builder.Configuration.GetConnectionString("DefaultConnection")));
 });
 
 
@@ -26,6 +27,7 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
     })
     .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddHostedService<TunnelService>();
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme =
@@ -99,6 +101,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    
 }
 
 app.UseHttpsRedirection();

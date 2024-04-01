@@ -93,7 +93,7 @@ const getCurrentUser = async () => {
   try {
   
     const response = await BaseApiService(`Account/me`).list();
-
+    console.log(response.data);
     currentUser.value = response.data;
 
     console.log(currentUser.value);
