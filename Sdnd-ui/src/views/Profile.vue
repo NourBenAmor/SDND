@@ -91,13 +91,7 @@ const openEditUserView = (userId) => {
 
 const getCurrentUser = async () => {
   try {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      throw new Error("Token not found");
-    }
-
-    
+  
     const response = await BaseApiService(`Account/me`).list();
 
     currentUser.value = response.data;

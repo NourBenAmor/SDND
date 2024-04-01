@@ -39,7 +39,10 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRoute} from 'vue-router';
 import BaseApiService from '../../services/apiService';
+import { useRouter } from 'vue-router'; // Import useRouter from vue-router
+
 const route = useRoute();
+const router = useRouter(); 
 
 const saved = ref(false);
 const error = ref(false);
@@ -93,7 +96,8 @@ const updateUser = async () => {
     currentUser.value = response.data; 
     saved.value = true; 
 
-    
+    router.push('/profile');
+
   } catch (error) {
     console.error('Error updating user:', error);
     error.value = true; 
