@@ -276,6 +276,33 @@ public class DocumentController : ControllerBase
 
      return Ok();
  }
+ [HttpGet]
+[Route("api/documents")]
+public IActionResult GetDocuments()
+{
+    var files = Directory.GetFiles("path_to_your_upload_folder")
+                         .Select(Path.GetFileName)
+                         .ToList();
+    return Ok(files);
+}
+
+[HttpGet]
+[Route("api/download/{fileName}")]
+public IActionResult DownloadFile(string fileName)
+{
+    var filePath = Path.Combine("path_to_your_upload_folder", fileName);
+    if (!System.IO.File.Exists(filePath))
+        return NotFound("File not found");
+
+    var memory = new MemoryStream();
+    using (var stream = new FileStream(filePath, FileMode.Open))
+    {
+        stream.CopyTo(memory);
+    }
+    memory.Position = 0;
+
+    return File(memory, "application/pdf", fileName);
+}
 
 
 
