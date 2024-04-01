@@ -286,24 +286,56 @@ public IActionResult GetDocuments()
     return Ok(files);
 }
 
-[HttpGet]
-[Route("api/download/{fileName}")]
-public IActionResult DownloadFile(string fileName)
-{
-    var filePath = Path.Combine("path_to_your_upload_folder", fileName);
-    if (!System.IO.File.Exists(filePath))
-        return NotFound("File not found");
-
-    var memory = new MemoryStream();
-    using (var stream = new FileStream(filePath, FileMode.Open))
+    [HttpGet("Download/{id}")]
+    public async Task<IActionResult> DownloadDocument(Guid id)
     {
-        stream.CopyTo(memory);
+        try
+        {
+            var document = await _context.Documents.FindAsync(id);
+            if (document == null)
+            {
+                return NotFound($"Document with ID {id} not found.");
+            }
+
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), document.FilePath);
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(filePath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+
+            // Determine the content type based on the file extension or document type
+            var contentType = GetContentType(filePath); // Implement GetContentType method
+            var fileName = document.Name + ".pdf"; // Set the filename with .pdf extension
+
+            // Set the content-disposition header with the filename
+            Response.Headers.Add("content-disposition", $"attachment; filename=\"{fileName}\"");
+
+            return File(memory, contentType, fileName);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while downloading the document: {ex.Message}");
+        }
     }
-    memory.Position = 0;
 
-    return File(memory, "application/pdf", fileName);
-}
+    private string GetContentType(string filePath)
+    {
+        // Example implementation, you may need to expand this for different file types
+        var extension = Path.GetExtension(filePath).ToLowerInvariant();
+        return extension switch
+        {
+            ".pdf" => "application/pdf",
+            ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            _ => "application/octet-stream",
+        };
+    }
 
 
+
+
+    
 
 }
