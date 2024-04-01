@@ -11,3 +11,29 @@ import AuthorsTable from "./components/DocumentsTable.vue";
     
   </div>
 </template>./components/DocumentsTable.vue
+
+import axios from 'axios';
+  
+  export default {
+    data() {
+      return {
+        documents: []
+      };
+    },
+    mounted() {
+      this.fetchDocuments();
+    },
+    methods: {
+      async fetchDocuments() {
+        try {
+          
+          const response = await axios.get('');
+          
+          this.documents = response.data;
+        } catch (error) {
+          
+          console.error('Erreur lors de la récupération des documents:', error);
+        }
+      }
+    }
+  };
