@@ -12,8 +12,8 @@ using Sdnd_api.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlite((builder.Configuration.GetConnectionString("SqliteConnection")));
-    //options.UseSqlServer((builder.Configuration.GetConnectionString("DefaultConnection")));
+    //options.UseSqlite((builder.Configuration.GetConnectionString("SqliteConnection")));
+    options.UseSqlServer((builder.Configuration.GetConnectionString("DefaultConnection")));
 });
 
 
@@ -27,7 +27,8 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
     })
     .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddControllers().AddNewtonsoftJson();
-builder.Services.AddHostedService<TunnelService>();
+// uncomment the next line to enable NGROK 
+//builder.Services.AddHostedService<TunnelService>();
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme =
