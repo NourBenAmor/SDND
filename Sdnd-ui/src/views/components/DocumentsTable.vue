@@ -72,7 +72,7 @@
                 <td class="align-middle text-center">
                   <span class="text-secondary text-xs font-weight-bold">{{ formatDate(document.addedDate) }}</span>
                 </td>
-                <td class="align-middle">
+                <td class="align-middle d-flex">
                   <div class="ms-auto text-end">
                     <a class="btn btn-link text-green px-3 mb-0" @click="openDocumentView(document.id)"
                       href="javascript:;">
@@ -126,11 +126,10 @@
 </template>
 
 <script setup>
-import ConfirmationModalVue from './ConfirmationModal.vue';
 import { useRouter } from 'vue-router';
 import { computed, ref, onMounted } from 'vue';
-
-import axios from 'axios';
+import BaseApiService from '../../services/apiService';
+import ConfirmationModalVue from './ConfirmationModal.vue';
 
 
 
@@ -174,8 +173,9 @@ const paginatedAndFilteredDocuments = computed(() => {
 
 const fetchDocuments = async () => {
   try {
-    const response = await axios.get('https://localhost:7278/api/Document');
-    documents.value = response.data;
+    const response = await BaseApiService(`Document/me`).list();
+    console.log(response.data);
+    documents.value = response.data
   } catch (error) {
     console.error('Error fetching documents:', error);
   }
@@ -203,6 +203,7 @@ const openDocumentView = (documentId) => {
   router.push({ name: 'document-view', params: { id: documentId } });
 };
 
+
 const showConfirmModal = (index) => {
   showModal.value = true;
   documentIndexToDelete.value = index;
@@ -222,7 +223,8 @@ const getDocumentStateString = (documentState) => {
 const handleConfirm = async () => {
   try {
     const documentId = documents.value[documentIndexToDelete.value].id;
-    await axios.delete(`https://localhost:7278/api/Document/Delete/${documentId}`);
+    const response = await BaseApiService(`Document/Delete`).remove(documentId);
+    console.log(response);
     documents.value.splice(documentIndexToDelete.value, 1);
     showModal.value = false;
   } catch (error) {
@@ -236,9 +238,9 @@ const hideModal = () => {
 
 const sortByDate = () => {
   if (sortBy.value === 'asc') {
-    sortBy.value = 'desc'; // Switch to descending order
+    sortBy.value = 'desc';  
   } else {
-    sortBy.value = 'asc'; // Switch to ascending order
+    sortBy.value = 'asc';   
   }
 
   const sortedDocuments = [...documents.value].sort((a, b) => {
@@ -259,3 +261,4 @@ const sortByDate = () => {
   flex-direction: column;
 }
 </style>
+../../services/apiService

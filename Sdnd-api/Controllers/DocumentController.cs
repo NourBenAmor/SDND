@@ -4,12 +4,14 @@ using  Sdnd_api.Models;
 using Sdnd_api.Data;
 using Sdnd_api.Dtos.Requests;
 using System.Net.Mime;
+using Microsoft.AspNetCore.Authorization;
 using Sdnd_api.Interfaces;
 using Sdnd_api.Services;
 
 
 namespace Sdnd_api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class DocumentController : ControllerBase
@@ -17,24 +19,23 @@ public class DocumentController : ControllerBase
     private readonly AppDbContext _context;
 
     private readonly IUserAccessor _userAccessor;
-    public DocumentController(AppDbContext context,IUserAccessor userAccessor)
+    public DocumentController(AppDbContext context, IUserAccessor userAccessor)
     {
         _context = context;
         _userAccessor = userAccessor;
     }
 
     [HttpGet]
-    public  IActionResult GetAll()
+
+    public IActionResult GetAll()
     {
-        var Documents =  _context.Documents.ToList();
+        var Documents = _context.Documents.ToList();
         return Ok(Documents);
     }
-    
-    
-    
+
     [HttpGet("me")]
-    public  IActionResult Get()
-    {   
+    public IActionResult Get()
+    {
         var user = _userAccessor.GetCurrentUser();
 
         if (user == null)
@@ -44,8 +45,8 @@ public class DocumentController : ControllerBase
             .ToList();
         return Ok(userDocuments);
     }
-    
-    
+
+
     [HttpGet("{id}")]
     public ActionResult<Document> GetDocumentById(Guid id)
     {
@@ -62,11 +63,10 @@ public class DocumentController : ControllerBase
     }
 
 
-
     [HttpPost("upload")]
     public async Task<IActionResult> Upload([FromForm] FileUploadModel model)
     {
-        if (!ModelState.IsValid)            
+        if (!ModelState.IsValid)
             return BadRequest(ModelState);
         var user = _userAccessor.GetCurrentUser();
         if (user == null)
@@ -75,17 +75,17 @@ public class DocumentController : ControllerBase
         {
             Name = model.Name,
             Description = model.Description,
-            FileSize = (int)model.File.Length,    
+            FileSize = (int)model.File.Length,
             ContentType = model.contentType,
             Status = 1,
         };
-        var result = await UploadFile(model.File,newDocument.Id);
-        if (result == "file not selected" || result =="file Already Exists")
+        var result = await UploadFile(model.File, newDocument.Id);
+        if (result == "file not selected" || result == "file Already Exists")
             return BadRequest("File Not Uploaded");
-        
-        
-        newDocument.FilePath = result; 
-        //get the current user id and assign it to the document model
+
+
+        newDocument.FilePath = result;
+
         newDocument.OwnerId = user.Id;
         _context.Documents.Add(newDocument);
         await _context.SaveChangesAsync();
@@ -94,9 +94,9 @@ public class DocumentController : ControllerBase
 
     }
 
-    
-    
-    private async Task<string> UploadFile(IFormFile file,Guid DocumentId)
+
+
+    private async Task<string> UploadFile(IFormFile file, Guid DocumentId)
     {
         if (file == null && file.Length == 0)
         {
@@ -120,8 +120,8 @@ public class DocumentController : ControllerBase
 
         return dbPath;
     }
-    
-    
+
+
     [HttpDelete("Delete/{id}")]
     public async Task<IActionResult> DeleteDocument(Guid id)
     {
@@ -132,7 +132,7 @@ public class DocumentController : ControllerBase
             {
                 return NotFound($"Document with ID {id} not found.");
             }
-            string filePath = document.FilePath; 
+            string filePath = document.FilePath;
 
             if (System.IO.File.Exists(filePath))
             {
@@ -149,9 +149,9 @@ public class DocumentController : ControllerBase
             return StatusCode(500, $"An error occurred while deleting the document: {ex.Message}");
         }
     }
-        
-    
-    
+
+
+
     [HttpGet("filterByName")]
     public IActionResult FilterByName([FromQuery] string Name)
     {
@@ -169,6 +169,8 @@ public class DocumentController : ControllerBase
 
 
     // pdf sous forme de url
+
+    [AllowAnonymous]
     [HttpGet("pdf/{id}")]
     public IActionResult Get(Guid id)
     {
@@ -176,8 +178,8 @@ public class DocumentController : ControllerBase
         return File(stream, "application/pdf");
     }
 
-    [HttpPut("Update/{id}")]
-    public async Task<IActionResult> UpdateDocument(Guid id, [FromForm] DocumentUpdateModelDto model)
+    [HttpPut("UpdateData/{id}")]
+    public async Task<IActionResult> UpdateDocumentData(Guid id, [FromBody] DocumentUpdateModelDto model)
     {
         var document = await _context.Documents.FindAsync(id);
 
@@ -185,32 +187,13 @@ public class DocumentController : ControllerBase
         {
             return NotFound($"Document with ID {id} not found.");
         }
+       
 
         document.Name = model.Name;
         document.Description = model.Description;
         document.OwnerId = model.OwnerId;
         document.ContentType = model.ContentType;
         document.DocumentState = model.DocumentState;
-
-        if (HttpContext.Request.Form.Files.Count > 0) // Check if any files are uploaded
-        {
-            var uploadedFile = HttpContext.Request.Form.Files[0]; // Get the first uploaded file
-            if (uploadedFile.Length > 0) // Check if file has content
-            {
-                if (!string.IsNullOrEmpty(document.FilePath) && System.IO.File.Exists(document.FilePath))
-                {
-                    System.IO.File.Delete(document.FilePath);
-                }
-
-                document.FileSize = (int)uploadedFile.Length;
-                var result = await UploadFile(uploadedFile, id);
-                if (result == "file not selected" || result == "file Already Exists")
-                {
-                    return BadRequest("File Not Uploaded");
-                }
-                document.FilePath = result;
-            }
-        }
 
         try
         {
@@ -232,11 +215,52 @@ public class DocumentController : ControllerBase
     }
 
 
+    [HttpPut("UpdateFile/{id}")]
+    public async Task<IActionResult> UpdateFile(Guid id, [FromForm] FileUpdate model)
+    {
+        var document = await _context.Documents.FindAsync(id);
+
+        if (document == null)
+        {
+            return NotFound($"Document with ID {id} not found.");
+        }
+
+        if (System.IO.File.Exists(document.FilePath))
+        {
+            System.IO.File.Delete(document.FilePath);
+        }
+
+        var result = await UploadFile(model.File, id);
+        if (result == "file not selected" || result == "file Already Exists")
+            return BadRequest("File Not Uploaded");
+
+        document.FilePath = result;
+        document.FileSize = (int)model.File.Length;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!DocumentExists(id))
+            {
+                return NotFound($"Document with ID {id} not found.");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        return NoContent();
+    }
 
     private bool DocumentExists(Guid id)
     {
         return _context.Documents.Any(e => e.Id == id);
     }
+
 
 
 

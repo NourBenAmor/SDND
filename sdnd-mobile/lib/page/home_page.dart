@@ -1,13 +1,14 @@
 import 'dart:io';
-import 'dart:ui';
-import 'dart:ui';
-import 'package:flutter/material.dart';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart' show ByteData, kIsWeb;
-import '../utils.dart';
+
 import 'camera_page.dart';
+import 'editing_page.dart';
+
+
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -20,24 +21,26 @@ class HomePage extends StatelessWidget {
 
     final fileBytes = await photo.readAsBytes();
 
-
+    // Naviguer vers la page d'édition avec l'image sélectionnée
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditingPage(imageFile: File(photo.path)),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-
-      ),
+      appBar: AppBar(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(top: 32),
-
             ),
-
             SizedBox(height: 44),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -119,6 +122,26 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void showAlert(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

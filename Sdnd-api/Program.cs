@@ -42,9 +42,10 @@ builder.Services.AddAuthentication(options =>
             ValidateIssuer = true,
             ValidIssuer = builder.Configuration["JWT:Issuer"],
             ValidateAudience = true,
+            ValidateLifetime = true,
             ValidAudience = builder.Configuration["JWT:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
+                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:AccessTokenSecret"])
             )
         };
     });
@@ -85,7 +86,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("VueCorsPolicy", builder =>
     {
         builder
-            .WithOrigins("http://localhost:8080") 
+            .AllowAnyOrigin() 
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -103,10 +104,10 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+app.UseCors("VueCorsPolicy");
 
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseCors("VueCorsPolicy");
 
 app.Run();

@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:esys_flutter_share_plus/esys_flutter_share_plus.dart' as esysShare;
 
 class PDFListPage extends StatefulWidget {
   @override
@@ -50,17 +50,20 @@ class _PDFListPageState extends State<PDFListPage> {
     }
   }
 
-  Future<void> sharePDF(int index) async {
-    try {
-      final file = pdfFiles[index];
-      await Share.shareFiles([file.path]);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to share PDF'),
+  void sharePDF(String path, String filename) {
+    esysShare.Share.file(
+        'Sharing PDF', filename, File(path).readAsBytesSync(), 'application/pdf');
+  }
+
+  void openPDF(File pdfFile) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PDFView(
+          filePath: pdfFile.path,
         ),
-      );
-    }
+      ),
+    );
   }
 
   @override
@@ -74,21 +77,15 @@ class _PDFListPageState extends State<PDFListPage> {
         itemBuilder: (context, index) {
           final pdfFile = pdfFiles[index];
           return ListTile(
+            leading: Icon(Icons.picture_as_pdf),
             title: Text(pdfFile.path.split('/').last),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SavingPage(pdfFile: pdfFile),
-                ),
-              );
-            },
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
                   icon: Icon(Icons.share),
-                  onPressed: () => sharePDF(index),
+                  onPressed: () =>
+                      sharePDF(pdfFile.path, pdfFile.path.split('/').last),
                 ),
                 IconButton(
                   icon: Icon(Icons.delete),
@@ -96,29 +93,11 @@ class _PDFListPageState extends State<PDFListPage> {
                 ),
               ],
             ),
+            onTap: () {
+              openPDF(pdfFile);
+            },
           );
         },
-      ),
-    );
-  }
-}
-
-class SavingPage extends StatelessWidget {
-  final File pdfFile;
-
-  const SavingPage({Key? key, required this.pdfFile}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('View PDF'),
-      ),
-      body: Center(
-        child: PDFView(
-          filePath: pdfFile.path,
-          onViewCreated: (PDFViewController controller) {},
-        ),
       ),
     );
   }

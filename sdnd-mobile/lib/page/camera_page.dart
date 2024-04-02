@@ -43,40 +43,27 @@ class _CameraPageState extends State<CameraPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Camera Page'),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Positionner le bouton dans le coin inférieur droit
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.yellow[700],
+        onPressed: () async {
+          final capturedImage = await _capturePhoto();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EditingPage(imageFile: capturedImage),
+            ),
+          );
+        },
+        child: Icon(Icons.camera_alt),
       ),
       body: FutureBuilder<void>(
         future: _cameraFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return Stack(
-              children: [
-                Center(
-                  child: CameraPreview(_cameraController),
-                ),
-                Positioned(
-                  bottom: 50,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: FloatingActionButton(
-                      backgroundColor: Colors.yellow[700],
-                      onPressed: () async {
-                        final capturedImage = await _capturePhoto();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                EditingPage(imageFile: capturedImage),
-                          ),
-                        );
-                      },
-                      child: Icon(Icons.camera_alt),
-                    ),
-                  ),
-                ),
-              ],
+            return Center(
+              child: CameraPreview(_cameraController),
             );
           } else {
             return Center(
@@ -87,6 +74,7 @@ class _CameraPageState extends State<CameraPage> {
       ),
     );
   }
+
 
   Future<File> _capturePhoto() async {
     if (_cameraController == null ||

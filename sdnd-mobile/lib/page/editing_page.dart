@@ -24,7 +24,8 @@ class EditingPage extends StatelessWidget {
     );
 
     // Save the PDF file on the device
-    final output = await File(imageFile.path.replaceAll('.jpg', '.pdf')).writeAsBytes(await pdf.save());
+    final output = await File(imageFile.path.replaceAll('.jpg', '.pdf'))
+        .writeAsBytes(await pdf.save());
 
     // Navigate to the SavingPage after generating the PDF
     Navigator.push(
@@ -52,24 +53,25 @@ class EditingPage extends StatelessWidget {
             bottom: 20, // Adjust bottom position as needed
             child: Container(
               alignment: Alignment.center,
-              child: ElevatedButton(
+              child: ElevatedButton.icon(
                 onPressed: () {
                   // Call the function to generate the PDF when the user presses the import button
                   generatePdf(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.yellow[700], // Set button background color to yellow
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0), // Increase padding to make the button larger
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.file_upload), // Import icon
-                      SizedBox(width: 8), // Add spacing between icon and text
-                      Text('Import PDF'),
-                    ],
+                  backgroundColor: Colors.yellow[700],
+                  // Set button background color to yellow
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  // Increase padding
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        8), // Round the button corners
                   ),
+                ),
+                icon: Icon(Icons.file_upload, size: 28), // Larger icon size
+                label: Text(
+                  'Import PDF',
+                  style: TextStyle(fontSize: 18), // Increase text size
                 ),
               ),
             ),

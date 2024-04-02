@@ -1,5 +1,4 @@
 C:\Users\utilisateur\Desktop\hhh\Sdnd-api\bin\Debug\net8.0\appsettings.Development.json
-C:\Users\utilisateur\Desktop\hhh\Sdnd-api\bin\Debug\net8.0\appsettings.json
 C:\Users\utilisateur\Desktop\hhh\Sdnd-api\bin\Debug\net8.0\Sdnd-api.exe
 C:\Users\utilisateur\Desktop\hhh\Sdnd-api\bin\Debug\net8.0\Sdnd-api.deps.json
 C:\Users\utilisateur\Desktop\hhh\Sdnd-api\bin\Debug\net8.0\Sdnd-api.runtimeconfig.json
@@ -141,6 +140,7 @@ C:\Users\utilisateur\Desktop\hhh\Sdnd-api\obj\Debug\net8.0\refint\Sdnd-api.dll
 C:\Users\utilisateur\Desktop\hhh\Sdnd-api\obj\Debug\net8.0\Sdnd-api.pdb
 C:\Users\utilisateur\Desktop\hhh\Sdnd-api\obj\Debug\net8.0\Sdnd-api.genruntimeconfig.cache
 C:\Users\utilisateur\Desktop\hhh\Sdnd-api\obj\Debug\net8.0\ref\Sdnd-api.dll
+<<<<<<< HEAD
 C:\Users\user\Desktop\stage\Sdnd-api\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\user\Desktop\stage\Sdnd-api\bin\Debug\net8.0\appsettings.json
 C:\Users\user\Desktop\stage\Sdnd-api\bin\Debug\net8.0\Sdnd-api.exe
@@ -284,3 +284,8 @@ C:\Users\user\Desktop\stage\Sdnd-api\obj\Debug\net8.0\refint\Sdnd-api.dll
 C:\Users\user\Desktop\stage\Sdnd-api\obj\Debug\net8.0\Sdnd-api.pdb
 C:\Users\user\Desktop\stage\Sdnd-api\obj\Debug\net8.0\Sdnd-api.genruntimeconfig.cache
 C:\Users\user\Desktop\stage\Sdnd-api\obj\Debug\net8.0\ref\Sdnd-api.dll
+=======
+C:\Users\utilisateur\Desktop\hhh\Sdnd-api\bin\Debug\net8.0\Sdnd-api.staticwebassets.runtime.json
+C:\Users\utilisateur\Desktop\hhh\Sdnd-api\bin\Debug\net8.0\appsettings.json
+>>>>>>> 593a506072e45d4f88046a63a101368c5134158d
+C:\Users\user\Desktop\stage\Sdnd-api\bin\Debug\net8.0\Sdnd-api.staticwebassets.runtime.json

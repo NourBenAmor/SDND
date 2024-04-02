@@ -1,0 +1,37 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\utilisateur\\Desktop\\hhh\\Sdnd-api\\wwwroot\\Images\\2B9D6A64-A361-489C-E3B0-08DC42775BC6\\03340bb0-e453-4a00-b456-1064ed76a032.png",
+      "PackagePath": "staticwebassets\\Images\\2B9D6A64-A361-489C-E3B0-08DC42775BC6\\03340bb0-e453-4a00-b456-1064ed76a032.png"
+    },
+    {
+      "Id": "C:\\Users\\utilisateur\\Desktop\\hhh\\Sdnd-api\\wwwroot\\Images\\519a15d0-7f6b-46fc-7cd0-08dc480f9244\\053af8ca-db7b-4dda-b2a2-29e2fc74b1ca.png",
+      "PackagePath": "staticwebassets\\Images\\519a15d0-7f6b-46fc-7cd0-08dc480f9244\\053af8ca-db7b-4dda-b2a2-29e2fc74b1ca.png"
+    },
+    {
+      "Id": "C:\\Users\\utilisateur\\Desktop\\hhh\\Sdnd-api\\wwwroot\\Images\\519a15d0-7f6b-46fc-7cd0-08dc480f9244\\ed635319-f8c6-4f21-bfe0-1c3bcf89ca47.jpg",
+      "PackagePath": "staticwebassets\\Images\\519a15d0-7f6b-46fc-7cd0-08dc480f9244\\ed635319-f8c6-4f21-bfe0-1c3bcf89ca47.jpg"
+    },
+    {
+      "Id": "C:\\Users\\utilisateur\\Desktop\\hhh\\Sdnd-api\\wwwroot\\Images\\fcd0198e-b667-4cec-9a9d-5245f31d714a.png",
+      "PackagePath": "staticwebassets\\Images\\fcd0198e-b667-4cec-9a9d-5245f31d714a.png"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.Sdnd-api.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.Sdnd-api.props",
+      "PackagePath": "build\\Sdnd-api.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.Sdnd-api.props",
+      "PackagePath": "buildMultiTargeting\\Sdnd-api.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.Sdnd-api.props",
+      "PackagePath": "buildTransitive\\Sdnd-api.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

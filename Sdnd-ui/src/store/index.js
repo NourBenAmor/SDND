@@ -1,12 +1,14 @@
 import { createStore } from "vuex";
-
+import { auth } from "./auth-module";
 export default createStore({
+  modules: {
+    auth,
+  },
   state: {
     hideConfigButton: false,
     isPinned: false,
     showConfig: false,
     sidebarType: "bg-white",
-    isRTL: false,
     mcolor: "",
     darkMode: false,
     isNavFixed: false,

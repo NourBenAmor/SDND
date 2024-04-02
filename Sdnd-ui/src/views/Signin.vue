@@ -1,37 +1,66 @@
 <script setup>
-import { onBeforeUnmount, onBeforeMount } from "vue";
+import { onBeforeUnmount, onBeforeMount,onMounted,ref,computed } from "vue";
 import { useStore } from "vuex";
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import axios from "axios";
+import { useRouter } from "vue-router"; 
 import Navbar from "@/examples/PageLayout/Navbar.vue";
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonSwitch from "@/components/ArgonSwitch.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
+// import BaseApiService from "../data/apiService";
 const body = document.getElementsByTagName("body")[0];
 const loginData = ref({
   username: "",
   password: ""
 });
-const errorMessage = ref("");
+const store = useStore();
+const message = ref(false);
 const router = useRouter();
+
+
+
+const loggedIn = computed(() => store.state.auth.status.loggedIn);
+
+
+onMounted(() => {
+  if (loggedIn.value) {
+    router.push('/'); // Assuming profile is accessible from root path
+  }
+});
 
 const login = async () => {
   try {
-    const response = await axios.post("https://localhost:7278/api/Account/login", loginData.value);
-    const { token, id } = response.data;
-    localStorage.setItem("token", token);
-    localStorage.setItem("userId", id);
-    router.push('/dashboard-default');
+    await store.dispatch('auth/login', loginData.value);
+      router.push('/');
   } catch (error) {
-    if (error.response && error.response.status === 401) {
-      errorMessage.value = "Invalid username or password.";
-    } else {
-      errorMessage.value = "An error occurred. Please try again later.";
-    }
+    message.value = true;
+    const errorMessage =
+      (error.response &&
+        error.response.data &&
+        error.response.data.message) ||
+      error.message ||
+      error.toString();
+    console.error(errorMessage);
   }
 };
-const store = useStore();
+
+
+// const login = async () => {
+//   try {
+//     const response = await BaseApiService('Account/login').create(loginData.value);
+//     const { token, id } = response.data;
+//     localStorage.setItem("token", token);
+//     store.state.token = token;
+//     console.log(token);
+//     localStorage.setItem("userId", id);
+//     router.push('/dashboard-default');
+//   } catch (error) {
+//     if (error.response && error.response.status === 401) {
+//       errorMessage.value = "Invalid username or password.";
+//     } else {
+//       errorMessage.value = "An error occurred. Please try again later.";
+//     }
+//   }
+// };
 onBeforeMount(() => {
   store.state.hideConfigButton = true;
   store.state.showNavbar = false;
@@ -71,11 +100,11 @@ onBeforeUnmount(() => {
                 <div class="card-body">
                   <form @submit.prevent="login">
                     <div class="mb-3">
-                      <argon-input v-model="loginData.username" type="text" placeholder="Username" name="username"
+                      <argon-input v-model="loginData.username"  type="text" placeholder="Username" name="username"
                         size="lg" />
                     </div>
                     <div class="mb-3">
-                      <argon-input v-model="loginData.password" type="password" placeholder="Password" name="password"
+                      <argon-input v-model="loginData.password"  type="password" placeholder="Password" name="password"
                         size="lg" />
                     </div>
                     <argon-switch id="rememberMe" name="remember-me">Remember me</argon-switch>
@@ -111,4 +140,4 @@ onBeforeUnmount(() => {
       </div>
     </section>
   </main>
-</template>
+</template>../services/apiService

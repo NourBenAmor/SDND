@@ -30,7 +30,7 @@ public class UserAccessor : IUserAccessor
 
 // Or access other custom user claims you might have added
         string userId= claimsPrincipal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
+            
         return (new CurrentUserDto
         {
             Id = Guid.Parse(userId),

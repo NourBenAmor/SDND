@@ -9,3 +9,9 @@ public class Annotation :BaseEntity
     public string type { get; set; }
     public List<string> tags { get; set; }
 }
+public class AnnotationRevision
+{
+    public int Id { get; set; }
+    public DateTime RevisionDate { get; set; }
+    public string Content { get; set; }
+}

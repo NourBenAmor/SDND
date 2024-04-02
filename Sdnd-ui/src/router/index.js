@@ -9,6 +9,12 @@ import AddDocument from "../views/components/AddDocument.vue";
 import Permissions from "../views/components/Permissions.vue";
 import SharedDocuments from "../views/components/SharedDocuments.vue";
 import DocumentEdit from "../views/components/DocumentEdit.vue";
+import UserTable from "../views/components/UserTable.vue";
+
+
+
+import EditProfile from "../views/components/EditProfile.vue";
+
 const routes = [
   {
     path: "/",
@@ -41,6 +47,16 @@ const routes = [
     name: "Signup",
     component: Signup,
   },
+  {
+    path: "/users",
+    name: "User",
+    component: UserTable,
+  },
+  {
+    path: '/edit-profile/:id',
+    name: 'EditProfile',
+    component: EditProfile
+  },
   { path: "/add-view", name: "add-view", component: AddDocument },
   {
     path: "/edit/:id",
@@ -62,5 +78,17 @@ const router = createRouter({
   routes,
   linkActiveClass: "active",
 });
+router.beforeEach((to, from, next) => {
+  const publicPages = ["/signin", "/signup"];
+  const authRequired = !publicPages.includes(to.path);
+  const loggedIn = localStorage.getItem("user");
 
+  // trying to access a restricted page + not logged in
+  // redirect to login page
+  if (authRequired && !loggedIn) {
+    next("/signin");
+  } else {
+    next();
+  }
+});
 export default router;
