@@ -10,7 +10,7 @@ class CustomInputField extends StatefulWidget {
   final TextEditingController? controller;
   // Ajout du contrôleur
   const CustomInputField({
-    Key? key,
+    super.key,
     required this.labelText,
     required this.hintText,
     required this.validator,
@@ -18,7 +18,7 @@ class CustomInputField extends StatefulWidget {
     this.isDense,
     this.obscureText = false,
     this.controller
-  }) : super(key: key);
+  });
 
   @override
   State<CustomInputField> createState() => _CustomInputFieldState();

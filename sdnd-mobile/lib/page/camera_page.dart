@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'editing_page.dart';
 
 class CameraPage extends StatefulWidget {
-  const CameraPage({Key? key}) : super(key: key);
+  const CameraPage({super.key});
 
   @override
   _CameraPageState createState() => _CameraPageState();
@@ -44,7 +44,7 @@ class _CameraPageState extends State<CameraPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Camera Page'),
+        title: const Text('Camera Page'),
       ),
       body: FutureBuilder<void>(
         future: _cameraFuture,
@@ -72,14 +72,14 @@ class _CameraPageState extends State<CameraPage> {
                           ),
                         );
                       },
-                      child: Icon(Icons.camera_alt),
+                      child: const Icon(Icons.camera_alt),
                     ),
                   ),
                 ),
               ],
             );
           } else {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }
@@ -89,8 +89,7 @@ class _CameraPageState extends State<CameraPage> {
   }
 
   Future<File> _capturePhoto() async {
-    if (_cameraController == null ||
-        !_cameraController.value.isInitialized) {
+    if (!_cameraController.value.isInitialized) {
       throw 'La caméra n\'est pas initialisée.';
     }
 

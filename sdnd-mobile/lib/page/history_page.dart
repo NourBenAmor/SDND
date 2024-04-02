@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 
 class PDFListPage extends StatefulWidget {
+  const PDFListPage({super.key});
+
   @override
   _PDFListPageState createState() => _PDFListPageState();
 }
@@ -25,9 +26,9 @@ class _PDFListPageState extends State<PDFListPage> {
       setState(() {
         pdfFiles = files;
         thumbnails.clear();
-        pdfFiles.forEach((file) {
+        for (var file in pdfFiles) {
           thumbnails[file.path] = Image.file(file, width: 100, height: 100, fit: BoxFit.cover);
-        });
+        }
       });
     } catch (e) {
       print('Failed to load PDFs: $e');
@@ -42,13 +43,13 @@ class _PDFListPageState extends State<PDFListPage> {
         thumbnails.removeWhere((key, value) => key == pdfFiles[index].path);
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('PDF deleted successfully'),
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Failed to delete PDF'),
         ),
       );
@@ -59,7 +60,7 @@ class _PDFListPageState extends State<PDFListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('PDF List'),
+        title: const Text('PDF List'),
       ),
       body: ListView.builder(
         itemCount: pdfFiles.length,
@@ -70,7 +71,7 @@ class _PDFListPageState extends State<PDFListPage> {
             leading: thumbnail,
             title: Text(pdfFile.path.split('/').last),
             trailing: IconButton(
-              icon: Icon(Icons.delete),
+              icon: const Icon(Icons.delete),
               onPressed: () => deletePDF(index),
             ),
             onTap: () {

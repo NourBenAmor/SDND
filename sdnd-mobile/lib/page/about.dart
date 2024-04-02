@@ -65,7 +65,7 @@ class AboutPage extends StatelessWidget {
                     launchUrlString(
                         'https://www.dynamsoft.com/document-normalizer/docs/core/introduction/?ver=latest&ver=latest');
                   },
-                  child: Text(
+                  child: const Text(
                     'Dynamsoft Document Normalizer overview >',
                     style: TextStyle( fontSize: 16),
                   )),
@@ -83,7 +83,7 @@ class AboutPage extends StatelessWidget {
                   onTap: () {
                     launchUrlString('https://www.dynamsoft.com/company/about/');
                   },
-                  child: Text(
+                  child: const Text(
                     'Contact us >',
                     style: TextStyle( fontSize: 16),
                   )),
@@ -107,7 +107,7 @@ class AboutPage extends StatelessWidget {
                 style: TextStyle(color: Colors.white, fontSize: 14),
               ),
               Expanded(child: Container()),
-              Text(
+              const Text(
                 '1.0.2',
                 style: TextStyle( fontSize: 15),
               )
@@ -139,7 +139,7 @@ class AboutPage extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text('About',
+          title: const Text('About',
               style: TextStyle(
                 fontSize: 22,
 

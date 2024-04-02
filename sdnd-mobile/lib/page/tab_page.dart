@@ -53,7 +53,7 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
     return Scaffold(
       body: TabBarView(
         controller: _tabController,
-        children: [
+        children: const [
           HomePage(),
           PDFListPage(),
           LoginPage(),

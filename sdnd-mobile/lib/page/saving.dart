@@ -1,13 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:pdf/widgets.dart' as pdfLib;
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
 
 class SavingPage extends StatelessWidget {
   final File pdfFile;
 
-  const SavingPage({Key? key, required this.pdfFile}) : super(key: key);
+  const SavingPage({super.key, required this.pdfFile});
 
   Future<void> _savePdfToDevice(BuildContext context) async {
     try {
@@ -16,7 +15,7 @@ class SavingPage extends StatelessWidget {
       final saveFile = File('${dir!.path}/$fileName');
       await saveFile.writeAsBytes(await pdfFile.readAsBytes());
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('PDF saved successfully'),
         ),
       );
@@ -25,12 +24,12 @@ class SavingPage extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PDFListPage(),
+          builder: (context) => const PDFListPage(),
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Failed to save PDF'),
         ),
       );
@@ -41,11 +40,11 @@ class SavingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
+        title: const Text(''),
         actions: [
           IconButton(
             onPressed: () => _savePdfToDevice(context),
-            icon: Icon(Icons.save),
+            icon: const Icon(Icons.save),
           ),
         ],
       ),
@@ -60,6 +59,8 @@ class SavingPage extends StatelessWidget {
 }
 
 class PDFListPage extends StatefulWidget {
+  const PDFListPage({super.key});
+
   @override
   _PDFListPageState createState() => _PDFListPageState();
 }
@@ -89,7 +90,7 @@ class _PDFListPageState extends State<PDFListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('PDF List'),
+        title: const Text('PDF List'),
       ),
       body: ListView.builder(
         itemCount: pdfFiles.length,

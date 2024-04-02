@@ -1,9 +1,8 @@
-
-import 'dart:io';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:get/get.dart';
+
 import 'dart:convert';
 
 import 'package:airsafe/page/commun/page_heading.dart';
@@ -12,7 +11,7 @@ import 'package:airsafe/page/commun/custom_form_button.dart';
 import 'package:airsafe/page/commun/custom_input_field.dart';
 
 class SignupPage extends StatefulWidget {
-  const SignupPage({Key? key}) : super(key: key);
+  const SignupPage({super.key});
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -21,9 +20,9 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   final _signupFormKey = GlobalKey<FormState>();
 
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +38,16 @@ class _SignupPageState extends State<SignupPage> {
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(20)),
+                        BorderRadius.vertical(top: Radius.circular(20)),
                   ),
                   child: Column(
                     children: [
-                      const PageHeading(title: 'Sign-up',),
-                      const SizedBox(height: 16,),
+                      const PageHeading(
+                        title: 'Sign-up',
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
                       CustomInputField(
                         labelText: 'Name',
                         hintText: 'Your name',
@@ -57,7 +60,9 @@ class _SignupPageState extends State<SignupPage> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 16,),
+                      const SizedBox(
+                        height: 16,
+                      ),
                       CustomInputField(
                         labelText: 'Email',
                         hintText: 'Your email id',
@@ -73,7 +78,9 @@ class _SignupPageState extends State<SignupPage> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 16,),
+                      const SizedBox(
+                        height: 16,
+                      ),
                       CustomInputField(
                         labelText: 'Password',
                         hintText: 'Your password',
@@ -88,25 +95,49 @@ class _SignupPageState extends State<SignupPage> {
                         },
                         suffixIcon: true,
                       ),
-                      const SizedBox(height: 22,),
-                      CustomFormButton(innerText: 'Signup', onPressed: _handleSignupUser,),
-                      const SizedBox(height: 18,),
+                      const SizedBox(
+                        height: 22,
+                      ),
+                      CustomFormButton(
+                        innerText: 'Signup',
+                        onPressed: _handleSignupUser,
+                      ),
+                      const SizedBox(
+                        height: 18,
+                      ),
                       SizedBox(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            const Text('Already have an account ? ', style: TextStyle(fontSize: 13, color: Color(0xff939393), fontWeight: FontWeight.bold),),
+                            const Text(
+                              'Already have an account ? ',
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xff939393),
+                                  fontWeight: FontWeight.bold),
+                            ),
                             GestureDetector(
                               onTap: () => {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()))
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const LoginPage()))
                               },
-                              child: const Text('Log-in', style: TextStyle(fontSize: 15, color: Color(0xff748288), fontWeight: FontWeight.bold),),
+                              child: const Text(
+                                'Log-in',
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    color: Color(0xff748288),
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 30,),
+                      const SizedBox(
+                        height: 30,
+                      ),
                     ],
                   ),
                 ),
@@ -134,7 +165,8 @@ class _SignupPageState extends State<SignupPage> {
 
       try {
         final response = await http.post(
-          Uri.parse('https://10.0.2.2:5261/api/Account/register'),
+          Uri.parse(
+              'https://4f96-165-51-181-40.ngrok-free.app/api/Account/register'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
@@ -146,6 +178,7 @@ class _SignupPageState extends State<SignupPage> {
             const SnackBar(content: Text('Registration successful!')),
           );
           // Vous pouvez naviguer vers une autre page après une inscription réussie
+          Get.to(() => const LoginPage());
           // Navigator.push(context, MaterialPageRoute(builder: (context) => NextPage()));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

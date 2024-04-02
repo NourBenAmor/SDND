@@ -1,14 +1,15 @@
 import 'package:airsafe/page/homepage.dart';
 
-import 'package:airsafe/page/tab_page.dart';
 import 'package:flutter/material.dart';
-import 'package:airsafe/page/synchronisation.dart'; // Importer la nouvelle page WelcomePage
+// Importer la nouvelle page WelcomePage
 
 void main() {
-  runApp(AirSafeApp());
+  runApp(const AirSafeApp());
 }
 
 class AirSafeApp extends StatelessWidget {
+  const AirSafeApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,7 +17,7 @@ class AirSafeApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: homePage(),
+      home: const homePage(),
     );
   }
 }

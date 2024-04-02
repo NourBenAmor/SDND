@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SynchronizationPage extends StatelessWidget {
+  const SynchronizationPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
+        title: const Row(
           children: [
             Text("Back"),
             SizedBox(width: 10), // Espacement entre les textes
@@ -16,11 +18,11 @@ class SynchronizationPage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 18.0),
+          padding: const EdgeInsets.symmetric(horizontal: 18.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 34.0),
+              const SizedBox(height: 34.0),
               Stack(
                 alignment: Alignment.bottomLeft,
                 children: [
@@ -44,9 +46,9 @@ class SynchronizationPage extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   ),
-                  Align(
+                  const Align(
                     alignment: Alignment.bottomRight,
-                    child: Container(
+                    child: SizedBox(
                       width: 267.0,
                       child: Text(
                         "Automatically sync your documents",
@@ -56,7 +58,7 @@ class SynchronizationPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Align(
+                  const Align(
                     alignment: Alignment.topRight,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,17 +84,17 @@ class SynchronizationPage extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 41.0),
-              Text(
+              const SizedBox(height: 41.0),
+              const Text(
                 "Settings",
                 style: TextStyle(fontSize: 32.0),
               ),
-              SizedBox(height: 10.0),
+              const SizedBox(height: 10.0),
               InkWell(
                 onTap: () {
                   // Action when "Share with collaborators" is tapped
                 },
-                child: Row(
+                child: const Row(
                   children: [
                     Text(
                       "Share with collaborators",
@@ -103,12 +105,12 @@ class SynchronizationPage extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(height: 20.0),
+              const SizedBox(height: 20.0),
               InkWell(
                 onTap: () {
                   // Action when "Manage my account" is tapped
                 },
-                child: Row(
+                child: const Row(
                   children: [
                     Text(
                       "Manage my account",
@@ -129,11 +131,11 @@ class SynchronizationPage extends StatelessWidget {
 
   Widget buildBottomBar() {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 11.0),
+      margin: const EdgeInsets.symmetric(horizontal: 11.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(height: 10.0), // Espacement supplémentaire
+          const SizedBox(height: 10.0), // Espacement supplémentaire
           // Utilisation de SvgPicture.asset pour afficher le SVG
           SvgPicture.asset(
             'assets/images/img_tabs.svg',

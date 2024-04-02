@@ -2,13 +2,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pdfLib;
-import 'package:open_file/open_file.dart';
 import 'saving.dart'; // Import the SavingPage
 
 class EditingPage extends StatelessWidget {
   final File imageFile;
 
-  const EditingPage({Key? key, required this.imageFile}) : super(key: key);
+  const EditingPage({super.key, required this.imageFile});
 
   Future<void> generatePdf(BuildContext context) async {
     // Create a PDF document
@@ -39,7 +38,7 @@ class EditingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editing Page'),
+        title: const Text('Editing Page'),
       ),
       body: Stack(
         children: [
@@ -60,8 +59,8 @@ class EditingPage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.yellow[700], // Set button background color to yellow
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0), // Increase padding to make the button larger
+                child: const Padding(
+                  padding: EdgeInsets.all(16.0), // Increase padding to make the button larger
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
