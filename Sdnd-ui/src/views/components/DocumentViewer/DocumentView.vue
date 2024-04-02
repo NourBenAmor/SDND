@@ -49,7 +49,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModalMessage" tabindex="-1" role="dialog"
+    <div class="modal fade dark" id="exampleModalMessage" tabindex="-1" role="dialog"
       aria-labelledby="exampleModalMessageTitle" aria-hidden="true" data-bs-backdrop="false">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -122,10 +122,25 @@
       console.error(e);
     }
   }
+const downloadDocument = async () => {
+  try {
+    const response = await BaseApiService('Document/Download').get(documentId.value, {
+      responseType: 'blob'
+    });
 
-//   const downloadDocument = async () => {
-  
-// }
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'document.pdf');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  }
+  catch (error) {
+    console.error('Error downloading document:', error);
+  }
+}
 
 </script>
 
@@ -133,9 +148,10 @@
 .container {
   display: flex;
   flex-direction: column;
-  align-items: center; 
-
-
+  align-items: center;
+  justify-content: center; 
+  position: fixed;
+  height: 100vh;
 }
 
 .button-container {
@@ -190,7 +206,7 @@
   flex-direction: column;
   align-items: center;
   overflow: auto;
-  height:550px;
+  height:100%;
 
 }
 .file-container::-webkit-scrollbar {
