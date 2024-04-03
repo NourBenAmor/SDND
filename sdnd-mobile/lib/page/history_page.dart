@@ -1,104 +1,155 @@
 import 'dart:io';
+import 'package:esys_flutter_share_plus/esys_flutter_share_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:esys_flutter_share_plus/esys_flutter_share_plus.dart' as esysShare;
 
-class PDFListPage extends StatefulWidget {
+
+class ListPdfPage extends StatefulWidget {
   @override
-  _PDFListPageState createState() => _PDFListPageState();
+  _ListPdfPageState createState() => _ListPdfPageState();
 }
 
-class _PDFListPageState extends State<PDFListPage> {
-  List<File> pdfFiles = [];
+class _ListPdfPageState extends State<ListPdfPage> {
+  late List<File> _pdfFiles; // Liste des fichiers PDF
 
   @override
   void initState() {
     super.initState();
-    loadPDFs();
+    _loadPdfFiles(); // Charger les fichiers PDF au démarrage de la page
   }
 
-  Future<void> loadPDFs() async {
-    try {
-      final directory = await getExternalStorageDirectory();
-      final files = directory!.listSync().whereType<File>().toList();
-      setState(() {
-        pdfFiles = files;
-      });
-    } catch (e) {
-      print('Failed to load PDFs: $e');
+  Future<void> _loadPdfFiles() async {
+    // Charger la liste des fichiers PDF depuis le répertoire de téléchargement sur Android
+    Directory downloadsDirectory = Directory('/storage/emulated/0/Download');
+    List<FileSystemEntity> entities = downloadsDirectory.listSync(recursive: false);
+    List<File> pdfFiles = [];
+    for (FileSystemEntity entity in entities) {
+      if (entity is File && entity.path.endsWith('.pdf')) {
+        pdfFiles.add(entity);
+      }
     }
+    setState(() {
+      _pdfFiles = pdfFiles;
+    });
   }
 
-  Future<void> deletePDF(int index) async {
-    try {
-      await pdfFiles[index].delete();
-      setState(() {
-        pdfFiles.removeAt(index);
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('PDF deleted successfully'),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to delete PDF'),
-        ),
-      );
-    }
-  }
-
-  void sharePDF(String path, String filename) {
-    esysShare.Share.file(
-        'Sharing PDF', filename, File(path).readAsBytesSync(), 'application/pdf');
-  }
-
-  void openPDF(File pdfFile) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PDFView(
-          filePath: pdfFile.path,
-        ),
-      ),
+  void _deletePdfFile(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirmation"),
+          content: Text("Êtes-vous sûr de vouloir supprimer ce fichier ?"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Annuler"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Ferme la boîte de dialogue
+              },
+            ),
+            TextButton(
+              child: Text("Supprimer"),
+              onPressed: () {
+                File fileToDelete = _pdfFiles[index];
+                fileToDelete.deleteSync(); // Supprimer le fichier du système de fichiers
+                _pdfFiles.removeAt(index); // Supprimer le fichier de la liste
+                setState(() {}); // Mettre à jour l'interface utilisateur
+                Navigator.of(context).pop(); // Ferme la boîte de dialogue
+              },
+            ),
+          ],
+        );
+      },
     );
+  }
+
+  Future<void> _sharePdfFile(File file) async {
+    await Share.file('Share PDF', 'pdf_file.pdf', file.readAsBytesSync(), 'application/pdf');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('PDF List'),
+        title: Text('Liste des PDF'),
       ),
-      body: ListView.builder(
-        itemCount: pdfFiles.length,
+      body: _pdfFiles != null
+          ? ListView.builder(
+        itemCount: _pdfFiles.length,
         itemBuilder: (context, index) {
-          final pdfFile = pdfFiles[index];
+          File pdfFile = _pdfFiles[index];
           return ListTile(
-            leading: Icon(Icons.picture_as_pdf),
-            title: Text(pdfFile.path.split('/').last),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.share),
-                  onPressed: () =>
-                      sharePDF(pdfFile.path, pdfFile.path.split('/').last),
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () => deletePDF(index),
-                ),
-              ],
+            leading: Icon(Icons.picture_as_pdf), // Icône de fichier PDF
+            title: Text(
+              pdfFile.path.split('/').last, // Nom du fichier PDF
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              'Taille: ${(pdfFile.lengthSync() / 1024).toStringAsFixed(2)} KB', // Taille du fichier PDF
+            ),
+            trailing: PopupMenuButton<String>(
+              onSelected: (String choice) {
+                if (choice == 'Delete') {
+                  _deletePdfFile(index);
+                } else if (choice == 'Share') {
+                  _sharePdfFile(pdfFile);
+                }
+              },
+              itemBuilder: (BuildContext context) {
+                return ['Delete', 'Share'].map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Row(
+                      children: <Widget>[
+                        choice == 'Delete'
+                            ? Icon(Icons.delete)
+                            : Icon(Icons.share),
+                        SizedBox(width: 8),
+                        Text(choice),
+                      ],
+                    ),
+                  );
+                }).toList();
+              },
             ),
             onTap: () {
-              openPDF(pdfFile);
+              // Naviguer vers la page de visualisation du PDF lorsque l'utilisateur clique sur un élément de la liste
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SavingPage(pdfFile: pdfFile),
+                ),
+              );
             },
           );
         },
+      )
+          : Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }
 }
+
+class SavingPage extends StatelessWidget {
+  final File pdfFile;
+
+  const SavingPage({Key? key, required this.pdfFile}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('PDF Viewer'),
+      ),
+      body: Center(
+        child: PDFView(
+          filePath: pdfFile.path,
+          onPageChanged: (int? page, int? total) {},
+        ),
+      ),
+    );
+  }
+}
+

@@ -43,30 +43,42 @@ class _CameraPageState extends State<CameraPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Positionner le bouton dans le coin inférieur droit
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.yellow[700],
-        onPressed: () async {
-          final capturedImage = await _capturePhoto();
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EditingPage(imageFile: capturedImage),
-            ),
-          );
-        },
-        child: Icon(Icons.camera_alt),
-      ),
+      appBar: AppBar(),
       body: FutureBuilder<void>(
         future: _cameraFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return Center(
-              child: CameraPreview(_cameraController),
+            return Stack(
+              children: [
+                Center(
+                  child: CameraPreview(_cameraController),
+                ),
+                Positioned(
+                  bottom: 16.0, // Ajustez la marge inférieure selon vos besoins
+                  right: 16.0, // Ajustez la marge droite selon vos besoins
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: FloatingActionButton(
+                      backgroundColor: Colors.yellow[700],
+                      onPressed: () async {
+                        final capturedImage = await _capturePhoto();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                EditingPage(imageFile: capturedImage),
+                          ),
+                        );
+                      },
+                      child: const Icon(Icons.camera_alt),
+                      shape: const CircleBorder(), // Rend le bouton sous forme de cercle
+                    ),
+                  ),
+                ),
+              ],
             );
           } else {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }
@@ -77,8 +89,7 @@ class _CameraPageState extends State<CameraPage> {
 
 
   Future<File> _capturePhoto() async {
-    if (_cameraController == null ||
-        !_cameraController.value.isInitialized) {
+    if (!_cameraController.value.isInitialized) {
       throw 'La caméra n\'est pas initialisée.';
     }
 

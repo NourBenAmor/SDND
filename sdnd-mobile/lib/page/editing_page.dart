@@ -1,8 +1,6 @@
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pdfLib;
-import 'package:open_file/open_file.dart';
 import 'saving.dart'; // Import the SavingPage
 
 class EditingPage extends StatelessWidget {
@@ -40,7 +38,7 @@ class EditingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editing Page'),
+        title: const Text('Editing Page'),
       ),
       body: Stack(
         children: [
@@ -64,8 +62,7 @@ class EditingPage extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   // Increase padding
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        8), // Round the button corners
+                    borderRadius: BorderRadius.circular(8), // Round the button corners
                   ),
                 ),
                 icon: Icon(Icons.file_upload, size: 28), // Larger icon size

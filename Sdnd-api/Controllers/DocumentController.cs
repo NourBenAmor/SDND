@@ -261,7 +261,81 @@ public class DocumentController : ControllerBase
         return _context.Documents.Any(e => e.Id == id);
     }
 
+ [HttpPost]
+ public async Task<IActionResult> DownloadFile()
+ {
+     var formCollection = await Request.ReadFormAsync();
+     var file = formCollection.Files.First();
+
+     var filePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", file.FileName));
+
+     using (var stream = new FileStream(filePath, FileMode.Create))
+     {
+         await file.CopyToAsync(stream);
+     }
+
+     return Ok();
+ }
+ [HttpGet]
+[Route("api/documents")]
+public IActionResult GetDocuments()
+{
+    var files = Directory.GetFiles("path_to_your_upload_folder")
+                         .Select(Path.GetFileName)
+                         .ToList();
+    return Ok(files);
+}
+
+    [HttpGet("Download/{id}")]
+    public async Task<IActionResult> DownloadDocument(Guid id)
+    {
+        try
+        {
+            var document = await _context.Documents.FindAsync(id);
+            if (document == null)
+            {
+                return NotFound($"Document with ID {id} not found.");
+            }
+
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), document.FilePath);
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(filePath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+
+            // Determine the content type based on the file extension or document type
+            var contentType = GetContentType(filePath); // Implement GetContentType method
+            var fileName = document.Name + ".pdf"; // Set the filename with .pdf extension
+
+            // Set the content-disposition header with the filename
+            Response.Headers.Add("content-disposition", $"attachment; filename=\"{fileName}\"");
+
+            return File(memory, contentType, fileName);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while downloading the document: {ex.Message}");
+        }
+    }
+
+    private string GetContentType(string filePath)
+    {
+        // Example implementation, you may need to expand this for different file types
+        var extension = Path.GetExtension(filePath).ToLowerInvariant();
+        return extension switch
+        {
+            ".pdf" => "application/pdf",
+            ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            _ => "application/octet-stream",
+        };
+    }
 
 
+
+
+    
 
 }

@@ -56,7 +56,7 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
         controller: _tabController,
         children: [
           HomePage(),
-          PDFListPage(),
+          ListPdfPage(),
           LoginPage(),
           SynchronizationPage(),
           AboutPage(),

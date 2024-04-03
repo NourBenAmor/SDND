@@ -1,5 +1,7 @@
 import 'dart:io';
 
+
+import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,7 +13,7 @@ import 'editing_page.dart';
 
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   Future<void> scanImage(BuildContext context, XFile photo) async {
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
@@ -38,10 +40,19 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
+
             Padding(
               padding: const EdgeInsets.only(top: 32),
             ),
             SizedBox(height: 44),
+
+            const Padding(
+              padding: EdgeInsets.only(top: 32),
+
+            ),
+
+            const SizedBox(height: 44),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -71,7 +82,7 @@ class HomePage extends StatelessWidget {
                           width: 90,
                           height: 60,
                         ),
-                        Text(
+                        const Text(
                           "Camera Scan",
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(fontSize: 16, color: Colors.white),
@@ -103,7 +114,7 @@ class HomePage extends StatelessWidget {
                           width: 90,
                           height: 60,
                         ),
-                        Text(
+                        const Text(
                           "Image Scan",
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(fontSize: 16, color: Colors.white),

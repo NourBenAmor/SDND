@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class DocumentList extends StatefulWidget {
+  const DocumentList({super.key});
+
   @override
   _DocumentListScreenState createState() => _DocumentListScreenState();
 }
@@ -40,7 +42,7 @@ class _DocumentListScreenState extends State<DocumentList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Liste des Documents'),
+        title: const Text('Liste des Documents'),
       ),
       body: ListView.builder(
         itemCount: _documents.length,

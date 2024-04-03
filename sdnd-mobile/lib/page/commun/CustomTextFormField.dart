@@ -8,7 +8,7 @@ class CustomTextFormField extends StatelessWidget {
   final String validation;
   final bool required;
 
-  CustomTextFormField({
+  const CustomTextFormField({super.key, 
     required this.decoration,
     required this.controllerName,
     required this.alignment,

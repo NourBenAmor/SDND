@@ -2,7 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:external_path/external_path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import 'history_page.dart'; // Importez votre page ListPdfPage
 
 class SavingPage extends StatefulWidget {
   final File pdfFile;
@@ -23,14 +26,20 @@ class _SavingPageState extends State<SavingPage> {
       try {
         final directory = await ExternalPath.getExternalStoragePublicDirectory(
             ExternalPath.DIRECTORY_DOWNLOADS);
-        final fileName = widget.pdfFile.path
-            .split('/')
-            .last;
-        final saveFile = File('${directory}/$fileName');
+        final fileName = widget.pdfFile.path.split('/').last;
+        final saveFile = File('$directory/$fileName');
         await saveFile.writeAsBytes(await widget.pdfFile.readAsBytes());
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('PDF downloaded successfully'),
+          ),
+        );
+
+        // Rediriger vers ListPdfPage après le téléchargement réussi
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ListPdfPage(), // Remplacez ListPdfPage par votre nom de page
           ),
         );
       } catch (e) {
@@ -49,10 +58,32 @@ class _SavingPageState extends State<SavingPage> {
     }
   }
 
+  Future<void> _savePdfToDevice(BuildContext context) async {
+    try {
+      final dir = await getExternalStorageDirectory();
+      final fileName = widget.pdfFile.path.split('/').last;
+      final saveFile = File('$dir/$fileName');
+      await saveFile.writeAsBytes(await widget.pdfFile.readAsBytes());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('PDF saved successfully'),
+        ),
+      );
+
+      // Naviguer simplement en arrière pour revenir à la page précédente
+      Navigator.pop(context);
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to save PDF'),
+        ),
+      );
+    }
+  }
+
   Future<bool> _requestStoragePermission() async {
-    if (await Permission.storage
-        .request()
-        .isGranted) {
+    if (await Permission.storage.request().isGranted) {
       return true;
     } else {
       return false;

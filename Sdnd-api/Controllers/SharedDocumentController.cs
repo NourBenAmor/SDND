@@ -92,11 +92,12 @@ public class ShareController : ControllerBase
     public async Task<IActionResult> GetSharedDocument()
     {
         var currentUser = _userAccessor.GetCurrentUser();
-        IEnumerable<SharedDocument> sharedDocuments = _context.SharedDocuments
-            .Where(d => d.SharedWithUserId == currentUser.Id);
+        IEnumerable<SharedDocument> sharedDocuments = await _context.SharedDocuments
+            .Where(d => d.SharedWithUserId == currentUser.Id)
+            .ToListAsync();
 
         List<Document> documents = new List<Document>();
-        foreach (var sharedDocument in sharedDocuments )
+        foreach (var sharedDocument in sharedDocuments)
         {
             var document = await _context.Documents.FirstOrDefaultAsync(x => x.Id == sharedDocument.DocumentId);
             documents.Add(document);
@@ -104,5 +105,6 @@ public class ShareController : ControllerBase
 
         return Ok(documents);
     }
-    
+
+
 }

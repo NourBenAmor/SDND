@@ -1,25 +1,32 @@
 import 'dart:convert';
+import 'package:airsafe/page/UploadDocumentForm.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:get/get.dart';
 import 'package:airsafe/page/commun/custom_input_field.dart';
 import 'package:airsafe/page/compte/forget_password_page.dart';
 import 'package:airsafe/page/compte/signup_page.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:airsafe/page/commun/page_heading.dart';
 import 'package:airsafe/page/commun/custom_form_button.dart';
-import 'package:airsafe/page/commun/custom_input_field.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+const storage = FlutterSecureStorage();
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
+
+
+
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
+  final String baseUrl = 'http://10.0.2.2:7278/api';
   Future<void> _handleLoginUser(BuildContext context) async {
-    final url = Uri.parse('http://10.0.2.2:7278/api/Account/login');
+    final url = Uri.parse('$baseUrl/Account/login');
     final headers = {'Content-Type': 'application/json'};
 
     print('Username: ${usernameController.text}');
@@ -47,7 +54,9 @@ class _LoginPageState extends State<LoginPage> {
         print('Username: ${responseData['username']}');
         print('Email: ${responseData['email']}');
         print('Token: ${responseData['token']}');
-
+        String token = jsonDecode(response.body)['token'];
+        await storage.write(key: 'jwt_token', value: token);
+        //Get.to(() => const UploadDocumentForm());
         // Add further logic here (e.g., navigation to home screen)
       } else if (response.statusCode == 400) {
         // Bad request, probably validation error
@@ -64,8 +73,6 @@ class _LoginPageState extends State<LoginPage> {
       // Add further error handling logic here (e.g., displaying error message)
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -106,24 +113,39 @@ class _LoginPageState extends State<LoginPage> {
                   },
                 ),
                 const SizedBox(height: 20),
-                CustomFormButton(innerText: 'Login', onPressed: () => _handleLoginUser(context)),
+                CustomFormButton(
+                    innerText: 'Login',
+                    onPressed: () => _handleLoginUser(context)),
                 const SizedBox(height: 18),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgetPasswordPage())),
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const ForgetPasswordPage())),
                       child: const Text(
                         'Forget password?',
-                        style: TextStyle(color: Color(0xff939393), fontSize: 13, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Color(0xff939393),
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                     const SizedBox(width: 20),
                     GestureDetector(
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SignupPage())),
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SignupPage())),
                       child: const Text(
                         'Sign-up',
-                        style: TextStyle(color: Color(0xff748288), fontSize: 15, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Color(0xff748288),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],

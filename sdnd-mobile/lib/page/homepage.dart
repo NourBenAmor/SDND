@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
 
-import 'package:airsafe/page/compte/login_page.dart';
 import 'package:airsafe/page/tab_page.dart';
 
 class homePage extends StatelessWidget {
+  const homePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           '',
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -29,16 +30,16 @@ class homePage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Container(
-                    margin: EdgeInsets.symmetric(vertical: 16),
+                    margin: const EdgeInsets.symmetric(vertical: 16),
                     child: Image.asset(
                       'images/img_10.png',
                       height: 187,
                       filterQuality: FilterQuality.high,
                     ),
                   ),
-                  Text(
+                  const Text(
                     'Please follow the instructions below to capture the entire page',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -54,20 +55,20 @@ class homePage extends StatelessWidget {
           SingleChildScrollView(
             child: Container(
               color: Colors.white,
-              padding: EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    margin: EdgeInsets.symmetric(vertical: 16),
+                    margin: const EdgeInsets.symmetric(vertical: 16),
                     child: Image.asset(
                       'images/img_11.png',
                       height: 187,
                       filterQuality: FilterQuality.high,
                     ),
                   ),
-                  Text(
+                  const Text(
                     'Hold your device steady and capture the entire page in one shot. Make sure all corners are visible',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -75,7 +76,7 @@ class homePage extends StatelessWidget {
                       fontWeight: FontWeight.bold, // Texte en gras
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Wrap(
                     alignment: WrapAlignment.center,
                     spacing: 20,
@@ -84,17 +85,18 @@ class homePage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => TabPage()),
+                            MaterialPageRoute(builder: (context) => const TabPage()),
                           );
                         },
-                        child: Text('I\'m Ready To Go'),
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.black, backgroundColor: Colors.yellow[700],
+                          foregroundColor: Colors.black,
+                          backgroundColor: Colors.yellow[700],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18.0),
-                            side: BorderSide(color: Colors.black),
+                            side: const BorderSide(color: Colors.black),
                           ),
                         ),
+                        child: const Text('I\'m Ready To Go'),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -103,14 +105,15 @@ class homePage extends StatelessWidget {
                             SystemNavigator.pop();
                           }
                         },
-                        child: Text('Not Now'),
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.black, backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18.0),
-                            side: BorderSide(color: Colors.white),
+                            side: const BorderSide(color: Colors.white),
                           ),
                         ),
+                        child: const Text('Not Now'),
                       ),
                     ],
                   ),

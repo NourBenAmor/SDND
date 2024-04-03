@@ -8,7 +8,7 @@ namespace Sdnd_api.Controllers;
 
 
 
-//[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")]
 [Route("api/")]
 [ApiController]
 public class AdminController : ControllerBase
@@ -42,7 +42,27 @@ public class AdminController : ControllerBase
 
         return Ok(userDtos);
     }
-    
+    [HttpGet("me")]
+    public async Task<IActionResult> GetCurrentUser()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+
+        var userModel = new
+        {
+            Id = user.Id,
+            Username = user.UserName,
+            Email = user.Email,
+            Roles = roles // Include roles in the response
+        };
+
+        return Ok(userModel);
+    }
 
     //  PUT: api/Account/changeRole/{id}
     [HttpPut("addRole/{id}")]

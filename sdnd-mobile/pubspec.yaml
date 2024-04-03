@@ -31,7 +31,6 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_staggered_animations: ^1.1.1
-  http: ^1.2.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -64,6 +63,11 @@ dependencies:
   flutter_downloader: ^1.11.6
   external_path: ^1.0.3
   photo_view: ^0.14.0
+  dio: ^5.4.2+1
+  flutter_secure_storage: ^9.0.0
+  get: ^4.6.6
+  http: ^1.2.1
+  pdf_thumbnail: ^0.1.6+1
 
 
 

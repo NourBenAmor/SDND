@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Sdnd_api.Interfaces;
 using Sdnd_api.Models;
@@ -13,9 +14,11 @@ public class TokenService : ITokenService
 {
     private readonly IConfiguration _config;
     private readonly SymmetricSecurityKey _key;
+    private readonly UserManager<User> _userManager;
 
-    public TokenService(IConfiguration config)
+    public TokenService(IConfiguration config,UserManager<User> userManager)
     {
+        _userManager = userManager;
         _config = config;
         _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(GetSigningKey()));
     }
@@ -27,7 +30,7 @@ public class TokenService : ITokenService
         return _config["JWT:AccessTokenSecret"];
     }
 
-    public string CreateToken(User user)
+    public async Task<string> CreateToken(User user)
     {
         try
         {
@@ -35,14 +38,21 @@ public class TokenService : ITokenService
             {
                 throw new ArgumentNullException("User object or its properties are invalid.");
             }
-
+            var roles =  await _userManager.GetRolesAsync(user);
+            
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email,user.Email),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             };
 
+            
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+            
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 
             var tokenDescriptor = new SecurityTokenDescriptor
