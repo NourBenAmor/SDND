@@ -1,20 +1,19 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
-
 import 'package:airsafe/page/commun/page_heading.dart';
-import 'package:airsafe/page/compte/login_page.dart';
 import 'package:airsafe/page/commun/custom_input_field.dart';
-
 import '../commun/custom_form_button.dart';
 
+
 class ForgetPasswordPage extends StatefulWidget {
-  const ForgetPasswordPage({super.key});
+  const ForgetPasswordPage({Key? key}) : super(key: key);
 
   @override
   State<ForgetPasswordPage> createState() => _ForgetPasswordPageState();
 }
 
 class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
+
   final _forgetPasswordFormKey = GlobalKey<FormState>();
 
   @override
@@ -24,53 +23,41 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
         backgroundColor: const Color(0xffEEF1F3),
         body: Column(
           children: [
+
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(20),
-                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20),),
                 ),
                 child: SingleChildScrollView(
                   child: Form(
                     key: _forgetPasswordFormKey,
                     child: Column(
                       children: [
-                        const PageHeading(
-                          title: 'Forgot password',
-                        ),
+                        const PageHeading(title: 'Forgot password',),
                         CustomInputField(
                             labelText: 'Email',
                             hintText: 'Your email id',
                             isDense: true,
                             validator: (textValue) {
-                              if (textValue == null || textValue.isEmpty) {
+                              if(textValue == null || textValue.isEmpty) {
                                 return 'Email is required!';
                               }
-                              if (!EmailValidator.validate(textValue)) {
+                              if(!EmailValidator.validate(textValue)) {
                                 return 'Please enter a valid email';
                               }
                               return null;
-                            }),
-                        const SizedBox(
-                          height: 20,
+                            }
                         ),
-                        CustomFormButton(
-                          innerText: 'Submit',
-                          onPressed: _handleForgetPassword,
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
+                        const SizedBox(height: 20,),
+                        CustomFormButton(innerText: 'Submit', onPressed: _handleForgetPassword,),
+                        const SizedBox(height: 20,),
                         Container(
                           alignment: Alignment.center,
                           child: GestureDetector(
                             onTap: () => {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const LoginPage()))
+                              //Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()))
                             },
                             child: const Text(
                               'Back to login',

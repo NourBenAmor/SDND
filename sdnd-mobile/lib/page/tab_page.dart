@@ -2,6 +2,7 @@ import 'package:airsafe/page/compte/login_page.dart';
 import 'package:airsafe/page/synchronisation.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+
 import 'history_page.dart';
 
 import 'about.dart';
@@ -53,9 +54,9 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
     return Scaffold(
       body: TabBarView(
         controller: _tabController,
-        children: const [
+        children: [
           HomePage(),
-          PDFListPage(),
+          ListPdfPage(),
           LoginPage(),
           SynchronizationPage(),
           AboutPage(),

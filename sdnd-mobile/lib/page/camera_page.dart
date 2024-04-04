@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'editing_page.dart';
 
 class CameraPage extends StatefulWidget {
-  const CameraPage({super.key});
+  const CameraPage({Key? key}) : super(key: key);
 
   @override
   _CameraPageState createState() => _CameraPageState();
@@ -43,9 +43,7 @@ class _CameraPageState extends State<CameraPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Camera Page'),
-      ),
+      appBar: AppBar(),
       body: FutureBuilder<void>(
         future: _cameraFuture,
         builder: (context, snapshot) {
@@ -56,10 +54,10 @@ class _CameraPageState extends State<CameraPage> {
                   child: CameraPreview(_cameraController),
                 ),
                 Positioned(
-                  bottom: 50,
-                  left: 0,
-                  right: 0,
-                  child: Center(
+                  bottom: 16.0, // Ajustez la marge inférieure selon vos besoins
+                  right: 16.0, // Ajustez la marge droite selon vos besoins
+                  child: Align(
+                    alignment: Alignment.bottomRight,
                     child: FloatingActionButton(
                       backgroundColor: Colors.yellow[700],
                       onPressed: () async {
@@ -73,6 +71,7 @@ class _CameraPageState extends State<CameraPage> {
                         );
                       },
                       child: const Icon(Icons.camera_alt),
+                      shape: const CircleBorder(), // Rend le bouton sous forme de cercle
                     ),
                   ),
                 ),
@@ -87,6 +86,7 @@ class _CameraPageState extends State<CameraPage> {
       ),
     );
   }
+
 
   Future<File> _capturePhoto() async {
     if (!_cameraController.value.isInitialized) {

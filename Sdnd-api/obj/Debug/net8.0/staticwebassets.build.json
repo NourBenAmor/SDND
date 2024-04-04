@@ -1,11 +1,27 @@
 {
   "Version": 1,
+<<<<<<< HEAD
+  "Hash": "NiFD8Y7yLMOyuX5CH/K79WbMRQxzbfppm7nSeaqYrXE=",
+=======
   "Hash": "DyE+BfBDsDveglSGfUvZ/Y77+be1RsP3Ptbz/cjAxhk=",
+>>>>>>> 3a1e729b118f70638b19e40e10d1731534b5dcaf
   "Source": "Sdnd-api",
   "BasePath": "_content/Sdnd-api",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
+<<<<<<< HEAD
+  "DiscoveryPatterns": [
+    {
+      "Name": "Sdnd-api\\wwwroot",
+      "Source": "Sdnd-api",
+      "ContentRoot": "C:\\Users\\user\\Desktop\\stage\\Sdnd-api\\wwwroot\\",
+      "BasePath": "_content/Sdnd-api",
+      "Pattern": "**"
+    }
+  ],
+=======
   "DiscoveryPatterns": [],
+>>>>>>> 3a1e729b118f70638b19e40e10d1731534b5dcaf
   "Assets": []
 }

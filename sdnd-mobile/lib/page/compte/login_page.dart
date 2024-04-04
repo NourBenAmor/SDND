@@ -19,10 +19,12 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
+
+
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final String baseUrl = 'https://4f96-165-51-181-40.ngrok-free.app/api';
+  final String baseUrl = 'http://10.0.2.2:7278/api';
   Future<void> _handleLoginUser(BuildContext context) async {
     final url = Uri.parse('$baseUrl/Account/login');
     final headers = {'Content-Type': 'application/json'};
@@ -54,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
         print('Token: ${responseData['token']}');
         String token = jsonDecode(response.body)['token'];
         await storage.write(key: 'jwt_token', value: token);
-        Get.to(() => const UploadDocumentForm());
+        //Get.to(() => const UploadDocumentForm());
         // Add further logic here (e.g., navigation to home screen)
       } else if (response.statusCode == 400) {
         // Bad request, probably validation error
