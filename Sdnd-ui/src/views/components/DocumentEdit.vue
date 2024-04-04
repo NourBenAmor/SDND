@@ -54,6 +54,9 @@
 import { useRoute } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import BaseApiService from '../../services/apiService';
+import { useRouter} from 'vue-router';
+
+const router = useRouter();
 
 const editedDocument = ref({
   name: '',
@@ -101,6 +104,7 @@ const updateData = async () => {
       };
 
       await BaseApiService('Document').update(`UpdateData/${documentId}`, requestData);
+      router.push('/tables');
     } else if (updateOption.value === 'pdf') {
       // Ensure a file is selected
       if (!file.value) {
@@ -112,6 +116,7 @@ const updateData = async () => {
       formData.append('file', file.value);
 
       await BaseApiService('Document').update(`UpdateFile/${documentId}`, formData);
+      router.push('/tables');
     }
 
     console.log('Update request successful');
