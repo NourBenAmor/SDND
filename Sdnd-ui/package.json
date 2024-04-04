@@ -38,6 +38,7 @@
     "vue-pdf": "^4.3.0",
     "vue-resize-sensor": "^2.0.0",
     "vue-router": "4.3.0",
+    "vue3-toastify": "^0.2.1",
     "vuex": "4.1.0",
     "yup": "^1.4.0"
   },
