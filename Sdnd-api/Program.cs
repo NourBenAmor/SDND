@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-//using NgrokAspNet;
 using Sdnd_api.Data;
 using Sdnd_api.Interfaces;
 using Sdnd_api.Models;
@@ -27,8 +26,6 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
     })
     .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddControllers().AddNewtonsoftJson();
-// uncomment the next line to enable NGROK 
-//builder.Services.AddHostedService<TunnelService>();
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme =
