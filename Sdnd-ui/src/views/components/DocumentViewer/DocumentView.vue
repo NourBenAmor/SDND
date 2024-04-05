@@ -7,17 +7,16 @@
         Page <span id="page-num"></span> of <span id="page-count"></span>
       </span>
       <div class="middle-bar">
-        <div class="text-Primary">{{ scale * 100 }} %</div>
-        <button @click="scale = scale < 2 ? scale + 0.25 : scale" class="btn btn-link text-primary px-2  mb-0 mx-2">
+        <button class="btn btn-link text-primary px-2  mb-0 mx-2">
           <i class="fa-solid fa-magnifying-glass-plus"></i>
         </button>
-        <button @click="scale = scale > 0.25 ? scale - 0.25 : scale" class="btn btn-link text-primary px-2  mb-0 mx-2">
+        <button class="btn btn-link text-primary px-2  mb-0 mx-2">
           <i class="fa-solid fa-magnifying-glass-minus"></i>
         </button>
-        <button @click="scale = 1.88" class=" btn btn-link text-primary px-2 mb-0 mx-2">
+        <button class="btn btn-link text-primary px-2  mb-0 mx-2">
           <i class="fa-solid fa-expand"></i>
         </button>
-        <button @click="scale = 1" class="btn btn-link text-primary px-2  mb-0 mx-2">
+        <button class="btn btn-link text-primary px-2  mb-0 mx-2">
           <i class="fa-solid fa-compress"></i>
         </button>
       </div>
@@ -41,7 +40,7 @@
 
     <div class="file-container">
       <div v-for="page in pages" :key="page">
-        <VuePDF :pdf="pdf" :scale="scale" :page="page" style=" margin-bottom:12px;" :fit-parent="fitParent">
+        <VuePDF :pdf="pdf" :page="page" style=" margin-bottom:12px;">
           <div>
             Loading...
           </div>
@@ -98,8 +97,9 @@
   const username =  ref('');
   const documentId = ref(route.params.id);
   const src = ref(`http://localhost:7278/api/Document/pdf/${documentId.value}`);
-  const scale = ref(1) ; 
-  const fitParent = ref(false);
+
+  
+
   const { pdf, pages } = usePDF(src)
 //   const showShareModal = (index) => {
 //     showModal.value = true;
@@ -180,8 +180,8 @@ const downloadDocument = async () => {
 
 .middle-bar {
   display:flex;
-  justify-content:center;
-  align-items:center;
+  justify-content:space-between;
+  align-items:space-between;
 }
 
 .btn:hover {
@@ -199,8 +199,7 @@ const downloadDocument = async () => {
 }
 
 .file-container {
-  background: #00000041; 
-  /* backdrop-filter: blur(3px); */
+  background: #00000041;
   color: #fff;
   width: 100%;
   display: flex;

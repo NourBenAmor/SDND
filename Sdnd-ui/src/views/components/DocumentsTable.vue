@@ -5,13 +5,15 @@
       <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0">Documents Table</h6>
         <div class="d-flex align-items-center">
-          <input type="text" v-model="filterText" class="form-control me-2" style="height: 38px"
-            placeholder="Enter Name" />
+          <input type="text" v-model="filterText" class="form-control me-2" style="height: 38px;"
+            placeholder="Enter Name">
           <button class="btn btn-primary px-0 mb-0 d-flex align-items-center text-nowrap px-2 mx-2"
             @click="openAddDocumentView(document)" href="javascript:;">
-            <i class="fas fa-add me-2" aria-hidden="true"></i> Add New Document
+            <i class="fas fa-add  me-2" aria-hidden="true"></i> Add New Document
           </button>
         </div>
+
+
       </div>
 
       <div class="card-body px-0 pt-0 pb-2">
@@ -28,8 +30,7 @@
                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                   Document State
                 </th>
-                <th
-                  class="text-uppercase text-secondary text-center align-middle  text-xxs font-weight-bolder opacity-7">
+                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                   Description
                 </th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -56,25 +57,20 @@
                   </div>
                 </td>
                 <td>
-                  <p class="text-xs font-weight-bold mb-0">
-                    {{ document.contentType }}
-                  </p>
+                  <p class="text-xs font-weight-bold mb-0">{{ document.contentType }}</p>
                 </td>
+              
+              <td class="align-middle text-center text-sm">
 
-                <td class="align-middle text-center text-sm">
                   <p class="badge badge-sm bg-gradient-success">
                     {{ getDocumentStateString(document.documentState) }}
                   </p>
                 </td>
                 <td class="align-middle text-center">
-                  <span class="text-xs font-weight-bold mb-0">{{
-                    document.description
-                    }}</span>
+                  <span class="text-xs font-weight-bold mb-0">{{ document.description }}</span>
                 </td>
                 <td class="align-middle text-center">
-                  <span class="text-secondary text-xs font-weight-bold">{{
-                    formatDate(document.addedDate)
-                    }}</span>
+                  <span class="text-secondary text-xs font-weight-bold">{{ formatDate(document.addedDate) }}</span>
                 </td>
                 <td class="align-middle d-flex">
                   <div class="ms-auto text-end">
@@ -86,10 +82,11 @@
                       <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit
                     </a>
 
-                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" @click="showConfirmDeleteModal(index)"
+                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" @click="showConfirmModal(index)"
                       href="javascript:;">
                       <i class="far fa-trash-alt me-2" aria-hidden="true"></i>Delete
                     </a>
+
                   </div>
                 </td>
               </tr>
@@ -103,9 +100,11 @@
         </div>
       </div>
     </div>
-    <AddDocument :show="showAddDocModal" @add-newdocument="addDocument" />
-    <ConfirmationModalVue :show="showDeleteModal" message="Are you sure you want to delete this document ?"
-      @confirm="handleDeleteConfirm" @cancel="hideAllModals" />
+
+
+
+    <ConfirmationModalVue :show="showModal" message="Are you sure you want to delete this document?"
+      @confirm="handleConfirm" @cancel="hideModal" />
   </div>
   <nav aria-label="Page navigation example" class="d-flex justify-content-center">
     <ul class="pagination mt-3">
@@ -127,27 +126,24 @@
 </template>
 
 <script setup>
-import { useRouter } from "vue-router";
-import { useStore } from "vuex";
-import { computed, ref, onMounted,watch } from "vue";
-import {toast} from 'vue3-toastify';
-import BaseApiService from "../../services/apiService";
-import AddDocument from "./AddDocument.vue";
-import ConfirmationModalVue from "./ConfirmationModal.vue";
+import { useRouter } from 'vue-router';
+import { computed, ref, onMounted } from 'vue';
+import BaseApiService from '../../services/apiService';
+import ConfirmationModalVue from './ConfirmationModal.vue';
+
+
+
 const documents = ref([]);
-const filterText = ref("");
-const showDeleteModal = ref(false);
-const showAddDocModal = ref(false);
+const filterText = ref('');
+const showModal = ref(false);
 const documentIndexToDelete = ref(null);
 const currentPage = ref(1);
-const documentsPerPage = 6;
-const sortBy = ref("asc");
+const documentsPerPage = 3;
+const sortBy = ref('asc');
 const router = useRouter();
-const store = useStore();
+
 const totalDocuments = computed(() => documents.value.length);
-const totalPages = computed(() =>
-  Math.ceil(totalDocuments.value / documentsPerPage)
-);
+const totalPages = computed(() => Math.ceil(totalDocuments.value / documentsPerPage));
 
 const changePage = (page) => {
   currentPage.value = page;
@@ -166,7 +162,7 @@ const prevPage = () => {
 };
 
 const paginatedAndFilteredDocuments = computed(() => {
-  const filtered = documents.value.filter((document) =>
+  const filtered = documents.value.filter(document =>
     document.name.toLowerCase().includes(filterText.value.toLowerCase())
   );
 
@@ -174,13 +170,14 @@ const paginatedAndFilteredDocuments = computed(() => {
   const endIndex = startIndex + documentsPerPage;
   return filtered.slice(startIndex, endIndex);
 });
+
 const fetchDocuments = async () => {
   try {
     const response = await BaseApiService(`Document/me`).list();
     console.log(response.data);
-    documents.value = response.data;
+    documents.value = response.data
   } catch (error) {
-    console.error("Error fetching documents:", error);
+    console.error('Error fetching documents:', error);
   }
 };
 
@@ -194,102 +191,69 @@ onMounted(() => {
 });
 
 const openEditView = (documentId) => {
-  router.push({ name: "EditView", params: { id: documentId } });
+  router.push({ name: 'EditView', params: { id: documentId } });
 };
+
+
 
 const openAddDocumentView = () => {
-  showAddDocModal.value = true;
-  store.state.showOverlay = true;
+  router.push({ name: 'add-view' });
 };
-
-
-async function addDocument(newDoc) {
-  try {
-    const formData = new FormData();
-    formData.append('Name', newDoc.name);
-    formData.append('Description', newDoc.description);
-    formData.append('contentType', newDoc.contentType);
-    formData.append('file', newDoc.file);
-    const response = await BaseApiService(`Document/upload`).create(formData);
-    await hideAllModals();
-    toast.success("Document Added Successfully !", {
-      autoClose: 1000,
-      position: toast.POSITION.BOTTOM_RIGHT,
-    });
-    console.log(response.data);
-  } catch (e) {
-    console.log(e);
-  }
-}
 const openDocumentView = (documentId) => {
-  router.push({ name: "document-view", params: { id: documentId } });
+  router.push({ name: 'document-view', params: { id: documentId } });
 };
 
 
-const showConfirmDeleteModal = (index) => {
-  showDeleteModal.value = true;
-  store.state.showOverlay = true;
+const showConfirmModal = (index) => {
+  showModal.value = true;
   documentIndexToDelete.value = index;
 };
 const getDocumentStateString = (documentState) => {
   switch (documentState) {
     case 0:
-      return "Uploaded";
+      return 'Uploaded';
     case 1:
-      return "OCR Pending";
+      return 'OCR Pending';
     case 2:
-      return "Signed";
+      return 'Signed';
     default:
-      return "Unknown";
+      return 'Unknown';
   }
 };
-const handleDeleteConfirm = async () => {
+const handleConfirm = async () => {
   try {
     const documentId = documents.value[documentIndexToDelete.value].id;
     const response = await BaseApiService(`Document/Delete`).remove(documentId);
     console.log(response);
     documents.value.splice(documentIndexToDelete.value, 1);
-    hideDeleteModal();
-    toast.error("Document Deleted !", {
-      autoClose: 1000,
-      position: toast.POSITION.BOTTOM_RIGHT,
-    });
+    showModal.value = false;
   } catch (error) {
-    console.error("Error deleting document:", error);
+    console.error('Error deleting document:', error);
   }
 };
 
-const hideDeleteModal = () => {
-  showDeleteModal.value = false;
-  store.state.showOverlay = false;
-}
-
-const hideAllModals = () => {
-  hideDeleteModal();
-  showAddDocModal.value = false;
+const hideModal = () => {
+  showModal.value = false;
 };
-watch(() => store.state.showOverlay, (newVal, oldVal) => {
-  if (newVal === false && oldVal === true) {
-    hideAllModals();
-  }
-}, { immediate: true });
 
 const sortByDate = () => {
-  if (sortBy.value === "asc") {
-    sortBy.value = "desc";
+  if (sortBy.value === 'asc') {
+    sortBy.value = 'desc';  
   } else {
-    sortBy.value = "asc";
+    sortBy.value = 'asc';   
   }
 
   const sortedDocuments = [...documents.value].sort((a, b) => {
     const dateA = new Date(a.addedDate);
     const dateB = new Date(b.addedDate);
-    return sortBy.value === "asc" ? dateA - dateB : dateB - dateA;
+    return sortBy.value === 'asc' ? dateA - dateB : dateB - dateA;
   });
 
   documents.value = sortedDocuments;
 };
 </script>
+
+
 
 <style scoped>
 .sorting-icons {

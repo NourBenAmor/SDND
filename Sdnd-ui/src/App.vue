@@ -27,14 +27,11 @@ const isAbsolute = computed(() => store.state.isAbsolute);
 const showSidenav = computed(() => store.state.showSidenav);
 const layout = computed(() => store.state.layout);
 const showNavbar = computed(() => store.state.showNavbar);
-const showOverlay = computed(() => store.state.showOverlay);
 const showFooter = computed(() => store.state.showFooter);
 const showConfig = computed(() => store.state.showConfig);
 const hideConfigButton = computed(() => store.state.hideConfigButton);
 const toggleConfigurator = () => store.commit("toggleConfigurator");
-const hideOverlayEvent = () =>{
-  store.state.showOverlay = false;
-}
+
 const navClasses = computed(() => {
   return {
     "position-sticky bg-white left-auto top-2 z-index-sticky":
@@ -47,7 +44,6 @@ const navClasses = computed(() => {
 });
 </script>
 <template>
-  <div v-if="showOverlay" @click="hideOverlayEvent" class="overlay"></div>
   <div
     v-show="layout === 'landing'"
     class="landing-bg h-100 bg-gradient-primary position-fixed w-100"
@@ -72,19 +68,3 @@ const navClasses = computed(() => {
     />
   </main>
 </template>
-<style scoped>
-.overlay {
-  /* display: none; */
-  /* hide modal initially */
-  position: absolute;
-  /* position to allow modal to cover over it */
-  z-index: 10000;
-  background: rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(4px);
-    /* gray out the background when modal appears */  /* gray out the background when modal appears */
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-</style>
