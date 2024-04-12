@@ -162,7 +162,7 @@ const updateRole = async () => {
 const removeRole = async (userId, role) => {
   try {
     const response = await axios.put(
-      `http://localhost:7278/api/removeRole/${userId}`,
+      `https://localhost:7278/api/removeRole/${userId}`,
       `"${role}"`,
       {
         headers: {

@@ -12,8 +12,9 @@
     </div>
     <div class="form-group">
       <label for="description" class="label">Description:</label>
-      <input type="text" class="form-control" id="description" v-model="newDocument.description" required>
-    </div>
+      <textarea type="text" class="form-control" id="description" v-model="newDocument.description" required>
+    </textarea>
+  </div>
     
     <div class="form-group">
       <label for="fileInput" class="label">Update File:</label>

@@ -67,10 +67,18 @@
                   </p>
                 </td>
                 <td class="align-middle text-center">
-                  <span class="text-xs font-weight-bold mb-0">{{
-                    document.description
-                    }}</span>
-                </td>
+  <span class="text-wrap d-inline-block" style="max-width: 300px;">
+    <span class="text-xs font-weight-bold mb-0">
+      {{ document.description.length > 50 ? document.description.slice(0, 50) + '...' : document.description }}
+      <span v-if="document.description.length > 50" class="view-all">
+        <a href="#" @click="showFullDescription(document.description)">View All</a>
+      </span>
+    </span>
+  </span>
+</td>
+
+
+
                 <td class="align-middle text-center">
                   <span class="text-secondary text-xs font-weight-bold">{{
                     formatDate(document.addedDate)
@@ -124,6 +132,25 @@
       </li>
     </ul>
   </nav>
+  <div class="modal fade" id="fullDescriptionModal" tabindex="-1" role="dialog" aria-labelledby="fullDescriptionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="fullDescriptionModalLabel">Full Description</h5>
+        <button type="button" class="close" @click="hideFullDescriptionModal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{ fullDescription }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" @click="hideFullDescriptionModal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </template>
 
 <script setup>
@@ -165,6 +192,25 @@ const prevPage = () => {
   }
 };
 
+
+const fullDescription = ref('');
+
+const showFullDescription = (description) => {
+  fullDescription.value = description;
+  const modal = document.getElementById('fullDescriptionModal');
+  if (modal) {
+    modal.classList.add('show');
+    modal.style.display = 'block';
+  }
+};
+
+const hideFullDescriptionModal = () => {
+  const modal = document.getElementById('fullDescriptionModal');
+  if (modal) {
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+  }
+};
 const paginatedAndFilteredDocuments = computed(() => {
   const filtered = documents.value.filter((document) =>
     document.name.toLowerCase().includes(filterText.value.toLowerCase())

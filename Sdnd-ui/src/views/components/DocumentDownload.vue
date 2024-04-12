@@ -20,7 +20,7 @@ export default {
       if (this.selectedFile) {
         const formData = new FormData();
         formData.append('file', this.selectedFile);
-        axios.post('http://localhost:3000/api/download', formData, {
+        axios.post('https://localhost:3000/api/download', formData, {
           responseType: 'blob'
         }).then(response => {
           const url = window.URL.createObjectURL(new Blob([response.data]));
