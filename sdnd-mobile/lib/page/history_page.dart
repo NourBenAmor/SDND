@@ -11,7 +11,8 @@ class ListPdfPage extends StatefulWidget {
 }
 
 class _ListPdfPageState extends State<ListPdfPage> {
-  late List<File> _pdfFiles; // Liste des fichiers PDF
+  List<File> _pdfFiles = [];
+  // Liste des fichiers PDF
 
   @override
   void initState() {
@@ -144,12 +145,15 @@ class SavingPage extends StatelessWidget {
         title: Text('PDF Viewer'),
       ),
       body: Center(
-        child: PDFView(
+        child: pdfFile.existsSync() // Vérifier si le fichier PDF existe
+            ? PDFView(
           filePath: pdfFile.path,
           onPageChanged: (int? page, int? total) {},
-        ),
+        )
+            : Text('Le fichier PDF n\'existe pas'),
       ),
     );
   }
 }
+
 

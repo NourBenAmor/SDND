@@ -1,25 +1,26 @@
 import 'dart:io';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'history_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
 const storage = FlutterSecureStorage();
+
+// Importez la nouvelle page de liste de fichiers
 
 class Document {
   String name;
   String description;
   String contentType;
-  File file;
+  File? file;
 
   Document({
     required this.name,
     required this.description,
     required this.contentType,
-    required this.file,
+    this.file,
   });
 }
-
+/*
 class ApiService {
   static const String baseUrl = "https://4f96-165-51-181-40.ngrok-free.app/api";
   static late final Dio _dio;
@@ -58,13 +59,14 @@ class ApiService {
     }
   }
 }
+ */
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -73,14 +75,14 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Upload Document'),
         ),
-        body: const UploadDocumentForm(),
+        body: UploadDocumentForm(),
       ),
     );
   }
 }
 
 class UploadDocumentForm extends StatefulWidget {
-  const UploadDocumentForm({super.key});
+  const UploadDocumentForm({Key? key});
 
   @override
   _UploadDocumentFormState createState() => _UploadDocumentFormState();
@@ -90,62 +92,65 @@ class _UploadDocumentFormState extends State<UploadDocumentForm> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController contentTypeController = TextEditingController();
-  late File file;
+  File? file;
 
-  void _chooseFile() async {
-    // Implement file picker logic here
-    // For simplicity, let's assume a file is picked from the device
-    // Replace this with your file picker logic
-    // In actual implementation, you can use packages like file_picker
-  }
-
-  void _submit() async {
-    Document document = Document(
-      name: nameController.text,
-      description: descriptionController.text,
-      contentType: contentTypeController.text,
-      file: file,
+  void _importFile() {
+    // Implémentez ici la logique pour importer un fichier
+    // Par exemple, vous pouvez utiliser un sélecteur de fichiers ou une galerie
+    // Une fois que l'utilisateur a sélectionné un fichier, vous pouvez effectuer une action appropriée
+    // Pour l'exemple, nous allons simplement naviguer vers la page de liste de fichiers
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ListPdfPage()),
     );
-
-    try {
-      Response response = await ApiService.addDocument(document);
-      // Handle success response, navigate to desired screen
-      print(response.data);
-    } catch (e) {
-      // Handle error
-      print(e);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          TextField(
-            controller: nameController,
-            decoration: const InputDecoration(labelText: 'Name'),
-          ),
-          TextField(
-            controller: descriptionController,
-            decoration: const InputDecoration(labelText: 'Description'),
-          ),
-          TextField(
-            controller: contentTypeController,
-            decoration: const InputDecoration(labelText: 'Content Type'),
-          ),
-          ElevatedButton(
-            onPressed: _chooseFile,
-            child: const Text('Choose File'),
-          ),
-          ElevatedButton(
-            onPressed: _submit,
-            child: const Text('Submit'),
-          ),
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Upload Document'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Name'),
+            ),
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(labelText: 'Description'),
+            ),
+            TextField(
+              controller: contentTypeController,
+              decoration: const InputDecoration(labelText: 'Content Type'),
+            ),
+            ElevatedButton(
+              onPressed: _importFile, // Utilisez la méthode _importFile pour gérer le clic sur le bouton
+              child: const Text('Import File'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Document document = Document(
+                  name: nameController.text,
+                  description: descriptionController.text,
+                  contentType: contentTypeController.text,
+                  file: file,
+                );
+
+                // Handle document submission here
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
+// Définition de la nouvelle page de liste de fichiers
+

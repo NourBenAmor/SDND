@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pdfLib;
+import 'formulaireFile.dart';
 import 'saving.dart'; // Import the SavingPage
 
 class EditingPage extends StatelessWidget {
@@ -29,7 +30,7 @@ class EditingPage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SavingPage(pdfFile: output),
+        builder: (context) => FormulairePage(pdfFile: output),
       ),
     );
   }

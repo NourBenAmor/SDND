@@ -11,6 +11,8 @@ import 'package:airsafe/page/commun/page_heading.dart';
 import 'package:airsafe/page/commun/custom_form_button.dart';
 import 'package:airsafe/page/commun/custom_input_field.dart';
 
+import 'login_page.dart';
+
 class SignupPage extends StatefulWidget {
   const SignupPage({Key? key}) : super(key: key);
 
@@ -134,19 +136,43 @@ class _SignupPageState extends State<SignupPage> {
 
       try {
         final response = await http.post(
-          Uri.parse('http://10.0.2.2:7278/api/Account/register'),
+          Uri.parse('https://10.0.2.2:7278/api/Account/register'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
           body: jsonData,
         );
 
+
         if (response.statusCode == 200) {
+
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registration successful!')),
+            SnackBar(
+              content: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  'Sign Up successful',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              duration: Duration(seconds: 5),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              margin: EdgeInsets.symmetric(horizontal: 20.0),
+              padding: EdgeInsets.symmetric(vertical: 15.0),
+            ),
           );
-          // Navigate to another page after successful registration
-          // Navigator.push(context, MaterialPageRoute(builder: (context) => NextPage()));
+
+
+          // Delay navigation to allow SnackBar display
+          await Future.delayed(Duration(seconds: 2));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginPage()),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Registration failed: ${response.body}')),

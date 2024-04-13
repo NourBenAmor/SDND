@@ -27,10 +27,7 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
         icon: 'images/icon-history-gray.png',
         selectedIcon: 'images/icon-history-orange.png'),
 
-    CustomTab(
-        text: 'Compte', // Renommer l'onglet pour le bouton de compte
-        icon: 'images/compte.png',
-        selectedIcon: 'images/compte.png'),
+
     CustomTab(
         text: 'Paramètres', // Ajouter un nouvel onglet pour les paramètres
         icon: 'images/param.png',
@@ -57,7 +54,6 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
         children: [
           HomePage(),
           ListPdfPage(),
-          LoginPage(),
           SynchronizationPage(),
           AboutPage(),
         ],
