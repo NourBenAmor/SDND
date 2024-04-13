@@ -8,7 +8,7 @@ namespace Sdnd_api.Models
         [Required]
         public string Name { get; set; }
         public string ContentType { get; set; }
-        public string Description { get; set; } = "";
+        public string Context { get; set; } = "";
         public string OcrText { get; set; } = string.Empty;
         public int FileSize { get; set; }
         public Guid OwnerId { get; set; }
@@ -17,7 +17,7 @@ namespace Sdnd_api.Models
 
         // Foreign key
         public Guid? DocumentId { get; set; }
-        // Navigation property
-        public Document Document { get; set; }
+      
+     
     }
 }

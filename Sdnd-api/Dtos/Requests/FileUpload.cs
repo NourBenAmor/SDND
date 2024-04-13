@@ -7,10 +7,10 @@ namespace Sdnd_api.Dtos.Requests
         [Required]
         public string Name { get; set; }
         public string ContentType { get; set; }
-        public string Description { get; set; } = "";
+        public string Context { get; set; } = "";
         public string OcrText { get; set; } = string.Empty;
         public int FileSize { get; set; }
-        public Guid OwnerId { get; set; }
+        public Guid OwnerId { get; set; }   
 
 
 

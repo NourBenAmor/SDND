@@ -68,13 +68,11 @@ namespace Sdnd_api.Data
                     .OnDelete(DeleteBehavior.SetNull);
             });
 
-            builder.Entity<Models.File>(entity =>
-            {
-                entity.HasOne(f => f.Document)
-                    .WithMany(d => d.Files)
-                    .HasForeignKey(f => f.DocumentId)
-                    .OnDelete(DeleteBehavior.SetNull);
-            });
+            builder.Entity<Models.File>()
+                .HasOne<Document>()
+                .WithMany()
+                .HasForeignKey(sd => sd.DocumentId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             builder.Entity<SharedDocument>()
                 .HasOne<Document>()

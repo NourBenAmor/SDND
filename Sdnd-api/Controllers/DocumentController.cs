@@ -75,9 +75,9 @@ public class DocumentController : ControllerBase
         {
             Name = model.Name,
             Description = model.Description,
-            FileSize = (int)model.File.Length,
-            ContentType = model.contentType,
+           
             Status = 1,
+
         };
         var result = await UploadFile(model.File, newDocument.Id);
         if (result == "file not selected" || result == "file Already Exists")
@@ -192,7 +192,7 @@ public class DocumentController : ControllerBase
         document.Name = model.Name;
         document.Description = model.Description;
         document.OwnerId = model.OwnerId;
-        document.ContentType = model.ContentType;
+       
         document.DocumentState = model.DocumentState;
 
         try
@@ -235,7 +235,7 @@ public class DocumentController : ControllerBase
             return BadRequest("File Not Uploaded");
 
         document.FilePath = result;
-        document.FileSize = (int)model.File.Length;
+        
 
         try
         {
