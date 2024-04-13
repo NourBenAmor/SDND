@@ -9,7 +9,7 @@ namespace Sdnd_api.Data
 {
     public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
-        public AppDbContext(DbContextOptions options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 
@@ -17,6 +17,7 @@ namespace Sdnd_api.Data
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Annotation> Annotations { get; set; }
         public virtual DbSet<SharedDocument> SharedDocuments { get; set; }
+        public virtual DbSet<Models.File> Files { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -57,7 +58,6 @@ namespace Sdnd_api.Data
 
             builder.Entity<Document>(entity =>
             {
-
                 entity.HasMany<Annotation>()
                     .WithOne()
                     .HasForeignKey(e => e.documentId)
@@ -68,12 +68,19 @@ namespace Sdnd_api.Data
                     .OnDelete(DeleteBehavior.SetNull);
             });
 
-            builder.Entity<SharedDocument>()
-    .HasOne<Document>()
-    .WithMany()
-    .HasForeignKey(sd => sd.DocumentId)
-    .OnDelete(DeleteBehavior.SetNull);
+            builder.Entity<Models.File>(entity =>
+            {
+                entity.HasOne(f => f.Document)
+                    .WithMany(d => d.Files)
+                    .HasForeignKey(f => f.DocumentId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
 
+            builder.Entity<SharedDocument>()
+                .HasOne<Document>()
+                .WithMany()
+                .HasForeignKey(sd => sd.DocumentId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }
