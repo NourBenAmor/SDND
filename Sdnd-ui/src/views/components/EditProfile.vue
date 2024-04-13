@@ -86,7 +86,7 @@ const updateUser = async () => {
       return;
     }
 
-    const response = await axios.put(`http://localhost:7278/api/Account/update/${userId}`, formData, {
+    const response = await axios.put(`https://localhost:7278/api/Account/update/${userId}`, formData, {
       headers: {
         'Content-Type': 'application/json'
       }

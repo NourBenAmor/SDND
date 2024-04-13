@@ -21,9 +21,10 @@
         <input type="text" class="form-control" id="contentType" v-model="editedDocument.contentType" required>
       </div>
       <div class="form-group">
-        <label for="description" class="label">Description:</label>
-        <input type="text" class="form-control" id="description" v-model="editedDocument.description" required>
-      </div>
+  <label for="description" class="label">Description:</label>
+  <textarea class="form-control" id="description" v-model="editedDocument.description" required></textarea>
+</div>
+
       <div class="form-group">
         <label for="documentState" class="label">Document State:</label>
         <select class="form-control" v-model="editedDocument.documentState">

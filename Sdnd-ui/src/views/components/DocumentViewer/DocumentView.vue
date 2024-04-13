@@ -97,7 +97,7 @@
   const route = useRoute();
   const username =  ref('');
   const documentId = ref(route.params.id);
-  const src = ref(`http://localhost:7278/api/Document/pdf/${documentId.value}`);
+  const src = ref(`https://localhost:7278/api/Document/pdf/${documentId.value}`);
   const scale = ref(1) ; 
   const fitParent = ref(false);
   const { pdf, pages } = usePDF(src)
