@@ -18,6 +18,12 @@ public class AnnotationsController : ControllerBase
     }
 
 
+   /* public async Task<IActionResult> MakeAnnotation()
+    {
+        
+    }*/
+
+
     [HttpPost]
     public async Task<ActionResult<Annotation>> PostAnnotation(Annotation annotation)
     {
@@ -38,4 +44,11 @@ public class AnnotationsController : ControllerBase
 
         return annotations;
     }
+
+    [HttpPost("saveAnnotations")]
+    public async Task<IActionResult> AllAnnotations([FromBody] Object data)
+    {
+        return Accepted(data);
+    }
+    
 }

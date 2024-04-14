@@ -2,8 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Sdnd_api.Models;
-using System;
-using System.Collections.Generic;
+using Sdnd_Api.Models;
 
 namespace Sdnd_api.Data
 {
@@ -17,6 +16,7 @@ namespace Sdnd_api.Data
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Annotation> Annotations { get; set; }
         public virtual DbSet<SharedDocument> SharedDocuments { get; set; }
+        public virtual DbSet<DocFile> DocFiles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -57,7 +57,7 @@ namespace Sdnd_api.Data
 
             builder.Entity<Document>(entity =>
             {
-
+                
                 entity.HasMany<Annotation>()
                     .WithOne()
                     .HasForeignKey(e => e.documentId)
@@ -66,13 +66,14 @@ namespace Sdnd_api.Data
                     .WithOne()
                     .HasForeignKey(e => e.DocumentId)
                     .OnDelete(DeleteBehavior.SetNull);
+                entity.HasMany<DocFile>()
+                    .WithOne()
+                    .HasForeignKey(e => e.DocumentId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
-            builder.Entity<SharedDocument>()
-    .HasOne<Document>()
-    .WithMany()
-    .HasForeignKey(sd => sd.DocumentId)
-    .OnDelete(DeleteBehavior.SetNull);
+            
+          
 
         }
     }
