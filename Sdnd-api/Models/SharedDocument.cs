@@ -6,5 +6,7 @@ namespace Sdnd_api.Models
     {
         public Guid DocumentId { get; set; }
         public Guid SharedWithUserId { get; set; }
+
+        public string Message { get; set; } = "";
     }
 }

@@ -5,6 +5,8 @@ using Sdnd_api.Data;
 using Sdnd_api.Dtos.Requests;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Authorization;
+using Sdnd_api.Dtos.QueryObjects;
+using Sdnd_api.Dtos.Responses;
 using Sdnd_api.Interfaces;
 using Sdnd_api.Services;
 
@@ -17,12 +19,13 @@ namespace Sdnd_api.Controllers;
 public class DocumentController : ControllerBase
 {
     private readonly AppDbContext _context;
-
+    private readonly IFileService _fileService;
     private readonly IUserAccessor _userAccessor;
-    public DocumentController(AppDbContext context, IUserAccessor userAccessor)
+    public DocumentController(AppDbContext context, IUserAccessor userAccessor,IFileService fileService)
     {
         _context = context;
         _userAccessor = userAccessor;
+        _fileService = fileService;
     }
 
     [HttpGet]
@@ -33,99 +36,96 @@ public class DocumentController : ControllerBase
         return Ok(Documents);
     }
 
+    
     [HttpGet("me")]
-    public IActionResult Get()
+    public IActionResult Get([FromQuery] DocumentQueryObject query)
     {
         var user = _userAccessor.GetCurrentUser();
 
         if (user == null)
             return BadRequest("Login first");
-        var userDocuments = _context.Documents
+        var documents = _context.Documents
             .Where(d => d.OwnerId == user.Id)
-            .ToList();
-        return Ok(userDocuments);
+            .AsQueryable();
+        if (!string.IsNullOrWhiteSpace(query.Name))
+            documents = documents.Where(s => s.Name.Contains(query.Name));
+        if (!string.IsNullOrWhiteSpace(query.Description))
+            documents = documents.Where(s => s.Description.Contains(query.Description));
+        if (query.DocumentState.HasValue)
+            documents = documents.Where(d => d.DocumentState == query.DocumentState.Value);
+        if (query.AddedDateBefore.HasValue)
+            documents = documents.Where(i => i.AddedDate.Date < query.AddedDateBefore);
+        if (query.AddedDateAfter.HasValue)
+            documents = documents.Where(i => i.AddedDate.Date > query.AddedDateAfter);
+        if (query.UpdatedDateBefore.HasValue)
+            documents = documents.Where(i => i.UpdatedDate.Date < query.UpdatedDateBefore);
+        if (query.UpdatedDateAfter.HasValue)
+            documents = documents.Where(i => i.UpdatedDate.Date > query.UpdatedDateAfter);
+        
+        return Ok(documents);
     }
 
 
     [HttpGet("{id}")]
-    public ActionResult<Document> GetDocumentById(Guid id)
+    public async Task<ActionResult<OneDocumentResponseDto>> GetDocumentById(Guid id)
     {
         if (string.IsNullOrEmpty(id.ToString()))
         {
             return NotFound("Document ID invalid");
         }
-        var document = _context.Documents.FirstOrDefault(e => e.Id == id);
+
+        // Fetch the document and handle not found case
+        var document = await _context.Documents.FindAsync(id);
         if (document == null)
         {
             return NotFound($"Document with ID {id} not found.");
         }
+
+        // Fetch document files using the file service
+        var documentFiles = await _fileService.GetDocFilesByDocumentId(id);
+
+        // Create and populate the response DTO
+        var responseDto = new OneDocumentResponseDto
+        {
+            Name = document.Name,
+            Description = document.Description ?? "", // Use null-coalescing for optional Description
+            OwnerId = document.OwnerId,
+            DocumentState = document.DocumentState,
+            Files = documentFiles // Assign the retrieved document files to the Files collection
+        };
+
+        return Ok(responseDto);
+    }
+
+
+
+    [HttpPost("add")]
+    public async Task<IActionResult> Post([FromBody] DocumentAddDto newDocument)
+    {
+        var user = _userAccessor.GetCurrentUser();
+        if (user == null)
+            return BadRequest("Login first");
+        Document document = new Document
+        {
+            Name = newDocument.Name,
+            Description = newDocument.Description,
+            OwnerId = user.Id,
+        };
+        await _context.Documents.AddAsync(document);
+        await _context.SaveChangesAsync();
         return Ok(document);
     }
 
 
-    [HttpPost("upload")]
-    public async Task<IActionResult> Upload([FromForm] FileUploadModel model)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-        var user = _userAccessor.GetCurrentUser();
-        if (user == null)
-            return BadRequest("Login First");
-        var newDocument = new Document
-        {
-            Name = model.Name,
-            Description = model.Description,
-           
-            Status = 1,
 
-        };
-        var result = await UploadFile(model.File, newDocument.Id);
-        if (result == "file not selected" || result == "file Already Exists")
-            return BadRequest("File Not Uploaded");
-
-
-        newDocument.FilePath = result;
-
-        newDocument.OwnerId = user.Id;
-        _context.Documents.Add(newDocument);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetDocumentById), new { id = newDocument.Id }, newDocument);
-
-    }
-
-
-
-    private async Task<string> UploadFile(IFormFile file, Guid DocumentId)
-    {
-        if (file == null && file.Length == 0)
-        {
-            return "file not selected";
-        }
-
-        var folderName = Path.Combine("Resource", "AllFiles");
-        var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-        if (!Directory.Exists(pathToSave))
-            Directory.CreateDirectory(pathToSave);
-        var fileName = DocumentId.ToString();
-        var fullPath = Path.Combine(pathToSave, fileName);
-        var dbPath = Path.Combine(folderName, fileName);
-
-        if (System.IO.File.Exists(fullPath))
-            return "file Already Exists";
-        await using (var stream = new FileStream(fullPath, FileMode.Create))
-        {
-            await file.CopyToAsync(stream);
-        }
-
-        return dbPath;
-    }
-
+    
 
     [HttpDelete("Delete/{id}")]
     public async Task<IActionResult> DeleteDocument(Guid id)
     {
-        try
+        
+        // make a method that deletes all the files for that document then delete the document by the doc Id 
+        /* try
         {
             var document = await _context.Documents.FindAsync(id);
             if (document == null)
@@ -147,7 +147,8 @@ public class DocumentController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, $"An error occurred while deleting the document: {ex.Message}");
-        }
+        }*/
+        return StatusCode(500, $"An error occurred while deleting the document");
     }
 
 
@@ -192,7 +193,6 @@ public class DocumentController : ControllerBase
         document.Name = model.Name;
         document.Description = model.Description;
         document.OwnerId = model.OwnerId;
-       
         document.DocumentState = model.DocumentState;
 
         try
@@ -215,127 +215,10 @@ public class DocumentController : ControllerBase
     }
 
 
-    [HttpPut("UpdateFile/{id}")]
-    public async Task<IActionResult> UpdateFile(Guid id, [FromForm] FileUpdate model)
-    {
-        var document = await _context.Documents.FindAsync(id);
 
-        if (document == null)
-        {
-            return NotFound($"Document with ID {id} not found.");
-        }
-
-        if (System.IO.File.Exists(document.FilePath))
-        {
-            System.IO.File.Delete(document.FilePath);
-        }
-
-        var result = await UploadFile(model.File, id);
-        if (result == "file not selected" || result == "file Already Exists")
-            return BadRequest("File Not Uploaded");
-
-        document.FilePath = result;
-        
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!DocumentExists(id))
-            {
-                return NotFound($"Document with ID {id} not found.");
-            }
-            else
-            {
-                throw;
-            }
-        }
-
-        return NoContent();
-    }
 
     private bool DocumentExists(Guid id)
     {
         return _context.Documents.Any(e => e.Id == id);
     }
-
- [HttpPost]
- public async Task<IActionResult> DownloadFile()
- {
-     var formCollection = await Request.ReadFormAsync();
-     var file = formCollection.Files.First();
-
-     var filePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", file.FileName));
-
-     using (var stream = new FileStream(filePath, FileMode.Create))
-     {
-         await file.CopyToAsync(stream);
-     }
-
-     return Ok();
- }
- [HttpGet]
-[Route("api/documents")]
-public IActionResult GetDocuments()
-{
-    var files = Directory.GetFiles("path_to_your_upload_folder")
-                         .Select(Path.GetFileName)
-                         .ToList();
-    return Ok(files);
-}
-
-    [HttpGet("Download/{id}")]
-    public async Task<IActionResult> DownloadDocument(Guid id)
-    {
-        try
-        {
-            var document = await _context.Documents.FindAsync(id);
-            if (document == null)
-            {
-                return NotFound($"Document with ID {id} not found.");
-            }
-
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), document.FilePath);
-            var memory = new MemoryStream();
-            using (var stream = new FileStream(filePath, FileMode.Open))
-            {
-                await stream.CopyToAsync(memory);
-            }
-            memory.Position = 0;
-
-            // Determine the content type based on the file extension or document type
-            var contentType = GetContentType(filePath); // Implement GetContentType method
-            var fileName = document.Name + ".pdf"; // Set the filename with .pdf extension
-
-            // Set the content-disposition header with the filename
-            Response.Headers.Add("content-disposition", $"attachment; filename=\"{fileName}\"");
-
-            return File(memory, contentType, fileName);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while downloading the document: {ex.Message}");
-        }
-    }
-
-    private string GetContentType(string filePath)
-    {
-        // Example implementation, you may need to expand this for different file types
-        var extension = Path.GetExtension(filePath).ToLowerInvariant();
-        return extension switch
-        {
-            ".pdf" => "application/pdf",
-            ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            _ => "application/octet-stream",
-        };
-    }
-
-
-
-
-    
-
 }
