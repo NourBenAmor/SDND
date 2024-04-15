@@ -14,9 +14,6 @@ class _FormulairePageState extends State<FormulairePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String name = '';
-  String contentType = '';
-  String description = '';
-  String type = '';
   double size = 0.0;
 
   @override
@@ -32,53 +29,15 @@ class _FormulairePageState extends State<FormulairePage> {
           child: ListView(
             children: [
               TextFormField(
-                decoration: InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(labelText: 'Nom'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a name';
+                    return 'Veuillez entrer un nom';
                   }
                   return null;
                 },
                 onSaved: (value) {
                   name = value!;
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Content Type'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a content type';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  contentType = value!;
-                },
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 10.0),
-                child: TextField(
-                  maxLines: null,
-                  keyboardType: TextInputType.multiline,
-                  decoration: InputDecoration(
-                    labelText: 'Description',
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (value) {
-                    description = value;
-                  },
-                ),
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Type'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a type';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  type = value!;
                 },
               ),
               SizedBox(height: 20),
