@@ -63,10 +63,12 @@
           <div class="modal-body">
             <form>
               <div class="form-group">
-                <label for="recipient-name" class="col-form-label">Share With</label>
-                <input type="text" class="form-control" placeholder="Write a valid Username" id="recipient-name"
-                  v-model="username">
-              </div>
+    <label for="recipient-name" class="col-form-label">Share With</label>
+    <select class="form-control" id="recipient-name" v-model="selectedUsername">
+      <option value="" disabled>Select a Username</option>
+      <option v-for="option in usernames" :key="option" :value="option">{{ option }}</option>
+    </select>
+  </div>
               <!-- <div class="form-group">
                 <label for="message-text" class="col-form-label">Message:</label>
                 <textarea class="form-control" id="message-text"></textarea>
@@ -84,44 +86,48 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
-  import BaseApiService from '../../../services/apiService';
-  import { useRouter,useRoute } from 'vue-router';
+import BaseApiService from '../../../services/apiService';
+import { useRouter, useRoute } from 'vue-router';
+import axios from "axios";
 
-  import { VuePDF, usePDF } from '@tato30/vue-pdf'
+import { VuePDF, usePDF } from '@tato30/vue-pdf'
 
-  
-  // const showModal = ref(false);
-  const router = useRouter();
-  const route = useRoute();
-  const username =  ref('');
-  const documentId = ref(route.params.id);
-  const src = ref(`https://localhost:7278/api/Document/pdf/${documentId.value}`);
-  const scale = ref(1) ; 
-  const fitParent = ref(false);
-  const { pdf, pages } = usePDF(src)
+
+// const showModal = ref(false);
+const router = useRouter();
+const route = useRoute();
+const username = ref('');
+const documentId = ref(route.params.id);
+const src = ref(`https://localhost:7278/api/Document/pdf/${documentId.value}`);
+const scale = ref(1);
+const fitParent = ref(false);
+const { pdf, pages } = usePDF(src)
+const selectedUsername = ref(''); // To store the selected username
+const usernames = ref([]);
 //   const showShareModal = (index) => {
 //     showModal.value = true;
-    
+
 //   };
-  const sharedocument = async ()=>{
-    try {
 
-      const ShareRequest = {
-        username : username.value,
-        documentId : documentId.value
+const sharedocument = async () => {
+  try {
 
-      }
-      console.log(ShareRequest);
-      const response = await BaseApiService(`Document/Share`).create(ShareRequest);
-      console.log(response.data);
-      router.push('/shared-documents');
+    const ShareRequest = {
+      username: username.value,
+      documentId: documentId.value
+
     }
-    catch(e){
-      console.error(e);
-    }
+    console.log(ShareRequest);
+    const response = await BaseApiService(`Document/Share`).create(ShareRequest);
+    console.log(response.data);
+    router.push('/shared-documents');
   }
+  catch (e) {
+    console.error(e);
+  }
+}
 const downloadDocument = async () => {
   try {
     const response = await BaseApiService('Document/Download').get(documentId.value, {
@@ -141,6 +147,23 @@ const downloadDocument = async () => {
     console.error('Error downloading document:', error);
   }
 }
+const fetchUsernames = async () => {
+  try {
+    const response = await axios.get('https://localhost:7278/api/Account/usernames');
+
+    if (response.status !== 200) {
+      throw new Error(`Failed to fetch usernames: ${response.status} - ${response.statusText}`);
+    }
+
+    usernames.value = response.data; // Set the fetched usernames to the ref
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+onMounted(() => {
+  fetchUsernames(); // Fetch usernames when the component is mounted
+});
 
 </script>
 
@@ -149,39 +172,41 @@ const downloadDocument = async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
   position: fixed;
   height: 100vh;
 }
 
 .button-container {
   display: flex;
-  gap: 10px; 
+  gap: 10px;
 }
 
 .viewer {
-  height: 80vh; 
-  width: 80%; 
+  height: 80vh;
+  width: 80%;
 }
+
 .modal-backdrop {
   display: none;
 }
+
 .tool-bar {
   background: #474747;
   color: #fff;
   padding: 1rem;
   width: 100%;
   height: 60px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 
 .middle-bar {
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .btn:hover {
@@ -199,7 +224,7 @@ const downloadDocument = async () => {
 }
 
 .file-container {
-  background: #00000041; 
+  background: #00000041;
   /* backdrop-filter: blur(3px); */
   color: #fff;
   width: 100%;
@@ -207,12 +232,14 @@ const downloadDocument = async () => {
   flex-direction: column;
   align-items: center;
   overflow: auto;
-  height:100%;
+  height: 100%;
 
 }
+
 .file-container::-webkit-scrollbar {
   background-color: #0000001a;
 }
+
 .file-container::-webkit-scrollbar-thumb {
   background-color: #474747;
 }
