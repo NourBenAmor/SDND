@@ -22,7 +22,7 @@ const userRoles = ref(['']);
 
 const fetchCurrentUser = async () => {
   try {
-    const response = await axios.get('http://localhost:7278/api/me', { headers: authHeader() });
+    const response = await axios.get('https://localhost:7278/api/me', { headers: authHeader() });
     currentUser.value = response.data;
     isLoggedIn.value = true;
     userRoles.value = response.data.roles; // Assign roles array to userRoles

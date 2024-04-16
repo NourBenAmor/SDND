@@ -1,8 +1,7 @@
 import 'dart:io';
-import 'package:esys_flutter_share_plus/esys_flutter_share_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:esys_flutter_share_plus/esys_flutter_share_plus.dart';
+
 
 
 class ListPdfPage extends StatefulWidget {
@@ -11,12 +10,13 @@ class ListPdfPage extends StatefulWidget {
 }
 
 class _ListPdfPageState extends State<ListPdfPage> {
-  late List<File> _pdfFiles; // Liste des fichiers PDF
+  List<File> _pdfFiles = [];
+  TextEditingController _editingController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _loadPdfFiles(); // Charger les fichiers PDF au démarrage de la page
+    _loadPdfFiles();
   }
 
   Future<void> _loadPdfFiles() async {
@@ -32,6 +32,43 @@ class _ListPdfPageState extends State<ListPdfPage> {
     setState(() {
       _pdfFiles = pdfFiles;
     });
+  }
+
+  void _renamePdfFile(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String currentName = _pdfFiles[index].path.split('/').last; // Nom actuel du fichier PDF
+        _editingController.text = currentName; // Initialiser le contrôleur de texte avec le nom actuel
+        return AlertDialog(
+          title: Text("Renommer le fichier"),
+          content: TextField(
+            controller: _editingController,
+            decoration: InputDecoration(hintText: 'Nouveau nom'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Annuler"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Fermer la boîte de dialogue
+              },
+            ),
+            TextButton(
+              child: Text("Valider"),
+              onPressed: () {
+                File oldFile = _pdfFiles[index];
+                String newPath = oldFile.path.replaceFirst(oldFile.path.split('/').last, _editingController.text);
+                oldFile.renameSync(newPath); // Renommer le fichier sur le système de fichiers
+                setState(() {
+                  _pdfFiles[index] = File(newPath); // Mettre à jour la liste avec le nouveau nom
+                });
+                Navigator.of(context).pop(); // Fermer la boîte de dialogue
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _deletePdfFile(int index) {
@@ -80,11 +117,16 @@ class _ListPdfPageState extends State<ListPdfPage> {
         itemBuilder: (context, index) {
           File pdfFile = _pdfFiles[index];
           return ListTile(
-            leading: Icon(Icons.picture_as_pdf), // Icône de fichier PDF
-            title: Text(
-              pdfFile.path.split('/').last, // Nom du fichier PDF
-              style: TextStyle(fontWeight: FontWeight.bold),
+            title: GestureDetector(
+              onDoubleTap: () {
+                _renamePdfFile(index);
+              },
+              child: Text(
+                pdfFile.path.split('/').last, // Nom du fichier PDF
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
+            leading: Icon(Icons.picture_as_pdf),
             subtitle: Text(
               'Taille: ${(pdfFile.lengthSync() / 1024).toStringAsFixed(2)} KB', // Taille du fichier PDF
             ),
@@ -113,15 +155,6 @@ class _ListPdfPageState extends State<ListPdfPage> {
                 }).toList();
               },
             ),
-            onTap: () {
-              // Naviguer vers la page de visualisation du PDF lorsque l'utilisateur clique sur un élément de la liste
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SavingPage(pdfFile: pdfFile),
-                ),
-              );
-            },
           );
         },
       )
@@ -131,25 +164,3 @@ class _ListPdfPageState extends State<ListPdfPage> {
     );
   }
 }
-
-class SavingPage extends StatelessWidget {
-  final File pdfFile;
-
-  const SavingPage({Key? key, required this.pdfFile}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('PDF Viewer'),
-      ),
-      body: Center(
-        child: PDFView(
-          filePath: pdfFile.path,
-          onPageChanged: (int? page, int? total) {},
-        ),
-      ),
-    );
-  }
-}
-

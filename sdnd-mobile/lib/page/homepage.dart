@@ -1,8 +1,11 @@
+import 'package:airsafe/page/compte/login_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
 
 import 'package:airsafe/page/tab_page.dart';
+
+import 'home_page.dart';
 
 class homePage extends StatelessWidget {
   const homePage({super.key});
@@ -85,7 +88,7 @@ class homePage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const TabPage()),
+                            MaterialPageRoute(builder: (context) => const HomePage()),
                           );
                         },
                         style: ElevatedButton.styleFrom(

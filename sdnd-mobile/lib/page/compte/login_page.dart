@@ -10,6 +10,8 @@ import 'package:airsafe/page/commun/page_heading.dart';
 import 'package:airsafe/page/commun/custom_form_button.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../home_page.dart';
+
 const storage = FlutterSecureStorage();
 
 class LoginPage extends StatefulWidget {
@@ -24,13 +26,10 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final String baseUrl = 'http://10.0.2.2:7278/api';
+  final String baseUrl = 'https://10.0.2.2:7278/api';
   Future<void> _handleLoginUser(BuildContext context) async {
     final url = Uri.parse('$baseUrl/Account/login');
     final headers = {'Content-Type': 'application/json'};
-
-    print('Username: ${usernameController.text}');
-    print('Password: ${passwordController.text}');
 
     // Check if both username and password are provided
     if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
@@ -47,18 +46,47 @@ class _LoginPageState extends State<LoginPage> {
       final response = await http.post(url, headers: headers, body: body);
 
       if (response.statusCode == 200) {
-        // Login successful
         final responseData = jsonDecode(response.body);
-        print('Login Successful');
         print('User ID: ${responseData['id']}');
         print('Username: ${responseData['username']}');
         print('Email: ${responseData['email']}');
         print('Token: ${responseData['token']}');
         String token = jsonDecode(response.body)['token'];
         await storage.write(key: 'jwt_token', value: token);
-        //Get.to(() => const UploadDocumentForm());
-        // Add further logic here (e.g., navigation to home screen)
-      } else if (response.statusCode == 400) {
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Align(
+              alignment: Alignment.center,
+              child: Text(
+                'Login successful',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            duration: Duration(seconds: 5),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            margin: EdgeInsets.symmetric(horizontal: 20.0),
+            padding: EdgeInsets.symmetric(vertical: 15.0),
+          ),
+        );
+
+        // Delay navigation to allow SnackBar display
+        await Future.delayed(Duration(seconds: 2)); // Adjust delay as needed
+
+        // Navigate to homepage
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      }
+
+
+
+      else if (response.statusCode == 400) {
         // Bad request, probably validation error
         print('Failed to login: ${response.body}');
         // Add further error handling logic here (e.g., displaying error message)
