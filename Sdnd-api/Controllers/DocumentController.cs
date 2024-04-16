@@ -90,6 +90,8 @@ public class DocumentController : ControllerBase
             Name = document.Name,
             Description = document.Description ?? "", // Use null-coalescing for optional Description
             OwnerId = document.OwnerId,
+            AddedDate = document.AddedDate,
+            UpdatedDate = document.UpdatedDate,
             DocumentState = document.DocumentState,
             Files = documentFiles // Assign the retrieved document files to the Files collection
         };
