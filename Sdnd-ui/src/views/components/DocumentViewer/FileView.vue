@@ -30,23 +30,29 @@
           data-bs-target="#exampleModalMessage">
           <i class="fas fa-share text-primary me-1" aria-hidden="true"></i>Share
         </button>
-        <button class="btn btn-link text-secondary px-1  mb-0 mx-2">
-          <i class="fas fa-pen text-primary me-1" aria-hidden="true"></i>Add Annotations
+        <button @click="addAnnotation" class="btn btn-link text-secondary px-1  mb-0 mx-2">
+          <i class="fas fa-pen text-primary me-1" aria-hidden="true"></i> <a
+            style="text-decoration: none; color: inherit;" :href="viewersrc" target="_blank">Add Annotations</a>
+        </button>
+        <button @click="showSignatureToolbar" class="btn btn-link text-secondary px-1  mb-0 mx-2">
+          <i class="fas fa-signature text-primary me-1" aria-hidden="true"></i>Add Signature
         </button>
       </div>
     </div>
 
-
-
-
     <div class="file-container">
+
+      <PdfAnnotate v-if="SignatureToolbar" />
+
+
       <div v-for="page in pages" :key="page">
-        <VuePDF :pdf="pdf" :scale="scale" :page="page" style=" margin-bottom:12px;" :fit-parent="fitParent">
+        <VuePDF :pdf="pdf" :scale="scale" :page="page" style=" margin-bottom:10px;" :fit-parent="fitParent">
           <div>
             Loading...
           </div>
         </VuePDF>
       </div>
+
     </div>
 
     <!-- Modal -->
@@ -85,26 +91,28 @@
 
 <script setup>
   import { ref } from 'vue';
-
   import BaseApiService from '../../../services/apiService';
   import { useRouter,useRoute } from 'vue-router';
-
   import { VuePDF, usePDF } from '@tato30/vue-pdf'
+  import PdfAnnotate from '../PdfAnnotate.vue';
 
-  
   // const showModal = ref(false);
   const router = useRouter();
   const route = useRoute();
   const username =  ref('');
   const documentId = ref(route.params.id);
-  const src = ref(`https://localhost:7278/api/Document/pdf/${documentId.value}`);
+  const src = defineProps("url");
+  const viewersrc = ref("../../../web/viewer.html?file="+src.value);
   const scale = ref(1) ; 
   const fitParent = ref(false);
-  const { pdf, pages } = usePDF(src)
-//   const showShareModal = (index) => {
+  const { pdf, pages } = usePDF(src);
+  const SignatureToolbar = ref(false);
+ //   const showShareModal = (index) => {
 //     showModal.value = true;
     
 //   };
+
+
   const sharedocument = async ()=>{
     try {
 
@@ -121,6 +129,9 @@
     catch(e){
       console.error(e);
     }
+  }
+  const showSignatureToolbar = () =>{
+    SignatureToolbar.value = !SignatureToolbar.value;
   }
 const downloadDocument = async () => {
   try {
@@ -153,6 +164,8 @@ const downloadDocument = async () => {
   position: fixed;
   height: 100vh;
 }
+
+
 
 .button-container {
   display: flex;
@@ -192,20 +205,23 @@ const downloadDocument = async () => {
   margin-left: 1rem;
 }
 
+
+
 .error {
   background: orangered;
   color: #fff;
   padding: 1rem;
 }
 
+
+
 .file-container {
   background: #00000041; 
-  /* backdrop-filter: blur(3px); */
   color: #fff;
   width: 100%;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  justify-content: center;
   overflow: auto;
   height:100%;
 

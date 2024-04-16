@@ -3,10 +3,12 @@
     <div class="card">
       <!-- Documents Table -->
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h6 class="mb-0">Documents Table</h6>
+        <h6 class="mb-0">My Documents</h6>
         <div class="d-flex align-items-center">
-          <input type="text" v-model="filterText" class="form-control me-2" style="height: 38px"
-            placeholder="Enter Name" />
+
+          <Dropdown v-model="CurrentDocumentState" :options="DocumentStates" optionLabel="name"
+            placeholder="DocumentState" class="dropdown w-full md:w-14rem mt-3 mb-3" />
+          <InputText class="searchInput" v-model="filterText" type="text" placeholder="Search" />
           <button class="btn btn-primary px-0 mb-0 d-flex align-items-center text-nowrap px-2 mx-2"
             @click="openAddDocumentView(document)" href="javascript:;">
             <i class="fas fa-add me-2" aria-hidden="true"></i> Add New Document
@@ -22,9 +24,6 @@
                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                   Name
                 </th>
-                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                  Content Type
-                </th>
                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                   Document State
                 </th>
@@ -33,10 +32,19 @@
                   Description
                 </th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                  Creation Date
-                  <button class="btn btn-link btn-sm" @click="sortByDate">
+                  Added Date
+                  <button class="btn btn-link btn-sm p-1 m-1" @click="sortByDate">
                     <div class="sorting-icons">
                       <i class="fas fa-sort-up" aria-hidden="true"></i>
+                      <i class="fas fa-sort-down" aria-hidden="true"></i>
+                    </div>
+                  </button>
+                </th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                  Updated Date
+                  <button class="btn btn-link btn-sm p-1 m-1" @click="sortByDate">
+                    <div class="sorting-icons">
+                      <i class="fas fa-sort-up m-0 p-0" aria-hidden="true"></i>
                       <i class="fas fa-sort-down" aria-hidden="true"></i>
                     </div>
                   </button>
@@ -55,27 +63,24 @@
                     </div>
                   </div>
                 </td>
-                <td>
-                  <p class="text-xs font-weight-bold mb-0">
-                    {{ document.contentType }}
-                  </p>
-                </td>
+
 
                 <td class="align-middle text-center text-sm">
-                  <p class="badge badge-sm bg-gradient-success">
+                  <p class="badge badge-md bg-gradient-success fs-20  mx-auto my-auto">
                     {{ getDocumentStateString(document.documentState) }}
                   </p>
                 </td>
                 <td class="align-middle text-center">
-  <span class="text-wrap d-inline-block" style="max-width: 300px;">
-    <span class="text-xs font-weight-bold mb-0">
-      {{ document.description.length > 50 ? document.description.slice(0, 50) + '...' : document.description }}
-      <span v-if="document.description.length > 50" class="view-all">
-        <a href="#" @click="showFullDescription(document.description)">View All</a>
-      </span>
-    </span>
-  </span>
-</td>
+                  <span class="text-wrap d-inline-block" style="max-width: 300px;">
+                    <span class="text-xs font-weight-bold mb-0">
+                      {{ document.description.length > 42 ? document.description.slice(0, 42) + '...' :
+                      document.description }}
+                      <span v-if="document.description.length > 42" class="view-all">
+                        <a href="#" @click="showFullDescription(document.description)">View All</a>
+                      </span>
+                    </span>
+                  </span>
+                </td>
 
 
 
@@ -84,12 +89,22 @@
                     formatDate(document.addedDate)
                     }}</span>
                 </td>
+                <td class="align-middle text-center">
+                  <span class="text-secondary text-xs font-weight-bold">{{
+                    formatDate(document.updatedDate)
+                    }}</span>
+                </td>
                 <td class="align-middle d-flex">
                   <div class="ms-auto text-end">
-                    <a class="btn btn-link text-green px-3 mb-0" @click="openDocumentView(document.id)"
-                      href="javascript:;">
+                    <button class="btn btn-link text-green px-3 mb-0" @click="openDocumentView(document.id)">
                       <i class="fas fa-eye text-green ms-2" aria-hidden="true"></i>{{ " " }}View
-                    </a>
+                    </button>
+
+                    <Sidebar v-if="docDetailsVisible" v-model:visible="docDetailsVisible" header="Document Details" :documentId="document.id"
+                      position="full">
+                      <Document />
+                    </Sidebar>
+
                     <a class="btn btn-link text-dark px-3 mb-0" @click="openEditView(document.id)">
                       <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit
                     </a>
@@ -132,39 +147,55 @@
       </li>
     </ul>
   </nav>
-  <div class="modal fade" id="fullDescriptionModal" tabindex="-1" role="dialog" aria-labelledby="fullDescriptionModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="fullDescriptionModalLabel">Full Description</h5>
-        <button type="button" class="close" @click="hideFullDescriptionModal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>{{ fullDescription }}</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" @click="hideFullDescriptionModal">Close</button>
+  <div class="modal fade" id="fullDescriptionModal" tabindex="-1" role="dialog"
+    aria-labelledby="fullDescriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="fullDescriptionModalLabel">Full Description</h5>
+          <button type="button" class="close" @click="hideFullDescriptionModal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>{{ fullDescription }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="hideFullDescriptionModal">Close</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 </template>
 
 <script setup>
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import Dropdown from 'primevue/dropdown';
+import InputText from'primevue/inputtext';
+import Sidebar from 'primevue/sidebar';
 import { computed, ref, onMounted,watch } from "vue";
 import {toast} from 'vue3-toastify';
 import BaseApiService from "../../services/apiService";
 import AddDocument from "./AddDocument.vue";
 import ConfirmationModalVue from "./ConfirmationModal.vue";
+import Document from "./DocumentViewer/Document.vue";
 const documents = ref([]);
 const filterText = ref("");
 const showDeleteModal = ref(false);
 const showAddDocModal = ref(false);
+let docDetailsVisible = ref(false);
+const filters = ref({
+  name: '',
+  description: '',
+  documentState: null,
+  // addedDateBefore: '',
+  // addedDateAfter: '',
+  // updatedDateBefore: '',
+  // updatedDateAfter: ''
+});
+
 const documentIndexToDelete = ref(null);
 const currentPage = ref(1);
 const documentsPerPage = 6;
@@ -176,6 +207,13 @@ const totalPages = computed(() =>
   Math.ceil(totalDocuments.value / documentsPerPage)
 );
 
+const CurrentDocumentState = ref(null);
+const DocumentStates = ref([
+  { name: 'Blank', code: 0 },
+  { name: 'Filled', code: 1 },
+  { name: 'Shared', code: 2 },
+  { name: 'Archived', code: 3 },
+]);
 const changePage = (page) => {
   currentPage.value = page;
 };
@@ -192,10 +230,27 @@ const prevPage = () => {
   }
 };
 
+watch(filterText, (newFilterText) => {
+  filters.value.name = newFilterText;
+  filters.value.description = newFilterText;
+  fetchDocuments();
+});
+
+
+watch(CurrentDocumentState, (newVal) => {
+  if (newVal.code) {
+    filters.value.documentState = newVal.code;
+  } else {
+    filters.value.documentState = null; // Set to null or any appropriate value when state is not selected
+  }
+  console.log(filters.value);
+  fetchDocuments();
+});
 
 const fullDescription = ref('');
 
 const showFullDescription = (description) => {
+  store.state.showOverlay = true;
   fullDescription.value = description;
   const modal = document.getElementById('fullDescriptionModal');
   if (modal) {
@@ -205,6 +260,7 @@ const showFullDescription = (description) => {
 };
 
 const hideFullDescriptionModal = () => {
+  store.state.showOverlay = false;
   const modal = document.getElementById('fullDescriptionModal');
   if (modal) {
     modal.classList.remove('show');
@@ -212,17 +268,17 @@ const hideFullDescriptionModal = () => {
   }
 };
 const paginatedAndFilteredDocuments = computed(() => {
-  const filtered = documents.value.filter((document) =>
-    document.name.toLowerCase().includes(filterText.value.toLowerCase())
-  );
-
+  // const filtered = documents.value.filter((document) =>
+  //   document.name.toLowerCase().includes(filterText.value.toLowerCase())
+  // );
+  const filtered = documents.value;
   const startIndex = (currentPage.value - 1) * documentsPerPage;
   const endIndex = startIndex + documentsPerPage;
   return filtered.slice(startIndex, endIndex);
 });
 const fetchDocuments = async () => {
   try {
-    const response = await BaseApiService(`Document/me`).list();
+    const response = await BaseApiService(`Document/me`).list({ params: filters.value });
     console.log(response.data);
     documents.value = response.data;
   } catch (error) {
@@ -239,6 +295,7 @@ onMounted(() => {
   fetchDocuments();
 });
 
+
 const openEditView = (documentId) => {
   router.push({ name: "EditView", params: { id: documentId } });
 };
@@ -246,30 +303,35 @@ const openEditView = (documentId) => {
 const openAddDocumentView = () => {
   showAddDocModal.value = true;
   store.state.showOverlay = true;
+
 };
 
 
 async function addDocument(newDoc) {
   try {
+    console.log(newDoc)
     const formData = new FormData();
     formData.append('Name', newDoc.name);
     formData.append('Description', newDoc.description);
-    formData.append('contentType', newDoc.contentType);
-    formData.append('file', newDoc.file);
-    const response = await BaseApiService(`Document/upload`).create(formData);
+    const response = await BaseApiService(`Document/add`).create(newDoc);
     await hideAllModals();
+    fetchDocuments();
     toast.success("Document Added Successfully !", {
       autoClose: 1000,
       position: toast.POSITION.BOTTOM_RIGHT,
     });
+
     console.log(response.data);
   } catch (e) {
     console.log(e);
   }
 }
-const openDocumentView = (documentId) => {
-  router.push({ name: "document-view", params: { id: documentId } });
-};
+async function openDocumentView(id) {
+  store.state.documentId = id; // Update state
+  await new Promise((resolve) => setTimeout(resolve, 0)); // Wait for a tick
+  console.log("store documentid ",store.state.documentId)
+  docDetailsVisible.value = true; // Execute after state update
+}
 
 
 const showConfirmDeleteModal = (index) => {
@@ -280,13 +342,13 @@ const showConfirmDeleteModal = (index) => {
 const getDocumentStateString = (documentState) => {
   switch (documentState) {
     case 0:
-      return "Uploaded";
+      return "Blank";
     case 1:
-      return "OCR Pending";
+      return "Filled";
     case 2:
-      return "Signed";
-    default:
-      return "Unknown";
+      return "Shared";
+    case 3:
+      return "Archived";
   }
 };
 const handleDeleteConfirm = async () => {
@@ -341,6 +403,14 @@ const sortByDate = () => {
 .sorting-icons {
   display: flex;
   flex-direction: column;
+}
+.dropdown , .searchInput {
+  height:40px;
+  margin-right: 10px;
+  border-radius: 10px;
+}
+#fullDescriptionModal {
+  z-index: 100001;
 }
 </style>
 ../../services/apiService
