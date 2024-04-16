@@ -16,7 +16,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer((builder.Configuration.GetConnectionString("DefaultConnection")));
 });
 
-
 // Add services to the container.
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
     {

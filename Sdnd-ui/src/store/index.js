@@ -5,6 +5,7 @@ export default createStore({
     auth,
   },
   state: {
+    documentId: null,
     hideConfigButton: false,
     isPinned: false,
     showConfig: false,

@@ -1,14 +1,8 @@
 <template>
-  
-
     <div  v-if="show" class="add-new-document-container">
       <div class="form-group">
       <label for="name" class="label">Name:</label>
       <input type="text" class="form-control" id="name" v-model="newDocument.name" required>
-    </div>
-    <div class="form-group">
-      <label for="contentType" class="label">Content Type:</label>
-      <input type="text" class="form-control" id="contentType" v-model="newDocument.contentType" required>
     </div>
     <div class="form-group">
       <label for="description" class="label">Description:</label>
@@ -17,7 +11,7 @@
   </div>
     
     <div class="form-group">
-      <label for="fileInput" class="label">Update File:</label>
+      <label for="fileInput" class="label">Add File:</label>
       <input type="file" class="form-control" id="file" @change="handleFileUpload">
     </div>
     <div class="button-container">
