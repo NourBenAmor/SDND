@@ -9,6 +9,7 @@ using Sdnd_api.Dtos.QueryObjects;
 using Sdnd_api.Dtos.Responses;
 using Sdnd_api.Interfaces;
 using Sdnd_api.Services;
+using Sdnd_Api.Models;
 
 
 namespace Sdnd_api.Controllers;
@@ -222,5 +223,22 @@ public class DocumentController : ControllerBase
     private bool DocumentExists(Guid id)
     {
         return _context.Documents.Any(e => e.Id == id);
+    }
+
+    [HttpGet("{documentId}/files")]
+    public async Task<IActionResult> GetFilesOfDocument(Guid documentId)
+    {
+        var document = await _context.Documents.FindAsync(documentId);
+
+        if (document == null)
+        {
+            return NotFound($"Document with ID {documentId} not found.");
+        }
+
+        var docFiles = await _context.DocFiles
+            .Where(df => df.DocumentId == documentId)
+            .ToListAsync();
+
+        return Ok(docFiles);
     }
 }

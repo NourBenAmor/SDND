@@ -190,17 +190,21 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form>
-                                <div class="form-group">
-                                    <label for="recipient-name" class="col-form-label">Share With</label>
-                                    <input type="text" class="form-control" placeholder="Write a valid Username"
-                                        id="recipient-name" v-model="username">
-                                </div>
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Share With</label>
+                <input type="text" class="form-control" placeholder="Write a valid Username" id="recipient-name"
+                  v-model="username">
+              </div>
+    <label for="recipient-name" class="col-form-label">Share With</label>
+    <select class="form-control" id="recipient-name" v-model="selectedUsername">
+      <option value="" disabled>Select a Username</option>
+      <option v-for="option in usernames" :key="option" :value="option">{{ option }}</option>
+    </select>
+  </div>
                                 <!-- <div class="form-group">
                 <label for="message-text" class="col-form-label">Message:</label>
                 <textarea class="form-control" id="message-text"></textarea>
               </div> -->
-                            </form>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn bg-gradient-secondary"
@@ -209,7 +213,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
         </SplitterPanel>
     </Splitter>
 </template>
@@ -324,13 +327,25 @@ const src = defineProps("url");
 const viewersrc = ref("../../../web/viewer.html?file=" + src.value);
 const scale = ref(1);
 const fitParent = ref(false);
-const { pdf, pages } = usePDF("https://localhost:7278/api/document/pdf/7e19b301-346c-49cc-ab03-ee6008f700f9");
+const { pdf, pages } = usePDF("https://localhost:7278/api/document/pdf/f19e2d4e-d36f-44d5-b39e-7c79f87f57b5");
 const SignatureToolbar = ref(false);
 //   const showShareModal = (index) => {
 //     showModal.value = true;
 
 //   };
-
+const selectedUsername = ref(''); // To store the selected username
+const usernames = ref([]);
+const fetchUsernames = async () => {
+  try {
+    const response = await BaseApiService(`Account/me`).list();
+    if (response.status !== 200) {
+      throw new Error(`Failed to fetch usernames: ${response.status} - ${response.statusText}`);
+    }
+    usernames.value = response.data; // Set the fetched usernames to the ref
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const sharedocument = async () => {
     try {
@@ -371,7 +386,9 @@ const downloadDocument = async () => {
         console.error('Error downloading document:', error);
     }
 }
-
+onMounted(() => {
+  fetchUsernames(); // Fetch usernames when the component is mounted
+});
 </script>
 
 <style lang="scss" scoped>

@@ -28,12 +28,25 @@
       <span v-if="error" class="text-danger">Error Updating document. Please try again.</span>
     </div>
   </div>
+  <div class="form-group">
+  <label for="fileInput" class="label">Attach File:</label>
+  <div class="d-flex align-items-center">
+    <input type="file" class="form-control" id="fileInput" style="display: none" @change="handleFileSelection">
+    <button class="btn btn-outline-secondary mr-2" style="color: #333; border-color: #ccc;" @click="selectFile">Select File</button>
+    <button class="btn btn-primary" @click="attachSelectedFile">Save Attachment</button>
+    <div id="notification" class="mt-2" style="display: none;"></div>
+</div>
+</div>
+
+
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import BaseApiService from '../../services/apiService';
 import { useRouter} from 'vue-router';
+import axios from 'axios';
+
 const router = useRouter();
 const props = defineProps({
   documentId:String
@@ -108,8 +121,60 @@ const onFileChange = (event) => {
   file.value = event.target.files[0];
 };
 
+const attachFile = async (documentId) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file.value);
+
+    const response = await axios.post(`https://localhost:7278/api/File/${documentId}/attach-file`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    // Handle response
+    console.log('File attached successfully:', response.data);
+    
+    // Show success notification
+    showNotification('File attached successfully!', 'success');
+  } catch (error) {
+    // Handle error
+    console.error('Error attaching file:', error.response.data);
+    
+    // Show error notification
+    showNotification('Error attaching file. Please try again.', 'error');
+  }
+};
+
+const showNotification = (message, type) => {
+  const notificationDiv = document.getElementById('notification');
+  notificationDiv.textContent = message;
+  notificationDiv.style.display = 'block';
+  notificationDiv.classList.remove('alert-success', 'alert-danger');
+  
+  if (type === 'success') {
+    notificationDiv.classList.add('alert', 'alert-success');
+  } else if (type === 'error') {
+    notificationDiv.classList.add('alert', 'alert-danger');
+  }
+};
+
+const handleFileSelection = (event) => {
+  file.value = event.target.files[0];
+};
+
+const attachSelectedFile = () => {
+  attachFile(props.documentId);
+};
+
+const selectFile = () => {
+  const fileInput = document.getElementById('fileInput');
+  fileInput.click();
+};
+
 
 onMounted(fetchDocument);
+
 </script>
 
 <style scoped>

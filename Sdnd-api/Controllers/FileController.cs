@@ -86,7 +86,48 @@ public class FileController : ControllerBase
 
     }
 
-    
+    [HttpPost("{documentId}/attach-file")]
+    public async Task<IActionResult> AttachFileToDocument(Guid documentId, [FromForm] FileUploadModel fileModel)
+    {
+        var document = await _context.Documents.FindAsync(documentId);
+
+        if (document == null)
+        {
+            return NotFound($"Document with ID {documentId} not found.");
+        }
+
+        if (fileModel.File == null || fileModel.File.Length == 0)
+        {
+            return BadRequest("No file uploaded or file is empty.");
+        }
+
+        // Créez un nouvel objet DocFile pour représenter le fichier
+        var docFile = new DocFile
+        {
+            DocumentId = documentId, // Associez le fichier au document
+            Name = fileModel.File.FileName // Utilisez le nom du fichier comme valeur pour la propriété 'Name'
+        };
+
+
+        // Utilisez la méthode UploadFile de votre service FileService pour télécharger le fichier et récupérer le chemin d'accès
+        var filePath = await _fileService.UploadFile(docFile, fileModel.File);
+
+        // Assurez-vous que le téléchargement du fichier s'est bien passé
+        if (filePath == null)
+        {
+            return BadRequest("File upload failed.");
+        }
+
+        // Mettez à jour le chemin d'accès du fichier dans l'objet DocFile
+        docFile.FilePath = filePath;
+
+        // Ajoutez le fichier à la base de données
+        _context.DocFiles.Add(docFile);
+        await _context.SaveChangesAsync();
+
+        return Ok(docFile);
+    }
+
 }
 
 
