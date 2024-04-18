@@ -44,15 +44,15 @@ namespace Sdnd_api.Data
                 entity.HasMany<Document>()
                     .WithOne()
                     .HasForeignKey(e => e.OwnerId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.NoAction);
                 entity.HasMany<SharedDocument>()
                     .WithOne()
                     .HasForeignKey(e => e.SharedWithUserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.NoAction);
                 entity.HasMany<Annotation>()
                     .WithOne()
                     .HasForeignKey(e => e.userId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             builder.Entity<Document>(entity =>
@@ -65,11 +65,11 @@ namespace Sdnd_api.Data
                 entity.HasMany<SharedDocument>()
                     .WithOne()
                     .HasForeignKey(e => e.DocumentId)
-                    .OnDelete(DeleteBehavior.SetNull);
+                    .OnDelete(DeleteBehavior.NoAction);
                 entity.HasMany<DocFile>()
                     .WithOne()
                     .HasForeignKey(e => e.DocumentId)
-                    .OnDelete(DeleteBehavior.SetNull);
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             
