@@ -54,7 +54,7 @@ class _CameraPageState extends State<CameraPage> {
         canUseGallery: true,
         androidScanTitle: 'Scanning',
         androidCropTitle: 'Crop',
-        androidCropBlackWhiteTitle: 'Black White',
+        androidCropBlackWhiteTitle: 'Black ',
         androidCropReset: 'Reset',
       );
 

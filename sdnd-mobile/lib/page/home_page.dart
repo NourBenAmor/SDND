@@ -7,9 +7,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'UploadDocumentForm.dart';
 import 'camera_page.dart';
 import 'editing_page.dart';
-
 import 'history_page.dart'; // Importez la nouvelle classe de page pour afficher le contenu du document
-
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -25,11 +23,9 @@ class _HomePageState extends State<HomePage> {
     // Navigation vers la page d'importation de documents
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => UploadDocumentForm()),
+      MaterialPageRoute(builder: (context) => UploadDocumentForm(token: '',)),
     );
   }
-
-
 
   Future<void> _pickImage() async {
     final ImagePicker _picker = ImagePicker();
@@ -69,9 +65,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _shareFolder(int index) {
-
-  }
+  void _shareFolder(int index) {}
 
   void _navigateToListPdfPage(BuildContext context) {
     Navigator.push(
@@ -151,7 +145,6 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-
           Expanded(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,7 +154,10 @@ class _HomePageState extends State<HomePage> {
                     itemCount: folders.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        leading: Icon(Icons.folder),
+                        leading: Hero(
+                          tag: 'folder_icon_$index', // Utilisez un tag unique pour chaque Hero
+                          child: Icon(Icons.folder),
+                        ),
                         title: Text(folders[index]),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -182,7 +178,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         onTap: () {
                           // Navigation vers la page de contenu du document lorsque l'utilisateur clique sur un document
-
+                          // Vous pouvez également utiliser Hero ici pour animer la transition si nécessaire
                         },
                       );
                     },
@@ -238,4 +234,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
