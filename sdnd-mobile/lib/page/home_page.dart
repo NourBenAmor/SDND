@@ -1,6 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
-import 'package:esys_flutter_share_plus/esys_flutter_share_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -8,18 +9,129 @@ import 'UploadDocumentForm.dart';
 import 'camera_page.dart';
 import 'editing_page.dart';
 
-import 'history_page.dart'; // Importez la nouvelle classe de page pour afficher le contenu du document
+import 'history_page.dart';
+import 'multiple_image.dart'; // Import the new page class to display document content
+class Document {
+  final String name;
+  final String description;
+  final String ownerId;
+  final DateTime addedDate;
+  final DateTime updatedDate;
+  final String documentState;
+  final List<String> files;
 
+  Document({
+    required this.name,
+    required this.description,
+    required this.ownerId,
+    required this.addedDate,
+    required this.updatedDate,
+    required this.documentState,
+    required this.files,
+  });
+
+}
+class DocumentQueryObject {
+  final String? name;
+  final String? description;
+  final State? documentState;
+  final DateTime? addedDateBefore;
+  final DateTime? addedDateAfter;
+  final DateTime? updatedDateBefore;
+  final DateTime? updatedDateAfter;
+
+  DocumentQueryObject({
+    this.name,
+    this.description,
+    this.documentState,
+    this.addedDateBefore,
+    this.addedDateAfter,
+    this.updatedDateBefore,
+    this.updatedDateAfter,
+  });
+}
+enum documentState {
+  Blank,
+  Filled,
+  Shared,
+  Archived,
+}
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final String token; // Define _token as a parameter for the HomePage widget
+
+  const HomePage({Key? key, required this.token}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  late String _token; // Define _token within the state class
+  List<Document> _documents = []; // State variable to store documents
   List<String> folders = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _token = widget.token;
+    _fetchDocuments(_token);
+  }
+
+  Future<void> _fetchDocuments(String token) async {
+    final url = Uri.parse('https://10.0.2.2:7278/api/Document/me');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final dynamic responseBody = jsonDecode(response.body);
+        if (responseBody != null && responseBody is List<dynamic>) { // Check if responseBody is not null and is a List
+          final List<dynamic> data = responseBody;
+          setState(() {
+            _documents = data.map((doc) {
+              // Extracting file paths from the list of maps
+              List<String> files = (doc['files'] as List<dynamic>?)
+                  ?.map<String>((file) => file['path'].toString())
+                  .toList() ?? [];
+
+              return Document(
+                name: doc['name'],
+                description: doc['description'].toString() ?? '',
+                ownerId: doc['ownerId'].toString() ?? '',
+                addedDate: DateTime.parse(doc['addedDate'].toString()),
+                updatedDate: DateTime.parse(doc['updatedDate'].toString()),
+                documentState: doc['documentState'].toString(),
+                files: files,
+              );
+            }).toList();
+
+
+            // Log the documents here
+            print('Documents: $_documents');
+          });
+        } else {
+          print('Response body from API is null or not a List');
+        }
+      } else {
+        throw Exception('Failed to load documents (Status Code: ${response.statusCode})');
+      }
+    } on SocketException catch (e) {
+      // Handle network errors
+      print('Socket Exception: $e');
+      // Show error message to the user
+    } catch (e) {
+      // Handle other exceptions
+      print('Exception: $e');
+      // Show error message to the user
+    }
+  }
+
 
   Future<void> _createNewFolder(BuildContext context) async {
     // Navigation vers la page d'importation de documents
@@ -107,6 +219,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,20 +227,19 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           Container(
-            width: double.infinity, // Prend toute la largeur de l'écran
-            height: MediaQuery.of(context).size.height / 4, // Un quart de la hauteur de l'écran
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height / 4,
             child: Image.asset(
-              'images/image-document.png', // Chemin vers votre image
-              fit: BoxFit.cover, // Ajustez la façon dont l'image est affichée
+              'images/image-document.png',
+              fit: BoxFit.cover,
             ),
           ),
           Container(
             padding: EdgeInsets.all(16.0),
-            color: Colors.grey[200]?.withOpacity(0.5), // Rendre la couleur grise semi-transparente
+            color: Colors.grey[200]?.withOpacity(0.5),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween, // Aligner les éléments sur la ligne
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Ajouter un conteneur vide pour pousser les boutons vers la gauche
                 Expanded(child: Container()),
                 Row(
                   children: [
@@ -136,33 +248,48 @@ class _HomePageState extends State<HomePage> {
                         _createNewFolder(context);
                       },
                       icon: Icon(Icons.create_new_folder),
-                      tooltip: 'Créer un nouveau dossier',
+                      tooltip: 'Create a new folder',
                     ),
-                    SizedBox(width: 4), // Réduire l'espace entre les boutons
+                    SizedBox(width: 4),
                     IconButton(
                       onPressed: () {
                         _navigateToListPdfPage(context); // Logique pour importer un fichier
                       },
                       icon: Icon(Icons.file_download_rounded),
-                      tooltip: 'Importer un fichier',
+                      tooltip: 'Import a file',
+                    ),
+                    SizedBox(width: 4),
+                    IconButton(
+                      onPressed: () {
+                        // Navigate to the MultipleImage page
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => MultipleImage()),
+                        );
+                      },
+                      icon: Icon(Icons.photo_library),
+                      tooltip: 'Select Multiple Images',
                     ),
                   ],
                 ),
               ],
             ),
           ),
-
           Expanded(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: folders.length,
+                  child: _documents.isNotEmpty
+                      ? ListView.builder(
+                    itemCount: _documents.length,
                     itemBuilder: (context, index) {
+                      final document = _documents[index];
                       return ListTile(
                         leading: Icon(Icons.folder),
-                        title: Text(folders[index]),
+                        title: Text(document.name),
+                        subtitle: Text(document.description),
+                        // Add more info to subtitle as needed
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -181,12 +308,13 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                         onTap: () {
-                          // Navigation vers la page de contenu du document lorsque l'utilisateur clique sur un document
-
+                          // Navigation to document content page
+                          // based on document information
                         },
                       );
                     },
-                  ),
+                  )
+                      : Center(child: Text('No documents found')),
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -238,4 +366,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-

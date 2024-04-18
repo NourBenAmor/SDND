@@ -9,8 +9,9 @@ import 'about.dart';
 
 
 class TabPage extends StatefulWidget {
-  const TabPage({super.key});
+  final String token; // Add token as a parameter to the TabPage widget
 
+  const TabPage({Key? key, required this.token}) : super(key: key);
   @override
   State<TabPage> createState() => _TabPageState();
 }
@@ -52,7 +53,7 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
       body: TabBarView(
         controller: _tabController,
         children: [
-          HomePage(),
+          HomePage(token: widget.token), // Pass the token to HomePage
           ListPdfPage(),
           SynchronizationPage(),
           AboutPage(),
