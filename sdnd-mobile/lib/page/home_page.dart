@@ -5,15 +5,16 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'UploadDocumentForm.dart';
+
 import 'camera_page.dart';
 import 'document_details.dart';
 import 'editing_page.dart';
+import 'file_list.dart';
+import 'multiple_image.dart';
 
-import 'history_page.dart';
-import 'multiple_image.dart'; // Import the new page class to display document content
 class Document {
   final String id;
+  final String documentId;
   final String name;
   final String description;
   final String ownerId;
@@ -24,6 +25,7 @@ class Document {
 
   Document({
     required this.id,
+    required this.documentId,
     required this.name,
     required this.description,
     required this.ownerId,
@@ -32,8 +34,8 @@ class Document {
     required this.documentState,
     required this.files,
   });
-
 }
+
 class DocumentQueryObject {
   final String? name;
   final String? description;
@@ -53,7 +55,8 @@ class DocumentQueryObject {
     this.updatedDateAfter,
   });
 }
-enum documentState {
+
+enum DocumentState {
   Blank,
   Filled,
   Shared,
@@ -94,17 +97,17 @@ class _HomePageState extends State<HomePage> {
 
       if (response.statusCode == 200) {
         final dynamic responseBody = jsonDecode(response.body);
-        if (responseBody != null && responseBody is List<dynamic>) { // Check if responseBody is not null and is a List
+        if (responseBody != null && responseBody is List<dynamic>) {
           final List<dynamic> data = responseBody;
           setState(() {
             _documents = data.map((doc) {
-              // Extracting file paths from the list of maps
               List<String> files = (doc['files'] as List<dynamic>?)
                   ?.map<String>((file) => file['path'].toString())
                   .toList() ?? [];
 
               return Document(
                 id: doc['id'].toString(), // Convert GUID to String
+                documentId: doc['documentId'].toString(),
                 name: doc['name'],
                 description: doc['description'].toString() ?? '',
                 ownerId: doc['ownerId'].toString() ?? '',
@@ -114,10 +117,6 @@ class _HomePageState extends State<HomePage> {
                 files: files,
               );
             }).toList();
-
-
-            // Log the documents here
-            print('Documents: $_documents');
           });
         } else {
           print('Response body from API is null or not a List');
@@ -126,26 +125,11 @@ class _HomePageState extends State<HomePage> {
         throw Exception('Failed to load documents (Status Code: ${response.statusCode})');
       }
     } on SocketException catch (e) {
-      // Handle network errors
       print('Socket Exception: $e');
-      // Show error message to the user
     } catch (e) {
-      // Handle other exceptions
       print('Exception: $e');
-      // Show error message to the user
     }
   }
-
-
-  Future<void> _createNewFolder(BuildContext context) async {
-    // Navigation vers la page d'importation de documents
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => UploadDocumentForm()),
-    );
-  }
-
-
 
   Future<void> _pickImage() async {
     final ImagePicker _picker = ImagePicker();
@@ -154,7 +138,6 @@ class _HomePageState extends State<HomePage> {
     try {
       pickedFile = await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
-        // Utilisez la méthode scanImage pour naviguer vers la page d'édition avec l'image sélectionnée
         await scanImage(context, pickedFile);
       }
     } catch (e) {
@@ -170,7 +153,6 @@ class _HomePageState extends State<HomePage> {
 
     final fileBytes = await photo.readAsBytes();
 
-    // Naviguer vers la page d'édition avec l'image sélectionnée
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -179,22 +161,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _deleteFolder(int index) {
-    setState(() {
-      folders.removeAt(index);
-    });
-  }
-
-  void _shareFolder(int index) {
-
-  }
-
   void _navigateToListPdfPage(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ListPdfPage()), // Créez une instance de ListPdfPage
+      MaterialPageRoute(builder: (context) => ListPdfPage()),
     );
   }
+
   void _navigateToDocumentDetailsPage(
       BuildContext context,
       String documentId,
@@ -210,25 +183,122 @@ class _HomePageState extends State<HomePage> {
           documentName: documentName,
           documentDescription: documentDescription,
           documentFiles: documentFiles,
-            token: _token// Pass documentFiles here
+          token: _token,
         ),
       ),
     );
   }
 
+  void _showCreateDocumentDialog(BuildContext context) {
+    String name = '';
+    String description = '';
 
-
-
-
-
-
-  void _showDeleteConfirmationDialog(BuildContext context, int index) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Delete Folder'),
-          content: Text('Are you sure you want to delete this folder?'),
+          title: Text('Create a New Document'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                onChanged: (value) {
+                  name = value;
+                },
+                decoration: InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                onChanged: (value) {
+                  description = value;
+                },
+                decoration: InputDecoration(labelText: 'Description'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _createDocument(name, description);
+                Navigator.pop(context);
+              },
+              child: Text('Create'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _createDocument(String name, String description) async {
+    if (name.isEmpty || description.isEmpty) {
+      print('Name and description cannot be empty');
+      return;
+    }
+
+    final url = Uri.parse('https://10.0.2.2:7278/api/Document/add');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer ${widget.token}',
+        },
+        body: jsonEncode({
+          'name': name,
+          'description': description,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Document created successfully');
+        _fetchDocuments(widget.token);
+      } else {
+        print('Failed to create document (Status Code: ${response.statusCode})');
+      }
+    } catch (e) {
+      print('Error creating document: $e');
+    }
+  }
+  void _deleteDocument(BuildContext context, String documentId) async {
+    final url = Uri.parse('https://10.0.2.2:7278/api/Document/Delete/$documentId');
+
+    try {
+      final response = await http.delete(
+        url,
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer ${widget.token}',
+        },
+      );
+
+      if (response.statusCode == 204) {
+        // Document deleted successfully, update UI
+        setState(() {
+          _documents.removeWhere((doc) => doc.id == documentId);
+        });
+        print('Document deleted successfully');
+      } else {
+        print('Failed to delete document (Status Code: ${response.statusCode})');
+      }
+    } catch (e) {
+      print('Error deleting document: $e');
+    }
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Confirm Deletion'),
+          content: Text('Are you sure you want to delete this document?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -238,7 +308,7 @@ class _HomePageState extends State<HomePage> {
             ),
             TextButton(
               onPressed: () {
-                _deleteFolder(index);
+                _deleteDocument(context, documentId);
                 Navigator.of(context).pop();
               },
               child: Text('Delete'),
@@ -248,8 +318,6 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -275,7 +343,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     IconButton(
                       onPressed: () {
-                        _createNewFolder(context);
+                        _showCreateDocumentDialog(context);
                       },
                       icon: Icon(Icons.create_new_folder),
                       tooltip: 'Create a new folder',
@@ -283,7 +351,7 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(width: 4),
                     IconButton(
                       onPressed: () {
-                        _navigateToListPdfPage(context); // Logique pour importer un fichier
+                        _navigateToListPdfPage(context);
                       },
                       icon: Icon(Icons.file_download_rounded),
                       tooltip: 'Import a file',
@@ -291,7 +359,6 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(width: 4),
                     IconButton(
                       onPressed: () {
-                        // Navigate to the MultipleImage page
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => MultipleImage()),
@@ -306,77 +373,66 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: _documents.isNotEmpty
-                      ? ListView.builder(
-                    itemCount: _documents.length,
-                    itemBuilder: (context, index) {
-                      final document = _documents[index];
-                      return ListTile(
-                        leading: Icon(Icons.folder),
-                        title: Text(document.name),
-                        subtitle: Text(document.description),
-                        // Add more info to subtitle as needed
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.delete),
-                              onPressed: () {
-                                _showDeleteConfirmationDialog(context, index);
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.share),
-                              onPressed: () {
-                                _shareFolder(index);
-                              },
-                            ),
-                          ],
-                        ),
-                        onTap: () {
-                          _navigateToDocumentDetailsPage(
-                            context,
-                            document.id,
-                            document.name,
-                            document.description,
-                            document.files,
-                          );
+            child: _documents.isNotEmpty
+                ? ListView.builder(
+              itemCount: _documents.length,
+              itemBuilder: (context, index) {
+                final document = _documents[index];
+                return ListTile(
+                  leading: Icon(Icons.folder),
+                  title: Text(document.name),
+                  subtitle: Text(document.description),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          _showDeleteConfirmationDialog(context, document.id);
                         },
-
-
-                      );
-                    },
-                  )
-                      : Center(child: Text('No documents found')),
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    FloatingActionButton(
-                      onPressed: () {
-                        // Naviguer vers la page de la caméra
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => CameraPage()),
-                        );
-                      },
-                      backgroundColor: Colors.yellow[700],
-                      child: Icon(Icons.camera_alt),
-                    ),
-                    SizedBox(height: 16),
-                    FloatingActionButton(
-                      onPressed: _pickImage, // Utilisez _pickImage pour gérer le clic sur le bouton
-                      backgroundColor: Colors.yellow[700],
-                      child: Icon(Icons.image),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.share),
+                        onPressed: () {
+                          //_shareFolder(index);
+                        },
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    _navigateToDocumentDetailsPage(
+                      context,
+                      document.id,
+                      document.name,
+                      document.description,
+                      document.files,
+                    );
+                  },
+                );
+              },
+            )
+                : Center(child: Text('No documents found')),
+          ),
+        ],
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CameraPage()),
+              );
+            },
+            backgroundColor: Colors.yellow[700],
+            child: Icon(Icons.camera_alt),
+          ),
+          SizedBox(height: 16),
+          FloatingActionButton(
+            onPressed: _pickImage,
+            backgroundColor: Colors.yellow[700],
+            child: Icon(Icons.image),
           ),
         ],
       ),

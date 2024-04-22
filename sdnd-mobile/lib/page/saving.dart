@@ -5,7 +5,7 @@ import 'package:external_path/external_path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'history_page.dart'; // Importez votre page ListPdfPage
+import 'file_list.dart'; // Importez votre page ListPdfPage
 
 class SavingPage extends StatefulWidget {
   final File pdfFile;

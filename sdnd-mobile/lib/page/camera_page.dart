@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:edge_detection/edge_detection.dart';
 
 import 'editing_page.dart';
 
@@ -15,14 +17,16 @@ class CameraPage extends StatefulWidget {
 class _CameraPageState extends State<CameraPage> {
   late Future<void> _cameraFuture;
   late CameraController _cameraController;
+  String? _imagePath;
 
   @override
   void initState() {
     super.initState();
-    _cameraFuture = _initializeCamera();
+    _cameraFuture = _initializeCameraAndDetectEdge(); // Initialise la caméra et détecte les contours automatiquement
   }
 
-  Future<void> _initializeCamera() async {
+  Future<void> _initializeCameraAndDetectEdge() async {
+    // Initialisation de la caméra
     final cameras = await availableCameras();
     final camera = cameras.first;
 
@@ -32,6 +36,41 @@ class _CameraPageState extends State<CameraPage> {
     );
 
     await _cameraController.initialize();
+
+    // Détecte les contours directement après l'initialisation de la caméra
+    await _captureAndDetectEdge();
+  }
+
+  Future<void> _captureAndDetectEdge() async {
+    if (!_cameraController.value.isInitialized) {
+      throw 'La caméra n\'est pas initialisée.';
+    }
+
+    try {
+      final XFile capturedImage = await _cameraController.takePicture();
+      // Appel de la détection des contours
+      bool success = await EdgeDetection.detectEdge(
+        capturedImage.path,
+        canUseGallery: true,
+        androidScanTitle: 'Scanning',
+        androidCropTitle: 'Crop',
+        androidCropBlackWhiteTitle: 'Black ',
+        androidCropReset: 'Reset',
+      );
+
+      if (success) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EditingPage(imageFile: File(capturedImage.path)),
+          ),
+        );
+      }
+
+
+    } catch (e) {
+      print('Erreur lors de la capture de l\'image: $e');
+    }
   }
 
   @override
@@ -48,34 +87,14 @@ class _CameraPageState extends State<CameraPage> {
         future: _cameraFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return Stack(
-              children: [
-                Center(
-                  child: CameraPreview(_cameraController),
+            return Visibility(
+              visible: _imagePath != null,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.file(
+                  File(_imagePath ?? ''),
                 ),
-                Positioned(
-                  bottom: 16.0, // Ajustez la marge inférieure selon vos besoins
-                  right: 16.0, // Ajustez la marge droite selon vos besoins
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: FloatingActionButton(
-                      backgroundColor: Colors.yellow[700],
-                      onPressed: () async {
-                        final capturedImage = await _capturePhoto();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                EditingPage(imageFile: capturedImage),
-                          ),
-                        );
-                      },
-                      child: const Icon(Icons.camera_alt),
-                      shape: const CircleBorder(), // Rend le bouton sous forme de cercle
-                    ),
-                  ),
-                ),
-              ],
+              ),
             );
           } else {
             return const Center(
@@ -85,20 +104,5 @@ class _CameraPageState extends State<CameraPage> {
         },
       ),
     );
-  }
-
-
-  Future<File> _capturePhoto() async {
-    if (!_cameraController.value.isInitialized) {
-      throw 'La caméra n\'est pas initialisée.';
-    }
-
-    try {
-      final XFile capturedImage = await _cameraController.takePicture();
-      return File(capturedImage.path);
-    } catch (e) {
-      print('Erreur lors de la capture de l\'image: $e');
-      rethrow;
-    }
   }
 }

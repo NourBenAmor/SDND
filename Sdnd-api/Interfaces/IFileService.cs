@@ -11,5 +11,9 @@ namespace Sdnd_api.Interfaces;
 
     //public Task PostMultiFileAsync(List<FileUploadModel> fileData);
 
+
+
+        //public Task PostMultiFileAsync(List<FileUploadModel> fileData);
+
     //public Task DownloadFileById(int fileName);
 }

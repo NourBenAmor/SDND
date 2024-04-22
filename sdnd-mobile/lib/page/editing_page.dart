@@ -6,9 +6,9 @@ import 'package:pdf/widgets.dart' as pdfLib;
 import 'saving.dart'; // Import the SavingPage
 
 class EditingPage extends StatefulWidget {
-  final File imageFile;
+  final File? imageFile; // Change to nullable File
 
-  const EditingPage({Key? key, required this.imageFile}) : super(key: key);
+  const EditingPage({Key? key, this.imageFile}) : super(key: key);
 
   @override
   _EditingPageState createState() => _EditingPageState();
@@ -22,40 +22,47 @@ class _EditingPageState extends State<EditingPage> {
   void initState() {
     super.initState();
     textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
-    doTextRecognition();
+    // Call doTextRecognition only if an image is provided
+    if (widget.imageFile != null) {
+      doTextRecognition();
+    }
   }
 
   Future<void> doTextRecognition() async {
-    InputImage inputImage = InputImage.fromFile(widget.imageFile);
-    final RecognizedText recognizedText =
-    await textRecognizer.processImage(inputImage);
+    if (widget.imageFile != null) {
+      InputImage inputImage = InputImage.fromFile(widget.imageFile!);
+      final RecognizedText recognizedText =
+      await textRecognizer.processImage(inputImage);
 
-    setState(() {
-      this.recognizedText = recognizedText.text;
-    });
+      setState(() {
+        this.recognizedText = recognizedText.text;
+      });
+    }
   }
 
   Future<void> generatePdf(BuildContext context) async {
-    // Create a PDF document
     final pdf = pdfLib.Document();
 
-    // Add a page to the PDF document
     pdf.addPage(
       pdfLib.Page(
         build: (pdfLib.Context context) {
-          return pdfLib.Center(
-            child: pdfLib.Image(
-                pdfLib.MemoryImage(widget.imageFile.readAsBytesSync())),
-          );
+          if (widget.imageFile != null) {
+            return pdfLib.Center(
+              child: pdfLib.Image(
+                  pdfLib.MemoryImage(widget.imageFile!.readAsBytesSync())),
+            );
+          } else {
+            return pdfLib.Center(
+              child: pdfLib.Text('No image available'), // Utiliser pdfLib.Text au lieu de Text
+            );
+          }
         },
       ),
     );
 
-    // Save the PDF file on the device
-    final output = await File(widget.imageFile.path.replaceAll('.jpg', '.pdf'))
+    final output = await File(widget.imageFile!.path.replaceAll('.jpg', '.pdf'))
         .writeAsBytes(await pdf.save());
 
-    // Navigate to the SavingPage after generating the PDF
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -78,16 +85,16 @@ class _EditingPageState extends State<EditingPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editing Page'),
-        actions: [
-
-        ],
+        actions: [],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
             child: Center(
-              child: Image.file(widget.imageFile),
+              child: widget.imageFile != null
+                  ? Image.file(widget.imageFile!)
+                  : Text('No image available'),
             ),
           ),
           GestureDetector(
