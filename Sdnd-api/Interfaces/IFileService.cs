@@ -9,6 +9,7 @@ namespace Sdnd_api.Interfaces;
         
         public  Task<List<DocFile>> GetDocFilesByDocumentId(Guid documentId);
 
+
         //public Task PostMultiFileAsync(List<FileUploadModel> fileData);
 
        //public Task DownloadFileById(int fileName);

@@ -9,6 +9,7 @@ using Sdnd_api.Dtos.QueryObjects;
 using Sdnd_api.Dtos.Responses;
 using Sdnd_api.Interfaces;
 using Sdnd_api.Services;
+using Sdnd_Api.Models;
 
 
 namespace Sdnd_api.Controllers;
@@ -90,6 +91,8 @@ public class DocumentController : ControllerBase
             Name = document.Name,
             Description = document.Description ?? "", // Use null-coalescing for optional Description
             OwnerId = document.OwnerId,
+            AddedDate = document.AddedDate,
+            UpdatedDate = document.UpdatedDate,
             DocumentState = document.DocumentState,
             Files = documentFiles // Assign the retrieved document files to the Files collection
         };
@@ -118,38 +121,42 @@ public class DocumentController : ControllerBase
 
 
 
-    
-
-    [HttpDelete("Delete/{id}")]
-    public async Task<IActionResult> DeleteDocument(Guid id)
+    [HttpDelete("DeleteFile/{id}")]
+    public async Task<IActionResult> DeleteFile(Guid id)
     {
-        
-        // make a method that deletes all the files for that document then delete the document by the doc Id 
-        /* try
+        try
         {
-            var document = await _context.Documents.FindAsync(id);
-            if (document == null)
-            {
-                return NotFound($"Document with ID {id} not found.");
-            }
-            string filePath = document.FilePath;
+            // Recherche du fichier dans la base de données
+            var fileToDelete = await _context.DocFiles.FindAsync(id);
 
-            if (System.IO.File.Exists(filePath))
+            if (fileToDelete == null)
             {
-                System.IO.File.Delete(filePath);
+                return NotFound($"File with ID {id} not found.");
             }
 
-            _context.Documents.Remove(document);
+            // Suppression du fichier sur le disque
+            if (!string.IsNullOrEmpty(fileToDelete.FilePath))
+            {
+                var fullPath = Path.Combine(Directory.GetCurrentDirectory(), fileToDelete.FilePath);
+
+                if (System.IO.File.Exists(fullPath))
+                {
+                    System.IO.File.Delete(fullPath);
+                }
+            }
+
+            // Suppression du fichier de la base de données
+            _context.DocFiles.Remove(fileToDelete);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"An error occurred while deleting the document: {ex.Message}");
-        }*/
-        return StatusCode(500, $"An error occurred while deleting the document");
+            return StatusCode(500, $"An error occurred while deleting the file: {ex.Message}");
+        }
     }
+
 
 
 
@@ -167,6 +174,12 @@ public class DocumentController : ControllerBase
 
         return Ok(filteredDocuments);
     }
+
+
+
+
+
+
 
 
     // pdf sous forme de url
@@ -220,5 +233,22 @@ public class DocumentController : ControllerBase
     private bool DocumentExists(Guid id)
     {
         return _context.Documents.Any(e => e.Id == id);
+    }
+
+    [HttpGet("{documentId}/files")]
+    public async Task<IActionResult> GetFilesOfDocument(Guid documentId)
+    {
+        var document = await _context.Documents.FindAsync(documentId);
+
+        if (document == null)
+        {
+            return NotFound($"Document with ID {documentId} not found.");
+        }
+
+        var docFiles = await _context.DocFiles
+            .Where(df => df.DocumentId == documentId)
+            .ToListAsync();
+
+        return Ok(docFiles);
     }
 }

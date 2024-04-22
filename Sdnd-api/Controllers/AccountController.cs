@@ -161,6 +161,20 @@ public class AccountController : ControllerBase
             return StatusCode(500, e);
         }
     }
+    [HttpGet("usernames")]
+    public async Task<IActionResult> GetAllUsernames()
+    {
+        var users = await _userManager.Users.ToListAsync(); // Fetch all users from UserManager
+
+        if (users == null || users.Count == 0)
+        {
+            return NotFound("No users found");
+        }
+
+        var usernames = users.Select(u => u.UserName).ToList();
+
+        return Ok(usernames);
+    }
 
 
 

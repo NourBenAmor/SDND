@@ -1,27 +1,31 @@
 <template>
 
-  <div class="modal" :class="{ 'is-active': isModalActive }">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Enter New Role</h5>
-
+<div class="modal" :class="{ 'is-active': isModalActive }">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select New Role</h5>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="new-role" class="control-label">New Role</label>
+          <select id="new-role" class="form-control" v-model="newRole">
+            <option value="" disabled>Select new role</option>
+            <option value="Admin">Admin</option>
+            <option value="User">User</option>
+          </select>
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="new-role" class="control-label">New Role</label>
-            <input id="new-role" class="form-control" type="text" v-model="newRole" placeholder="Enter new role">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <a class="btn btn-link text-dark px-3 mb-0" @click="updateRole">
-            <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Update
-          </a>
-          <button type="button" class="btn btn-secondary" @click="closeModal">Cancel</button>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-link text-dark px-3 mb-0" @click="updateRole">
+          <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Update
+        </a>
+        <button type="button" class="btn btn-secondary" @click="closeModal">Cancel</button>
       </div>
     </div>
   </div>
+</div>
+
 
   <!-- Users Table -->
   <div class="users-table-container">
@@ -140,7 +144,7 @@ const updateRole = async () => {
       return;
     }
 
-    const response = await axios.put(`http://localhost:7278/api/addRole/${userId}`, `"${role}"`, {
+    const response = await axios.put(`https://localhost:7278/api/addRole/${userId}`, `"${role}"`, {
       headers: {
         ...authHeader(), 
         'Content-Type': 'application/json',

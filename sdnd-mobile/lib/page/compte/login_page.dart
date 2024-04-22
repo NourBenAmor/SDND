@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:airsafe/page/UploadDocumentForm.dart';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
@@ -51,9 +51,10 @@ class _LoginPageState extends State<LoginPage> {
         print('Username: ${responseData['username']}');
         print('Email: ${responseData['email']}');
         print('Token: ${responseData['token']}');
-        String token = jsonDecode(response.body)['token'];
+        String token = responseData['token']; // Extract the token
         await storage.write(key: 'jwt_token', value: token);
 
+        // Show snackbar indicating successful login
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Align(
@@ -77,16 +78,14 @@ class _LoginPageState extends State<LoginPage> {
         // Delay navigation to allow SnackBar display
         await Future.delayed(Duration(seconds: 2)); // Adjust delay as needed
 
-        // Navigate to homepage
+        // Navigate to homepage with the token
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(
+            builder: (context) => HomePage(token: token), // Pass token to HomePage
+          ),
         );
-      }
-
-
-
-      else if (response.statusCode == 400) {
+      } else if (response.statusCode == 400) {
         // Bad request, probably validation error
         print('Failed to login: ${response.body}');
         // Add further error handling logic here (e.g., displaying error message)
@@ -101,6 +100,7 @@ class _LoginPageState extends State<LoginPage> {
       // Add further error handling logic here (e.g., displaying error message)
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

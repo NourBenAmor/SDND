@@ -1,45 +1,24 @@
 <template>
   <div class="edit-document-container">
-    <div class="form-group">
-      <label class="label">Update:</label>
-      <div>
-        <input type="radio" id="updatePdf" value="pdf" v-model="updateOption">
-        <label for="updatePdf">PDF</label>
-        <input type="radio" id="updateData" value="data" v-model="updateOption">
-        <label for="updateData">Data</label>
-      </div>
-    </div>
+ 
 
-    <div v-if="updateOption === 'data'">
+    <div>
       <!-- Form fields for updating document data -->
       <div class="form-group">
         <label for="name" class="label">Title:</label>
         <input type="text" class="form-control" id="name" v-model="editedDocument.name" required>
       </div>
       <div class="form-group">
-        <label for="contentType" class="label">Type:</label>
-        <input type="text" class="form-control" id="contentType" v-model="editedDocument.contentType" required>
-      </div>
-      <div class="form-group">
-  <label for="description" class="label">Description:</label>
-  <textarea class="form-control" id="description" v-model="editedDocument.description" required></textarea>
-</div>
-
-      <div class="form-group">
-        <label for="documentState" class="label">Document State:</label>
-        <select class="form-control" v-model="editedDocument.documentState">
-          <option value="0">Uploaded</option>
-          <option value="1">OCR Pending</option>
-          <option value="2">Signed</option>
-        </select>
+        <label for="description" class="label">Description:</label>
+        <textarea class="form-control" id="description" v-model="editedDocument.description" required></textarea>
       </div>
     </div>
 
-    <div v-else-if="updateOption === 'pdf'">
+    <div>
       <!-- Form fields for updating document PDF -->
       <div class="form-group">
-        <label for="fileInput" class="label">Update PDF File:</label>
-        <input type="file" class="form-control" id="fileInput"  @change="onFileChange">
+        <label for="fileInput" class="label">Files</label>
+        <input type="file" class="form-control" id="fileInput" @change="onFileChange">
       </div>
     </div>
 
@@ -49,33 +28,45 @@
       <span v-if="error" class="text-danger">Error Updating document. Please try again.</span>
     </div>
   </div>
+  <div class="form-group">
+  <label for="fileInput" class="label">Attach File:</label>
+  <div class="d-flex align-items-center">
+    <input type="file" class="form-control" id="fileInput" style="display: none" @change="handleFileSelection">
+    <button class="btn btn-outline-secondary mr-2" style="color: #333; border-color: #ccc;" @click="selectFile">Select File</button>
+    <button class="btn btn-primary" @click="attachSelectedFile">Save Attachment</button>
+    <div id="notification" class="mt-2" style="display: none;"></div>
+</div>
+</div>
+
+
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import BaseApiService from '../../services/apiService';
 import { useRouter} from 'vue-router';
+import axios from 'axios';
 
 const router = useRouter();
-
+const props = defineProps({
+  documentId:String
+})
 const editedDocument = ref({
   name: '',
-  contentType: '',
   description: '',
-  documentState: 'Uploaded',
+  documentState: 'Blank',
 });
 const saved = ref(false);
 const error = ref(false);
 
 const file = ref(null);
-const route = useRoute();
 const updateOption = ref('data'); // Default to updating document data
 
 const fetchDocument = async () => {
   try {
-    const documentId = route.params.id;
-    const response = await BaseApiService(`Document`).get(documentId);
+    const documentId = props.documentId;
+    console.log(documentId);
+    const response = await BaseApiService(`Document/${documentId}`).list();
     const document = response.data;
     editedDocument.value = { ...document };
   } catch (error) {
@@ -85,7 +76,7 @@ const fetchDocument = async () => {
 
 const updateData = async () => {
   try {
-    const documentId = route.params.id;
+    const documentId = props.documentId;
     
     if (updateOption.value === 'data') {
       // Validate required fields before sending the request
@@ -97,7 +88,6 @@ const updateData = async () => {
       
       const requestData = {
         name: editedDocument.value.name,
-        contentType: editedDocument.value.contentType,
         description: editedDocument.value.description,
         ownerId: editedDocument.value.ownerId,
         documentState: editedDocument.value.documentState,
@@ -131,8 +121,60 @@ const onFileChange = (event) => {
   file.value = event.target.files[0];
 };
 
+const attachFile = async (documentId) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file.value);
+
+    const response = await axios.post(`https://localhost:7278/api/File/${documentId}/attach-file`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    // Handle response
+    console.log('File attached successfully:', response.data);
+    
+    // Show success notification
+    showNotification('File attached successfully!', 'success');
+  } catch (error) {
+    // Handle error
+    console.error('Error attaching file:', error.response.data);
+    
+    // Show error notification
+    showNotification('Error attaching file. Please try again.', 'error');
+  }
+};
+
+const showNotification = (message, type) => {
+  const notificationDiv = document.getElementById('notification');
+  notificationDiv.textContent = message;
+  notificationDiv.style.display = 'block';
+  notificationDiv.classList.remove('alert-success', 'alert-danger');
+  
+  if (type === 'success') {
+    notificationDiv.classList.add('alert', 'alert-success');
+  } else if (type === 'error') {
+    notificationDiv.classList.add('alert', 'alert-danger');
+  }
+};
+
+const handleFileSelection = (event) => {
+  file.value = event.target.files[0];
+};
+
+const attachSelectedFile = () => {
+  attachFile(props.documentId);
+};
+
+const selectFile = () => {
+  const fileInput = document.getElementById('fileInput');
+  fileInput.click();
+};
+
 
 onMounted(fetchDocument);
+
 </script>
 
 <style scoped>
@@ -140,17 +182,19 @@ onMounted(fetchDocument);
   padding: 20px;
   background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  width: 70%;
+  width: 90%;
   margin: auto;
+  height: 80%;
 }
 
 .label {
   font-size: 14px;
+  margin-top: 10px;
+  margin-bottom: 5px;
 }
 
 .button-container {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 40px;
 }
 </style>

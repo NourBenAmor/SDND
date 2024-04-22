@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Sdnd_api.Data;
 using Sdnd_api.Interfaces;
 using Sdnd_Api.Models;
@@ -102,6 +103,44 @@ namespace FileUpload.Services
             }
         }*/
 
+        
+        // Méthode pour supprimer physiquement un fichier à partir de son chemin
+        public async Task<string> DeleteFileByPath(Guid fileId)
+        {
+            try
+            {
+                var fileToDelete = await _context.DocFiles.FindAsync(fileId);
+
+                if (fileToDelete == null)
+                {
+                    throw new FileNotFoundException("File not found in the database.");
+                }
+
+                if (!string.IsNullOrEmpty(fileToDelete.FilePath))
+                {
+                    var fullPath = Path.Combine(Directory.GetCurrentDirectory(), fileToDelete.FilePath);
+
+                    if (System.IO.File.Exists(fullPath))
+                    {
+                        System.IO.File.Delete(fullPath);
+                    }
+
+                    fileToDelete.FilePath = ""; // Effacer le chemin du fichier dans la base de données
+
+                    await _context.SaveChangesAsync();
+
+                    return "File deleted successfully.";
+                }
+                else
+                {
+                    return "File path is empty.";
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
 

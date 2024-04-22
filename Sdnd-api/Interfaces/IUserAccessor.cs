@@ -7,4 +7,5 @@ public interface IUserAccessor
 {
     CurrentUserDto GetCurrentUser();
 
+
 }
