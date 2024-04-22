@@ -11,6 +11,7 @@ import 'editing_page.dart';
 import 'file_list.dart';
 import 'multiple_image.dart';
 class Document {
+  final String documentId;
   final String name;
   final String description;
   final String ownerId;
@@ -20,6 +21,7 @@ class Document {
   final List<String> files;
 
   Document({
+    required this.documentId,
     required this.name,
     required this.description,
     required this.ownerId,
@@ -91,16 +93,16 @@ class _HomePageState extends State<HomePage> {
 
       if (response.statusCode == 200) {
         final dynamic responseBody = jsonDecode(response.body);
-        if (responseBody != null && responseBody is List<dynamic>) { // Check if responseBody is not null and is a List
+        if (responseBody != null && responseBody is List<dynamic>) {
           final List<dynamic> data = responseBody;
           setState(() {
             _documents = data.map((doc) {
-              // Extracting file paths from the list of maps
               List<String> files = (doc['files'] as List<dynamic>?)
                   ?.map<String>((file) => file['path'].toString())
                   .toList() ?? [];
 
               return Document(
+                documentId: doc['documentId'].toString(),
                 name: doc['name'],
                 description: doc['description'].toString() ?? '',
                 ownerId: doc['ownerId'].toString() ?? '',
@@ -110,10 +112,6 @@ class _HomePageState extends State<HomePage> {
                 files: files,
               );
             }).toList();
-
-
-            // Log the documents here
-            print('Documents: $_documents');
           });
         } else {
           print('Response body from API is null or not a List');
@@ -122,13 +120,9 @@ class _HomePageState extends State<HomePage> {
         throw Exception('Failed to load documents (Status Code: ${response.statusCode})');
       }
     } on SocketException catch (e) {
-      // Handle network errors
       print('Socket Exception: $e');
-      // Show error message to the user
     } catch (e) {
-      // Handle other exceptions
       print('Exception: $e');
-      // Show error message to the user
     }
   }
 
@@ -172,10 +166,56 @@ class _HomePageState extends State<HomePage> {
 
 
 
-  void _deleteFolder(int index) {
-    setState(() {
-      folders.removeAt(index);
-    });
+  void _deleteFolder(String documentId) async {
+    final url = Uri.parse('https://10.0.2.2:7278/api/Document/$documentId');
+
+    try {
+      final response = await http.delete(
+        url,
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer ${widget.token}',
+        },
+      );
+
+      if (response.statusCode == 204) {
+        setState(() {
+          _documents.removeWhere((doc) => doc.documentId == documentId);
+        });
+        print('Document deleted successfully');
+      } else {
+        print('Failed to delete document (Status Code: ${response.statusCode})');
+      }
+    } catch (e) {
+      print('Error deleting document: $e');
+    }
+  }
+
+
+  void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Delete Folder'),
+          content: Text('Are you sure you want to delete this folder?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _deleteFolder(documentId); // Passer l'ID du document à la méthode de suppression
+                Navigator.of(context).pop();
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
 
@@ -215,32 +255,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context, int index) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Delete Folder'),
-          content: Text('Are you sure you want to delete this folder?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                _deleteFolder(index);
-                Navigator.of(context).pop();
-              },
-              child: Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 
 
 
@@ -414,7 +429,7 @@ class _HomePageState extends State<HomePage> {
                               IconButton(
                                 icon: Icon(Icons.delete),
                                 onPressed: () {
-                                  _showDeleteConfirmationDialog(context, index);
+                                  _showDeleteConfirmationDialog(context, document.documentId);
                                 },
                               ),
                               IconButton(
@@ -466,12 +481,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-
-
-
-
-
 
 
 
