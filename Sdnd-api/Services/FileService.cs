@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Sdnd_api.Data;
 using Sdnd_api.Interfaces;
 using Sdnd_Api.Models;
@@ -13,9 +14,9 @@ namespace FileUpload.Services
         }
         public async Task<string> UploadFile(DocFile docFile, IFormFile file)
         {
-            if (file == null && file.Length == 0)
+            if (file == null || file.Length == 0)
             {
-                return "file not selected";
+                return "File not selected";
             }
 
             var folderName = Path.Combine("Resource", "AllFiles");
@@ -36,7 +37,6 @@ namespace FileUpload.Services
 
             return dbPath;
         }
-
         public async Task<List<DocFile>> GetDocFilesByDocumentId(Guid documentId)
         {
             var docFiles = _context.DocFiles
@@ -44,8 +44,7 @@ namespace FileUpload.Services
                 .ToList();
             return docFiles;
         }
-
-
+       
         /*public async Task PostMultiFileAsync(List<FileUploadModel> fileData)
         {
             try
@@ -103,6 +102,7 @@ namespace FileUpload.Services
         }*/
 
     }
+
 }
 
 

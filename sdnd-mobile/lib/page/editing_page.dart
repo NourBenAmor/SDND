@@ -123,20 +123,21 @@ class _EditingPageState extends State<EditingPage> {
               generatePdf(context);
             },
             style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.yellow[900],
-              backgroundColor: Colors.yellow[700],
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.yellow[700], // Set text color
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8), // Bordure arrondie
-                // Ajouter une ombre
+                borderRadius: BorderRadius.circular(8), // Rounded border
+                // You can add shadow or other styling here if needed
               ),
             ),
             icon: Icon(Icons.file_upload, size: 24, color: Colors.white),
             label: Text(
               'Import PDF',
-              style: TextStyle(fontSize: 16, color: Colors.white),
+              style: TextStyle(fontSize: 16),
             ),
           ),
+
         ],
       ),
     );

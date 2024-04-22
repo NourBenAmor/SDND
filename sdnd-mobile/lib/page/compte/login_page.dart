@@ -13,7 +13,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../home_page.dart';
 
 const storage = FlutterSecureStorage();
-
+class LoadingWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: CircularProgressIndicator(), // You can customize the loading indicator here
+    );
+  }
+}
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -27,13 +34,21 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final String baseUrl = 'https://10.0.2.2:7278/api';
+  bool _isLoading = false; // Flag to track loading state
+
   Future<void> _handleLoginUser(BuildContext context) async {
+    setState(() {
+      _isLoading = true; // Show loading indicator
+    });
     final url = Uri.parse('$baseUrl/Account/login');
     final headers = {'Content-Type': 'application/json'};
 
     // Check if both username and password are provided
     if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
       print('Username and Password are required');
+      setState(() {
+        _isLoading = false; // Hide loading indicator
+      });
       return; // Return early if either field is empty
     }
 
@@ -44,7 +59,9 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await http.post(url, headers: headers, body: body);
-
+      setState(() {
+        _isLoading = false; // Hide loading indicator after response
+      });
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         print('User ID: ${responseData['id']}');
@@ -102,8 +119,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
 
+
+
+
   @override
   Widget build(BuildContext context) {
+
     Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
@@ -145,6 +166,8 @@ class _LoginPageState extends State<LoginPage> {
                     innerText: 'Login',
                     onPressed: () => _handleLoginUser(context)),
                 const SizedBox(height: 18),
+                if (_isLoading) LoadingWidget(),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -185,4 +208,5 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
 }

@@ -121,14 +121,14 @@ public class DocumentController : ControllerBase
 
 
 
-    
 
-    [HttpDelete("Delete/{id}")]
+
+    /*[HttpDelete("Delete/{id}")]
     public async Task<IActionResult> DeleteDocument(Guid id)
     {
         
         // make a method that deletes all the files for that document then delete the document by the doc Id 
-        /* try
+         try
         {
             var document = await _context.Documents.FindAsync(id);
             if (document == null)
@@ -150,9 +150,9 @@ public class DocumentController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, $"An error occurred while deleting the document: {ex.Message}");
-        }*/
+        }
         return StatusCode(500, $"An error occurred while deleting the document");
-    }
+    }*/
 
 
 
@@ -241,4 +241,44 @@ public class DocumentController : ControllerBase
 
         return Ok(docFiles);
     }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteDocument(Guid id)
+    {
+        try
+        {
+            var document = await _context.Documents.FindAsync(id);
+            if (document == null)
+            {
+                return NotFound($"Document with ID {id} not found.");
+            }
+
+            await DeleteDocumentFiles(document.Id);
+
+            _context.Documents.Remove(document);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while deleting the document: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteDocumentFiles(Guid documentId)
+    {
+        var docFiles = await _context.DocFiles
+            .Where(df => df.DocumentId == documentId)
+            .ToListAsync();
+
+        foreach (var docFile in docFiles)
+        {
+
+
+            _context.DocFiles.Remove(docFile);
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
 }

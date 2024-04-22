@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Sdnd_api.Dtos.Requests;
 using Sdnd_api.Interfaces;
 using Sdnd_Api.Models;
+using System.Net.Mime;
 
 namespace Sdnd_api.Controllers;
 [ApiController]
@@ -85,6 +86,50 @@ public class FileController : ControllerBase
         return CreatedAtAction(nameof(GetDocFileById), new { id = newDocFile.Id }, newDocFile);
 
     }
+    [HttpGet("view/{id}")]
+    public IActionResult View(string id)
+    {
+        // Parse the ID string to a Guid
+        if (!Guid.TryParse(id, out Guid fileId))
+        {
+            return BadRequest("Invalid file ID.");
+        }
+
+        var docFile = _context.DocFiles.FirstOrDefault(x => x.Id == fileId);
+
+        if (docFile == null)
+        {
+            return NotFound("File not found.");
+        }
+
+        // Assuming you have a service to access the database and retrieve file paths based on IDs
+        var filePath = docFile.FilePath;
+
+        var fullPath = Path.Combine(Directory.GetCurrentDirectory(), filePath);
+
+        if (!System.IO.File.Exists(fullPath))
+        {
+            return NotFound("File not found.");
+        }
+
+        // Set the Content-Disposition header to inline to display the PDF in the browser
+        var contentDisposition = new System.Net.Mime.ContentDisposition
+        {
+            FileName = Path.GetFileName(fullPath),
+            Inline = true
+        };
+        Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+
+        // Set the content type
+        Response.ContentType = "application/pdf";
+
+        // Return the file content
+        var fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
+        return File(fileStream, "application/pdf");
+    }
+
+
+
 
     [HttpPost("{documentId}/attach-file")]
     public async Task<IActionResult> AttachFileToDocument(Guid documentId, [FromForm] FileUploadModel fileModel)
@@ -101,27 +146,22 @@ public class FileController : ControllerBase
             return BadRequest("No file uploaded or file is empty.");
         }
 
-        // Créez un nouvel objet DocFile pour représenter le fichier
         var docFile = new DocFile
         {
-            DocumentId = documentId, // Associez le fichier au document
-            Name = fileModel.File.FileName // Utilisez le nom du fichier comme valeur pour la propriété 'Name'
+            DocumentId = documentId, 
+            Name = fileModel.File.FileName 
         };
 
 
-        // Utilisez la méthode UploadFile de votre service FileService pour télécharger le fichier et récupérer le chemin d'accès
         var filePath = await _fileService.UploadFile(docFile, fileModel.File);
 
-        // Assurez-vous que le téléchargement du fichier s'est bien passé
         if (filePath == null)
         {
             return BadRequest("File upload failed.");
         }
 
-        // Mettez à jour le chemin d'accès du fichier dans l'objet DocFile
         docFile.FilePath = filePath;
 
-        // Ajoutez le fichier à la base de données
         _context.DocFiles.Add(docFile);
         await _context.SaveChangesAsync();
 

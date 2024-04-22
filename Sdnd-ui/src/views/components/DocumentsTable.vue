@@ -354,7 +354,7 @@ const getDocumentStateString = (documentState) => {
 const handleDeleteConfirm = async () => {
   try {
     const documentId = documents.value[documentIndexToDelete.value].id;
-    const response = await BaseApiService(`Document/Delete`).remove(documentId);
+    const response = await BaseApiService(`Document`).remove(documentId);
     console.log(response);
     documents.value.splice(documentIndexToDelete.value, 1);
     hideDeleteModal();

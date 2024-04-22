@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:airsafe/page/homepage.dart';
 
 import 'package:flutter/material.dart';
+
+import 'SplashScreen.dart';
 // Importer la nouvelle page WelcomePage
 
 void main() {
@@ -29,7 +31,7 @@ class AirSafeApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const homePage(),
+      home: SplashScreen(),
     );
   }
 }

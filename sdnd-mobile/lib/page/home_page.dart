@@ -7,11 +7,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'UploadDocumentForm.dart';
 import 'camera_page.dart';
+import 'document_details.dart';
 import 'editing_page.dart';
 
 import 'history_page.dart';
 import 'multiple_image.dart'; // Import the new page class to display document content
 class Document {
+  final String id;
   final String name;
   final String description;
   final String ownerId;
@@ -21,6 +23,7 @@ class Document {
   final List<String> files;
 
   Document({
+    required this.id,
     required this.name,
     required this.description,
     required this.ownerId,
@@ -101,6 +104,7 @@ class _HomePageState extends State<HomePage> {
                   .toList() ?? [];
 
               return Document(
+                id: doc['id'].toString(), // Convert GUID to String
                 name: doc['name'],
                 description: doc['description'].toString() ?? '',
                 ownerId: doc['ownerId'].toString() ?? '',
@@ -191,6 +195,32 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(builder: (context) => ListPdfPage()), // Créez une instance de ListPdfPage
     );
   }
+  void _navigateToDocumentDetailsPage(
+      BuildContext context,
+      String documentId,
+      String documentName,
+      String documentDescription,
+      List<String> documentFiles,
+      ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DocumentDetails(
+          documentId: documentId,
+          documentName: documentName,
+          documentDescription: documentDescription,
+          documentFiles: documentFiles,
+            token: _token// Pass documentFiles here
+        ),
+      ),
+    );
+  }
+
+
+
+
+
+
 
   void _showDeleteConfirmationDialog(BuildContext context, int index) {
     showDialog(
@@ -308,9 +338,16 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                         onTap: () {
-                          // Navigation to document content page
-                          // based on document information
+                          _navigateToDocumentDetailsPage(
+                            context,
+                            document.id,
+                            document.name,
+                            document.description,
+                            document.files,
+                          );
                         },
+
+
                       );
                     },
                   )
