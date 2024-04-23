@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:airsafe/page/UploadDocumentForm.dart';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
@@ -13,7 +13,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../home_page.dart';
 
 const storage = FlutterSecureStorage();
-
+class LoadingWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: CircularProgressIndicator(), // You can customize the loading indicator here
+    );
+  }
+}
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -27,13 +34,21 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final String baseUrl = 'https://10.0.2.2:7278/api';
+  bool _isLoading = false; // Flag to track loading state
+
   Future<void> _handleLoginUser(BuildContext context) async {
+    setState(() {
+      _isLoading = true; // Show loading indicator
+    });
     final url = Uri.parse('$baseUrl/Account/login');
     final headers = {'Content-Type': 'application/json'};
 
     // Check if both username and password are provided
     if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
       print('Username and Password are required');
+      setState(() {
+        _isLoading = false; // Hide loading indicator
+      });
       return; // Return early if either field is empty
     }
 
@@ -44,16 +59,19 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await http.post(url, headers: headers, body: body);
-
+      setState(() {
+        _isLoading = false; // Hide loading indicator after response
+      });
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         print('User ID: ${responseData['id']}');
         print('Username: ${responseData['username']}');
         print('Email: ${responseData['email']}');
         print('Token: ${responseData['token']}');
-        String token = jsonDecode(response.body)['token'];
+        String token = responseData['token']; // Extract the token
         await storage.write(key: 'jwt_token', value: token);
 
+        // Show snackbar indicating successful login
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Align(
@@ -77,16 +95,14 @@ class _LoginPageState extends State<LoginPage> {
         // Delay navigation to allow SnackBar display
         await Future.delayed(Duration(seconds: 2)); // Adjust delay as needed
 
-        // Navigate to homepage
+        // Navigate to homepage with the token
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(
+            builder: (context) => HomePage(token: token), // Pass token to HomePage
+          ),
         );
-      }
-
-
-
-      else if (response.statusCode == 400) {
+      } else if (response.statusCode == 400) {
         // Bad request, probably validation error
         print('Failed to login: ${response.body}');
         // Add further error handling logic here (e.g., displaying error message)
@@ -102,8 +118,13 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+
+
+
+
   @override
   Widget build(BuildContext context) {
+
     Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
@@ -145,6 +166,8 @@ class _LoginPageState extends State<LoginPage> {
                     innerText: 'Login',
                     onPressed: () => _handleLoginUser(context)),
                 const SizedBox(height: 18),
+                if (_isLoading) LoadingWidget(),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -185,4 +208,5 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
 }

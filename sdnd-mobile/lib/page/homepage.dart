@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'package:airsafe/page/tab_page.dart';
 
+import 'camera_page.dart';
 import 'home_page.dart';
 
 class homePage extends StatelessWidget {
@@ -88,7 +89,7 @@ class homePage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const HomePage()),
+                            MaterialPageRoute(builder: (context) => const LoginPage()),
                           );
                         },
                         style: ElevatedButton.styleFrom(

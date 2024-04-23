@@ -4,22 +4,11 @@
       <!-- Form fields for updating document data -->
       <div class="form-group">
         <label for="name" class="label">Title:</label>
-        <input
-          type="text"
-          class="form-control"
-          id="name"
-          v-model="editedDocument.name"
-          required
-        />
+        <input type="text" class="form-control" id="name" v-model="editedDocument.name" required />
       </div>
       <div class="form-group">
         <label for="description" class="label">Description:</label>
-        <textarea
-          class="form-control"
-          id="description"
-          v-model="editedDocument.description"
-          required
-        ></textarea>
+        <textarea class="form-control" id="description" v-model="editedDocument.description" required></textarea>
       </div>
     </div>
 
@@ -27,25 +16,28 @@
       <!-- Form fields for updating document PDF -->
       <div class="form-group">
         <label for="fileInput" class="label">Files</label>
-        <input
-          type="file"
-          class="form-control"
-          id="fileInput"
-          @change="onFileChange"
-        />
+        <input type="file" class="form-control" id="fileInput" @change="onFileChange" />
       </div>
     </div>
 
     <div class="button-container">
       <button class="btn btn-primary" @click="updateData">Save Changes</button>
-      <span v-if="saved" class="text-success"
-        >Document Updated successfully!</span
-      >
-      <span v-if="error" class="text-danger"
-        >Error Updating document. Please try again.</span
-      >
+      <span v-if="saved" class="text-success">Document Updated successfully!</span>
+      <span v-if="error" class="text-danger">Error Updating document. Please try again.</span>
     </div>
   </div>
+  <div class="form-group">
+    <label for="fileInput" class="label">Attach File:</label>
+    <div class="d-flex align-items-center">
+      <input type="file" class="form-control" id="fileInput" style="display: none" @change="handleFileSelection">
+      <button class="btn btn-outline-secondary mr-2" style="color: #333; border-color: #ccc;" @click="selectFile">Select
+        File</button>
+      <button class="btn btn-primary" @click="attachSelectedFile">Save Attachment</button>
+      <div id="notification" class="mt-2" style="display: none;"></div>
+    </div>
+  </div>
+
+
 </template>
 
 <script setup>
@@ -137,6 +129,7 @@ const onFileChange = (event) => {
 };
 
 onMounted(fetchDocument);
+
 </script>
 
 <style scoped>

@@ -9,6 +9,7 @@ using Sdnd_api.Dtos.QueryObjects;
 using Sdnd_api.Dtos.Responses;
 using Sdnd_api.Interfaces;
 using Sdnd_api.Services;
+using Sdnd_Api.Models;
 
 
 namespace Sdnd_api.Controllers;
@@ -66,37 +67,44 @@ public class DocumentController : ControllerBase
     }
 
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<OneDocumentResponseDto>> GetDocumentById(Guid id)
+    [HttpDelete("Delete/{id}")]
+    public async Task<IActionResult> DeleteDocument(Guid id)
     {
-        if (string.IsNullOrEmpty(id.ToString()))
+        try
         {
-            return NotFound("Document ID invalid");
+            var document = await _context.Documents.FindAsync(id);
+            if (document == null)
+            {
+                return NotFound($"Document with ID {id} not found.");
+            }
+
+            await DeleteDocumentFiles(document.Id);
+
+            _context.Documents.Remove(document);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while deleting the document: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteDocumentFiles(Guid documentId)
+    {
+        var docFiles = await _context.DocFiles
+            .Where(df => df.DocumentId == documentId)
+            .ToListAsync();
+
+        foreach (var docFile in docFiles)
+        {
+
+
+            _context.DocFiles.Remove(docFile);
         }
 
-        // Fetch the document and handle not found case
-        var document = await _context.Documents.FindAsync(id);
-        if (document == null)
-        {
-            return NotFound($"Document with ID {id} not found.");
-        }
-
-        // Fetch document files using the file service
-        var documentFiles = await _fileService.GetDocFilesByDocumentId(id);
-
-        // Create and populate the response DTO
-        var responseDto = new OneDocumentResponseDto
-        {
-            Name = document.Name,
-            Description = document.Description ?? "", // Use null-coalescing for optional Description
-            OwnerId = document.OwnerId,
-            AddedDate = document.AddedDate,
-            UpdatedDate = document.UpdatedDate,
-            DocumentState = document.DocumentState,
-            Files = documentFiles // Assign the retrieved document files to the Files collection
-        };
-
-        return Ok(responseDto);
+        await _context.SaveChangesAsync();
     }
 
 
@@ -120,40 +128,6 @@ public class DocumentController : ControllerBase
 
 
 
-    
-
-    [HttpDelete("Delete/{id}")]
-    public async Task<IActionResult> DeleteDocument(Guid id)
-    {
-        
-        // make a method that deletes all the files for that document then delete the document by the doc Id 
-        /* try
-        {
-            var document = await _context.Documents.FindAsync(id);
-            if (document == null)
-            {
-                return NotFound($"Document with ID {id} not found.");
-            }
-            string filePath = document.FilePath;
-
-            if (System.IO.File.Exists(filePath))
-            {
-                System.IO.File.Delete(filePath);
-            }
-
-            _context.Documents.Remove(document);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while deleting the document: {ex.Message}");
-        }*/
-        return StatusCode(500, $"An error occurred while deleting the document");
-    }
-
-
 
     [HttpGet("filterByName")]
     public IActionResult FilterByName([FromQuery] string Name)
@@ -169,6 +143,12 @@ public class DocumentController : ControllerBase
 
         return Ok(filteredDocuments);
     }
+
+
+
+
+
+
 
 
     // pdf sous forme de url
@@ -250,4 +230,23 @@ public class DocumentController : ControllerBase
     {
         return _context.Documents.Any(e => e.Id == id);
     }
+
+    [HttpGet("{documentId}/files")]
+    public async Task<IActionResult> GetFilesOfDocument(Guid documentId)
+    {
+        var document = await _context.Documents.FindAsync(documentId);
+
+        if (document == null)
+        {
+            return NotFound($"Document with ID {documentId} not found.");
+        }
+
+        var docFiles = await _context.DocFiles
+            .Where(df => df.DocumentId == documentId)
+            .ToListAsync();
+
+        return Ok(docFiles);
+    }
+   
+
 }

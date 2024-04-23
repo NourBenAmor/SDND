@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -10,6 +11,7 @@ namespace Sdnd_api.Models
         public string Description { get; set; } = "";
         public Guid OwnerId { get; set; }
         public State DocumentState { get; set; } = State.Blank;
+
     }
 
     public enum State 
@@ -19,4 +21,5 @@ namespace Sdnd_api.Models
         Shared,
         Archived
     }
+    
 }

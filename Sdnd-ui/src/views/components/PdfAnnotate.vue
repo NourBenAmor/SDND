@@ -8,14 +8,8 @@
       <button @click="fromDataURL"><i class="fa fa-file-image-o"></i></button>
       <button @click="handleDisabled"><i class="fa fa-ban"></i></button>
     </div>
-    <Vue3Signature
-      ref="signature1"
-      :sigOption="state.option"
-      :w="'300px'"
-      :h="'300px'"
-      :disabled="state.disabled"
-      class="example"
-    ></Vue3Signature>
+    <Vue3Signature ref="signature1" :sigOption="state.option" :w="'300px'" :h="'300px'" :disabled="state.disabled"
+      class="example"></Vue3Signature>
   </div>
 </template>
 
@@ -74,6 +68,7 @@ const handleDisabled = () => {
 .example {
   margin: 45px auto;
 }
+
 button {
   background-color: DodgerBlue;
   /* Blue background */
@@ -93,9 +88,11 @@ button {
 button:hover {
   background-color: RoyalBlue;
 }
+
 .toolbar {
   width: 100%;
 }
+
 .signatureEditor {
   width: 25%;
   height: 400px;
