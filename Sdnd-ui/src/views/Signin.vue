@@ -1,7 +1,7 @@
 <script setup>
-import { onBeforeUnmount, onBeforeMount,onMounted,ref,computed } from "vue";
+import { onBeforeUnmount, onBeforeMount, onMounted, ref, computed } from "vue";
 import { useStore } from "vuex";
-import { useRouter } from "vue-router"; 
+import { useRouter } from "vue-router";
 import Navbar from "@/examples/PageLayout/Navbar.vue";
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonSwitch from "@/components/ArgonSwitch.vue";
@@ -10,39 +10,35 @@ import ArgonButton from "@/components/ArgonButton.vue";
 const body = document.getElementsByTagName("body")[0];
 const loginData = ref({
   username: "",
-  password: ""
+  password: "",
 });
 const store = useStore();
 const message = ref(false);
 const router = useRouter();
-
-
-
+const IsLoading = ref(false);
 const loggedIn = computed(() => store.state.auth.status.loggedIn);
-
-
+// const error = ref('');
 onMounted(() => {
   if (loggedIn.value) {
-    router.push('/'); // Assuming profile is accessible from root path
+    router.push("/"); // Assuming profile is accessible from root path
   }
 });
 
 const login = async () => {
   try {
-    await store.dispatch('auth/login', loginData.value);
-      router.push('/');
+    IsLoading.value = true;
+    await store.dispatch("auth/login", loginData.value);
+    IsLoading.value = false;
+    router.push("/");
   } catch (error) {
     message.value = true;
     const errorMessage =
-      (error.response &&
-        error.response.data &&
-        error.response.data.message) ||
+      (error.response && error.response.data && error.response.data.message) ||
       error.message ||
       error.toString();
     console.error(errorMessage);
   }
 };
-
 
 // const login = async () => {
 //   try {
@@ -100,11 +96,11 @@ onBeforeUnmount(() => {
                 <div class="card-body">
                   <form @submit.prevent="login">
                     <div class="mb-3">
-                      <argon-input v-model="loginData.username"  type="text" placeholder="Username" name="username"
+                      <argon-input v-model="loginData.username" type="text" placeholder="Username" name="username"
                         size="lg" />
                     </div>
                     <div class="mb-3">
-                      <argon-input v-model="loginData.password"  type="password" placeholder="Password" name="password"
+                      <argon-input v-model="loginData.password" type="password" placeholder="Password" name="password"
                         size="lg" />
                     </div>
                     <argon-switch id="rememberMe" name="remember-me">Remember me</argon-switch>
@@ -119,7 +115,9 @@ onBeforeUnmount(() => {
                   <p class="mx-auto mb-4 text-sm">
                     Don't have an account?
                     <router-link class="nav-link me-2" to="/signup">
-                      <a href="#" class="text-success text-gradient font-weight-bold">Sign up</a>
+                      <span v-if="IsLoading" class="spinner-border spinner-border-sm" role="status"
+                        aria-hidden="true"></span>
+                      <a v-else href="#" class="text-success text-gradient font-weight-bold">Sign up</a>
                     </router-link>
                   </p>
                 </div>
@@ -129,15 +127,12 @@ onBeforeUnmount(() => {
               class="top-0 my-auto text-center col-6 d-lg-flex d-none h-100 pe-0 position-absolute end-0 justify-content-center flex-column">
               <div
                 class="position-relative bg-gradient-success h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center overflow-hidden"
-                style="background-size: cover;">
-
-
-              </div>
+                style="background-size: cover"></div>
             </div>
-
           </div>
         </div>
       </div>
     </section>
   </main>
-</template>../services/apiService
+</template>
+../services/apiService

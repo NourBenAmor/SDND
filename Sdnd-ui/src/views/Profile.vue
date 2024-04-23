@@ -1,14 +1,10 @@
 <template>
-
   <main>
-
     <div class="container-fluid">
-      <div class="page-header min-height-300" style="
-          
-          margin-right: -24px;
-          margin-left: -34%;
-        ">
-        
+      <div
+        class="page-header min-height-300"
+        style="margin-right: -24px; margin-left: -34%"
+      >
         <span class="mask bg-gradient-success opacity-6"></span>
       </div>
       <div class="card shadow-lg mt-n6">
@@ -16,21 +12,21 @@
           <div class="row gx-4">
             <div class="col-auto">
               <div class="avatar avatar-xl position-relative">
-                <img src="../assets/img/team-1.jpg" alt="profile_image" class="shadow-sm w-100 border-radius-lg" />
+                <img
+                  src="../assets/img/team-1.jpg"
+                  alt="profile_image"
+                  class="shadow-sm w-100 border-radius-lg"
+                />
               </div>
             </div>
             <div class="col-auto my-auto">
-
               <div v-if="currentUser" class="h-100">
                 <div class="mb-1">
                   <span>{{ currentUser.userName }}</span>
                 </div>
-
               </div>
             </div>
           </div>
-
-
         </div>
       </div>
     </div>
@@ -40,14 +36,16 @@
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center justify-content-end">
-                <button class="btn btn-success" size="sm" @click="openEditUserView(currentUser.id)">
+                <button
+                  class="btn btn-success"
+                  size="sm"
+                  @click="openEditUserView(currentUser.id)"
+                >
                   <span>Edit Profile</span>
                 </button>
               </div>
-
             </div>
             <div class="card-body">
-
               <p class="text-uppercase text-sm">User Information</p>
               <div v-if="currentUser" class="user-info">
                 <div class="user-info-item">
@@ -60,21 +58,19 @@
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
     </div>
   </main>
-
 </template>
 
 <script setup>
 import { onBeforeMount, onMounted, onBeforeUnmount } from "vue";
-import BaseApiService from '../services/apiService';
+import BaseApiService from "../services/apiService";
 import { useStore } from "vuex";
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 import setNavPills from "@/assets/js/nav-pills.js";
 import setTooltip from "@/assets/js/tooltip.js";
@@ -86,12 +82,11 @@ const router = useRouter();
 
 const currentUser = ref(null);
 const openEditUserView = (userId) => {
-  router.push({ name: 'EditProfile', params: { id: userId } });
+  router.push({ name: "EditProfile", params: { id: userId } });
 };
 
 const getCurrentUser = async () => {
   try {
-  
     const response = await BaseApiService(`Account/me`).list();
     console.log(response.data);
     currentUser.value = response.data;

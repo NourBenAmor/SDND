@@ -1,8 +1,8 @@
 <script setup>
-import { onBeforeUnmount, onBeforeMount ,onMounted,computed } from "vue";
+import { onBeforeUnmount, onBeforeMount, onMounted, computed } from "vue";
 import { useStore } from "vuex";
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 import Navbar from "@/examples/PageLayout/Navbar.vue";
 import AppFooter from "@/examples/PageLayout/Footer.vue";
 import ArgonInput from "@/components/ArgonInput.vue";
@@ -11,11 +11,10 @@ import ArgonButton from "@/components/ArgonButton.vue";
 const body = document.getElementsByTagName("body")[0];
 const router = useRouter();
 
-
 const registerForm = ref({
-  username: '',
-  email: '',
-  password: ''
+  username: "",
+  email: "",
+  password: "",
 });
 const successful = ref(false);
 const loading = ref(false);
@@ -54,18 +53,18 @@ const registerUser = async () => {
   successful.value = false;
   loading.value = true;
   try {
-    const newUser = { 
+    const newUser = {
       username: registerForm.value.username,
       email: registerForm.value.email,
-      password: registerForm.value.password
-    }
+      password: registerForm.value.password,
+    };
     console.log(newUser);
     const response = await store.dispatch("auth/register", newUser);
 
-    console.log('Registration successful:', response.data);
+    console.log("Registration successful:", response.data);
     message.value = response.message;
     successful.value = true;
-    router.push('/signin');
+    router.push("/signin");
   } catch (error) {
     message.value =
       (error.response && error.response.data && error.response.data.message) ||
@@ -104,7 +103,9 @@ onBeforeUnmount(() => {
     </div>
   </div>
   <main class="main-content mt-0">
-    <div class="page-header align-items-start min-vh-50 pt-5 pb-11 m-3 border-radius-lg">
+    <div
+      class="page-header align-items-start min-vh-50 pt-5 pb-11 m-3 border-radius-lg"
+    >
       <span class="mask bg-gradient-dark opacity-6"></span>
       <div class="container">
         <div class="row justify-content-center">
@@ -128,35 +129,63 @@ onBeforeUnmount(() => {
             <div class="row px-xl-5 px-sm-4 px-3">
               <div class="col-12">
                 <form @submit.prevent="handleSubmit">
-                  <ArgonInput id="name" type="text" placeholder="Name" aria-label="Name"
-                    v-model="registerForm.username" />
-                  <ArgonInput id="email" type="email" placeholder="Email" aria-label="Email"
-                    v-model="registerForm.email" />
-                  <ArgonInput id="password" type="password" placeholder="Password" aria-label="Password"
-                    v-model="registerForm.password" />
+                  <ArgonInput
+                    id="name"
+                    type="text"
+                    placeholder="Name"
+                    aria-label="Name"
+                    v-model="registerForm.username"
+                  />
+                  <ArgonInput
+                    id="email"
+                    type="email"
+                    placeholder="Email"
+                    aria-label="Email"
+                    v-model="registerForm.email"
+                  />
+                  <ArgonInput
+                    id="password"
+                    type="password"
+                    placeholder="Password"
+                    aria-label="Password"
+                    v-model="registerForm.password"
+                  />
                   <ArgonCheckbox checked>
                     <label class="form-check-label" for="flexCheckDefault">
                       I agree the
-                      <a href="javascript:;" class="text-dark font-weight-bolder">Terms and Conditions</a>
+                      <a
+                        href="javascript:;"
+                        class="text-dark font-weight-bolder"
+                        >Terms and Conditions</a
+                      >
                     </label>
                   </ArgonCheckbox>
                   <div>{{ message }}</div>
                   <div class="text-center">
-                    <ArgonButton fullWidth color="dark" variant="gradient" class="my-4 mb-2" type="submit">
+                    <ArgonButton
+                      fullWidth
+                      color="dark"
+                      variant="gradient"
+                      class="my-4 mb-2"
+                      type="submit"
+                    >
                       <span v-if="loading">
-                        <div class="spinner-border text-secondary" role="status">
+                        <div
+                          class="spinner-border text-secondary"
+                          role="status"
+                        >
                           <span class="visually-hidden">Loading...</span>
                         </div>
                       </span>
-                      <span v-else>
-                        Sign up
-                      </span>
+                      <span v-else> Sign up </span>
                     </ArgonButton>
                   </div>
                   <!-- Sign in link -->
                   <p class="text-sm mt-3 mb-0">
                     Already have an account?
-                    <a href="javascript:;" class="text-dark font-weight-bolder">Sign in</a>
+                    <a href="javascript:;" class="text-dark font-weight-bolder"
+                      >Sign in</a
+                    >
                   </p>
                 </form>
               </div>

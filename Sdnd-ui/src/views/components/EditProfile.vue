@@ -4,8 +4,7 @@
       <div class="page-header min-height-300">
         <span class="mask bg-gradient opacity-6"></span>
       </div>
-
-  </div>
+    </div>
     <div class="py-4 container-fluid">
       <div class="row">
         <div class="col-md-8">
@@ -13,18 +12,36 @@
             <div class="card-body">
               <p class="text-uppercase text-sm">Edit Profile</p>
               <div class="form-group">
-                <label for="userName" class="form-control-label">Username:</label>
-                
-                <input type="text" id="userName" v-model="editedUser.userName" class="form-control" />
+                <label for="userName" class="form-control-label"
+                  >Username:</label
+                >
+
+                <input
+                  type="text"
+                  id="userName"
+                  v-model="editedUser.userName"
+                  class="form-control"
+                />
               </div>
               <div class="form-group">
                 <label for="email" class="form-control-label">Email:</label>
-                <input type="email" id="email" v-model="editedUser.email" class="form-control" />
+                <input
+                  type="email"
+                  id="email"
+                  v-model="editedUser.email"
+                  class="form-control"
+                />
               </div>
               <div class="form-group">
-                <button class="btn btn-success " @click="updateUser">Save Changes</button>
-                <span v-if="saved" class="text-success">User updated successfully!</span>
-      <span v-if="error" class="text-danger">Error updating user. Please try again.</span>
+                <button class="btn btn-success" @click="updateUser">
+                  Save Changes
+                </button>
+                <span v-if="saved" class="text-success"
+                  >User updated successfully!</span
+                >
+                <span v-if="error" class="text-danger"
+                  >Error updating user. Please try again.</span
+                >
               </div>
             </div>
           </div>
@@ -35,76 +52,72 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
-import { useRoute} from 'vue-router';
-import BaseApiService from '../../services/apiService';
-import { useRouter } from 'vue-router'; // Import useRouter from vue-router
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { useRoute } from "vue-router";
+import BaseApiService from "../../services/apiService";
+import { useRouter } from "vue-router"; // Import useRouter from vue-router
 
 const route = useRoute();
-const router = useRouter(); 
+const router = useRouter();
 
 const saved = ref(false);
 const error = ref(false);
 
 const currentUser = ref(null);
 const editedUser = ref({
-  username: '',
-  email: ''
+  username: "",
+  email: "",
 });
-
 
 const fetchUser = async () => {
   try {
     const response = await BaseApiService(`Account/me`).list();
 
-    console.log('User data:', response.data);
+    console.log("User data:", response.data);
 
     currentUser.value = response.data;
-    editedUser.value = { ...response.data }; 
-    
-    //const routeId = route.params.id; // Get the route ID
-    //await fetchProfilePicture(routeId); 
+    editedUser.value = { ...response.data };
 
+    //const routeId = route.params.id; // Get the route ID
+    //await fetchProfilePicture(routeId);
   } catch (error) {
-    console.error('Error fetching user:', error);
+    console.error("Error fetching user:", error);
   }
 };
-
-
-
 
 const updateUser = async () => {
   try {
-    const userId = route.params.id; 
+    const userId = route.params.id;
     const formData = new FormData();
-    formData.append('username', editedUser.value.userName);
-    formData.append('email', editedUser.value.email);
+    formData.append("username", editedUser.value.userName);
+    formData.append("email", editedUser.value.email);
 
     if (!userId) {
-      console.error('Cannot update user: User ID is undefined or null.');
+      console.error("Cannot update user: User ID is undefined or null.");
       return;
     }
 
-    const response = await axios.put(`https://localhost:7278/api/Account/update/${userId}`, formData, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    const response = await axios.put(
+      `https://localhost:7278/api/Account/update/${userId}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
 
-    console.log('User updated:', response.data);
-    currentUser.value = response.data; 
-    saved.value = true; 
+    console.log("User updated:", response.data);
+    currentUser.value = response.data;
+    saved.value = true;
 
-    router.push('/profile');
-
+    router.push("/profile");
   } catch (error) {
-    console.error('Error updating user:', error);
-    error.value = true; 
+    console.error("Error updating user:", error);
+    error.value = true;
   }
 };
-
-
 
 onMounted(fetchUser);
 </script>

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sdnd_api.Dtos.Requests;
 using Sdnd_api.Interfaces;
+using Sdnd_api.Models;
 using Sdnd_Api.Models;
 
 namespace Sdnd_api.Controllers;
@@ -78,8 +79,9 @@ public class FileController : ControllerBase
 
 
         newDocFile.FilePath = result;
-
+        
         _context.DocFiles.Add(newDocFile);
+        Document.DocumentState = State.Filled;
         await _context.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetDocFileById), new { id = newDocFile.Id }, newDocFile);

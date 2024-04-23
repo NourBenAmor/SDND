@@ -31,11 +31,8 @@
   <ItemGroup>
     <Folder Include="Resource\AllFiles\" />
     <Folder Include="wwwroot\" />
-<<<<<<< Updated upstream
-	  <Folder Include="wwwroot\" />
-=======
     <Folder Include="Resource\" />
->>>>>>> Stashed changes
+
   </ItemGroup>
 
 </Project>

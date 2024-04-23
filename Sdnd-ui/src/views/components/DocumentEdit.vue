@@ -1,16 +1,25 @@
 <template>
   <div class="edit-document-container">
- 
-
     <div>
       <!-- Form fields for updating document data -->
       <div class="form-group">
         <label for="name" class="label">Title:</label>
-        <input type="text" class="form-control" id="name" v-model="editedDocument.name" required>
+        <input
+          type="text"
+          class="form-control"
+          id="name"
+          v-model="editedDocument.name"
+          required
+        />
       </div>
       <div class="form-group">
         <label for="description" class="label">Description:</label>
-        <textarea class="form-control" id="description" v-model="editedDocument.description" required></textarea>
+        <textarea
+          class="form-control"
+          id="description"
+          v-model="editedDocument.description"
+          required
+        ></textarea>
       </div>
     </div>
 
@@ -18,36 +27,45 @@
       <!-- Form fields for updating document PDF -->
       <div class="form-group">
         <label for="fileInput" class="label">Files</label>
-        <input type="file" class="form-control" id="fileInput" @change="onFileChange">
+        <input
+          type="file"
+          class="form-control"
+          id="fileInput"
+          @change="onFileChange"
+        />
       </div>
     </div>
 
     <div class="button-container">
       <button class="btn btn-primary" @click="updateData">Save Changes</button>
-      <span v-if="saved" class="text-success">Document Updated successfully!</span>
-      <span v-if="error" class="text-danger">Error Updating document. Please try again.</span>
+      <span v-if="saved" class="text-success"
+        >Document Updated successfully!</span
+      >
+      <span v-if="error" class="text-danger"
+        >Error Updating document. Please try again.</span
+      >
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import BaseApiService from '../../services/apiService';
-import { useRouter} from 'vue-router';
+import { ref, onMounted } from "vue";
+import BaseApiService from "../../services/apiService";
+import { useRouter } from "vue-router";
 const router = useRouter();
 const props = defineProps({
-  documentId:String
-})
+  documentId: String,
+});
 const editedDocument = ref({
-  name: '',
-  description: '',
-  documentState: 'Blank',
+  name: "",
+  description: "",
+  documentState: "Blank",
 });
 const saved = ref(false);
 const error = ref(false);
 
 const file = ref(null);
-const updateOption = ref('data'); // Default to updating document data
+const updateOption = ref("data"); // Default to updating document data
 
 const fetchDocument = async () => {
   try {
@@ -57,22 +75,26 @@ const fetchDocument = async () => {
     const document = response.data;
     editedDocument.value = { ...document };
   } catch (error) {
-    console.error('Error fetching document:', error);
+    console.error("Error fetching document:", error);
   }
 };
 
 const updateData = async () => {
   try {
     const documentId = props.documentId;
-    
-    if (updateOption.value === 'data') {
+
+    if (updateOption.value === "data") {
       // Validate required fields before sending the request
-      if (!editedDocument.value.name || !editedDocument.value.contentType || !editedDocument.value.description) {
+      if (
+        !editedDocument.value.name ||
+        !editedDocument.value.contentType ||
+        !editedDocument.value.description
+      ) {
         // Handle validation error
-        console.error('Required fields are missing');
+        console.error("Required fields are missing");
         return;
       }
-      
+
       const requestData = {
         name: editedDocument.value.name,
         description: editedDocument.value.description,
@@ -81,23 +103,29 @@ const updateData = async () => {
         // No need to include file in data update
       };
 
-      await BaseApiService('Document').update(`UpdateData/${documentId}`, requestData);
-      router.push('/tables');
-    } else if (updateOption.value === 'pdf') {
+      await BaseApiService("Document").update(
+        `UpdateData/${documentId}`,
+        requestData,
+      );
+      router.push("/tables");
+    } else if (updateOption.value === "pdf") {
       // Ensure a file is selected
       if (!file.value) {
-        console.error('No file selected');
+        console.error("No file selected");
         return;
       }
 
       const formData = new FormData();
-      formData.append('file', file.value);
+      formData.append("file", file.value);
 
-      await BaseApiService('Document').update(`UpdateFile/${documentId}`, formData);
-      router.push('/tables');
+      await BaseApiService("Document").update(
+        `UpdateFile/${documentId}`,
+        formData,
+      );
+      router.push("/tables");
     }
 
-    console.log('Update request successful');
+    console.log("Update request successful");
     saved.value = true;
   } catch (error) {
     console.error(error);
@@ -107,7 +135,6 @@ const updateData = async () => {
 const onFileChange = (event) => {
   file.value = event.target.files[0];
 };
-
 
 onMounted(fetchDocument);
 </script>

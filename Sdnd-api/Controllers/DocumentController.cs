@@ -177,8 +177,35 @@ public class DocumentController : ControllerBase
     [HttpGet("pdf/{id}")]
     public IActionResult Get(Guid id)
     {
-        var stream = new FileStream($"Resource/AllFiles/{id.ToString()}", FileMode.Open);
+        var stream = new FileStream($"Resource/AllFiles/{id.ToString()}",  FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
         return File(stream, "application/pdf");
+    }
+
+    [AllowAnonymous]
+    [HttpGet("pdf/second/{id}")]
+    public IActionResult GetSecond(Guid id)
+    {
+        try
+        {
+            // Ensure that the file exists
+            string filePath = $"Resource/AllFiles/{id.ToString()}";
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("not found"); // Return 404 if the file does not exist
+            }
+
+            // Read the file as a byte array
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+
+            // Return the file as a byte array with the appropriate content type
+            return File(fileBytes, "application/pdf", $"{id}.pdf");
+        }
+        catch (Exception ex)
+        {
+            // Log the error
+            Console.WriteLine($"Error retrieving PDF file: {ex.Message}");
+            return StatusCode(500); // Return 500 Internal Server Error
+        }
     }
 
     [HttpPut("UpdateData/{id}")]

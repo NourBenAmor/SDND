@@ -9,7 +9,7 @@ import "./assets/css/nucleo-svg.css";
 import Vue3Signature from "vue3-signature";
 import ArgonDashboard from "./argon-dashboard";
 import PrimeVue from "primevue/config";
-
+import ViewerPlugin from "pdf-annotate-sdnd";
 //in main.js
 import "primevue/resources/themes/aura-light-indigo/theme.css";
 
@@ -17,14 +17,15 @@ const appInstance = createApp(App);
 appInstance.use(Vue3Toasity, {
   autoClose: 3000,
 });
+appInstance.use(ViewerPlugin);
 appInstance.use(Vue3Signature);
 appInstance.use(store);
 appInstance.use(PrimeVue, {
   zIndex: {
     modal: 100001, //dialog, sidebar
-    // overlay: 1000, //dropdown, overlaypanel
-    // menu: 1000, //overlay menus
-    // tooltip: 1100, //tooltip
+    overlay: 130002, //dropdown, overlaypanel
+    menu: 100003, //overlay menus
+    tooltip: 110000, //tooltip
   },
 });
 appInstance.use(router);

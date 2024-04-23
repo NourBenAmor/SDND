@@ -45,6 +45,31 @@ namespace FileUpload.Services
             return docFiles;
         }
 
+        public async Task<string> UpdateFile(IFormFile file)
+        {
+            if (file == null && file.Length == 0)
+            {
+                return "file not selected";
+            }
+
+            var folderName = Path.Combine("Resource", "AllFiles");
+            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+            if (!Directory.Exists(pathToSave))
+                Directory.CreateDirectory(pathToSave);
+            var fileName = file.Name;
+            var fullPath = Path.Combine(pathToSave, fileName);
+            var dbPath = Path.Combine(folderName, fileName);
+
+            if (System.IO.File.Exists(fullPath))
+                return "file Already Exists";
+
+            await using (var stream = new FileStream(fullPath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return dbPath;
+        }
 
         /*public async Task PostMultiFileAsync(List<FileUploadModel> fileData)
         {

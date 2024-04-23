@@ -1,37 +1,40 @@
 <template>
-
-<div class="modal" :class="{ 'is-active': isModalActive }">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Select New Role</h5>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label for="new-role" class="control-label">New Role</label>
-          <select id="new-role" class="form-control" v-model="newRole">
-            <option value="" disabled>Select new role</option>
-            <option value="Admin">Admin</option>
-            <option value="User">User</option>
-          </select>
+  <div class="modal" :class="{ 'is-active': isModalActive }">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Select New Role</h5>
         </div>
-      </div>
-      <div class="modal-footer">
-        <a class="btn btn-link text-dark px-3 mb-0" @click="updateRole">
-          <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Update
-        </a>
-        <button type="button" class="btn btn-secondary" @click="closeModal">Cancel</button>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="new-role" class="control-label">New Role</label>
+            <select id="new-role" class="form-control" v-model="newRole">
+              <option value="" disabled>Select new role</option>
+              <option value="Admin">Admin</option>
+              <option value="User">User</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a class="btn btn-link text-dark px-3 mb-0" @click="updateRole">
+            <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i
+            >Update
+          </a>
+          <button type="button" class="btn btn-secondary" @click="closeModal">
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
 
   <!-- Users Table -->
   <div class="users-table-container">
     <div class="card">
       <!-- Table header -->
-      <div class="card-header d-flex justify-content-between align-items-center">
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
         <h6 class="mb-0">Users Table</h6>
       </div>
 
@@ -41,16 +44,24 @@
           <table class="table align-items-center mb-0">
             <thead>
               <tr>
-                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                <th
+                  class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                >
                   Username
                 </th>
-                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                <th
+                  class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                >
                   Email
                 </th>
-                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                <th
+                  class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                >
                   Role
                 </th>
-                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                <th
+                  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                >
                   Actions
                 </th>
               </tr>
@@ -72,14 +83,19 @@
                 </td>
                 <td class="align-middle">
                   <div class="ms-auto text-end">
-                    <a class="btn btn-link text-green px-3 mb-0" @click="openModal(user.id)">
+                    <a
+                      class="btn btn-link text-green px-3 mb-0"
+                      @click="openModal(user.id)"
+                    >
                       <i class="fas fa-pencil-alt me-1"></i> Update Role
                     </a>
-                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" @click="removeRole(user.id, user.role)">
+                    <a
+                      class="btn btn-link text-danger text-gradient px-3 mb-0"
+                      @click="removeRole(user.id, user.role)"
+                    >
                       <i class="far fa-trash-alt me-2"></i> Remove Role
                     </a>
                   </div>
-
                 </td>
               </tr>
             </tbody>
@@ -93,44 +109,42 @@
       </div>
     </div>
   </div>
-
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import BaseApiService from '../../services/apiService';
-import axios from 'axios';
-import authHeader from '../../services/auth-header';
+import { ref, onMounted } from "vue";
+import BaseApiService from "../../services/apiService";
+import axios from "axios";
+import authHeader from "../../services/auth-header";
 
 const isModalActive = ref(false);
-const newRole = ref('');
+const newRole = ref("");
 const selectedUserId = ref(null);
 const users = ref([]);
 
 const isLoggedIn = ref(false);
-const userRole = ref('');
-
+const userRole = ref("");
 
 const openModal = (userId) => {
-  console.log('Opening modal for user ID:', userId);
+  console.log("Opening modal for user ID:", userId);
   selectedUserId.value = userId;
   isModalActive.value = true;
 };
 
 const closeModal = () => {
   isModalActive.value = false;
-  newRole.value = '';
+  newRole.value = "";
   selectedUserId.value = null;
 };
 
 const fetchUsers = async () => {
   try {
-    const response = await BaseApiService('users').list();
+    const response = await BaseApiService("users").list();
     users.value = response.data;
     isLoggedIn.value = true;
     userRole.value = response.data.role;
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error("Error fetching users:", error);
   }
 };
 
@@ -140,26 +154,30 @@ const updateRole = async () => {
     const role = newRole.value;
 
     if (!userId) {
-      console.error('User ID is not selected.');
+      console.error("User ID is not selected.");
       return;
     }
 
-    const response = await axios.put(`https://localhost:7278/api/addRole/${userId}`, `"${role}"`, {
-      headers: {
-        ...authHeader(), 
-        'Content-Type': 'application/json',
+    const response = await axios.put(
+      `https://localhost:7278/api/addRole/${userId}`,
+      `"${role}"`,
+      {
+        headers: {
+          ...authHeader(),
+          "Content-Type": "application/json",
+        },
       },
-    });
+    );
 
     if (response.status === 204) {
-      console.log('User role updated successfully!');
+      console.log("User role updated successfully!");
       closeModal();
       fetchUsers();
-  } else {
-      console.error('Unexpected response:', response);
+    } else {
+      console.error("Unexpected response:", response);
     }
   } catch (error) {
-    console.error('Error updating user role:', error);
+    console.error("Error updating user role:", error);
   }
 };
 
@@ -171,23 +189,22 @@ const removeRole = async (userId, role) => {
       {
         headers: {
           ...authHeader(), // Include authorization headers
-          'Content-Type': 'application/json-patch+json',
-          'Accept': '*/*'
-        }
-      }
+          "Content-Type": "application/json-patch+json",
+          Accept: "*/*",
+        },
+      },
     );
 
     if (response.status === 204) {
-      console.log('Role removed successfully!');
+      console.log("Role removed successfully!");
       fetchUsers();
     } else {
-      console.error('Unexpected response:', response);
+      console.error("Unexpected response:", response);
     }
   } catch (error) {
-    console.error('Error removing role:', error);
+    console.error("Error removing role:", error);
   }
 };
-
 
 onMounted(() => {
   fetchUsers();

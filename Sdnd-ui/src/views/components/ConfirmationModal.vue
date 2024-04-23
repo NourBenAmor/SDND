@@ -1,37 +1,38 @@
 <template>
-    <div v-if="show" class="modal-card">
-      <p>{{ message }}</p>
-      <div class="button-container">
-        <button @click="confirm">
-          <i class="fas fa-check " beat></i> </button>
-        <button @click="cancel">
-          <i class="fas fa-times"></i> </button>
-      </div>
+  <div v-if="show" class="modal-card">
+    <p>{{ message }}</p>
+    <div class="button-container">
+      <button @click="confirm">
+        <i class="fas fa-check" beat></i>
+      </button>
+      <button @click="cancel">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
+  </div>
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+import { defineProps, defineEmits } from "vue";
 
 const { show, message } = defineProps({
   show: Boolean,
   message: {
     type: String,
-    default: 'Are you sure ?'
-  }
+    default: "Are you sure ?",
+  },
 });
 
-const emit = defineEmits(['confirm', 'cancel']);
+const emit = defineEmits(["confirm", "cancel"]);
 
 const confirm = () => {
-  emit('confirm');
+  emit("confirm");
 };
 
 const cancel = () => {
-  emit('cancel');
+  emit("cancel");
 };
 </script>
-
 
 <style scoped>
 /* Include Font Awesome CSS for icons */
@@ -70,7 +71,7 @@ const cancel = () => {
 }
 
 button {
-  padding:  0px ;
+  padding: 0px;
   border: none;
   border-radius: 5px;
   cursor: pointer;

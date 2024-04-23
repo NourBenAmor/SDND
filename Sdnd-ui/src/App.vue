@@ -1,4 +1,3 @@
-
 <script setup>
 import { computed } from "vue";
 import { useStore } from "vuex";
@@ -6,7 +5,6 @@ import Sidenav from "./examples/Sidenav";
 import Configurator from "@/examples/Configurator.vue";
 import Navbar from "@/examples/Navbars/Navbar.vue";
 import AppFooter from "@/examples/Footer.vue";
-
 const store = useStore();
 const isNavFixed = computed(() => store.state.isNavFixed);
 const darkMode = computed(() => store.state.darkMode);
@@ -19,9 +17,9 @@ const showFooter = computed(() => store.state.showFooter);
 const showConfig = computed(() => store.state.showConfig);
 const hideConfigButton = computed(() => store.state.hideConfigButton);
 const toggleConfigurator = () => store.commit("toggleConfigurator");
-const hideOverlayEvent = () =>{
+const hideOverlayEvent = () => {
   store.state.showOverlay = false;
-}
+};
 const navClasses = computed(() => {
   return {
     "position-sticky bg-white left-auto top-2 z-index-sticky":
@@ -35,16 +33,11 @@ const navClasses = computed(() => {
 </script>
 <template>
   <div v-if="showOverlay" @click="hideOverlayEvent" class="overlay"></div>
-  <div
-    v-show="layout === 'landing'"
-    class="landing-bg h-100 bg-gradient-primary position-fixed w-100"
-  ></div>
+  <div v-show="layout === 'landing'" class="landing-bg h-100 bg-gradient-primary position-fixed w-100"></div>
 
   <sidenav v-if="showSidenav" />
 
-  <main
-    class="main-content position-relative max-height-vh-100 h-100 border-radius-lg"
-  >
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
     <!-- nav -->
 
     <navbar :class="[navClasses]" v-if="showNavbar" />
@@ -53,10 +46,8 @@ const navClasses = computed(() => {
 
     <app-footer v-show="showFooter" />
 
-    <configurator
-      :toggle="toggleConfigurator"
-      :class="[showConfig ? 'show' : '', hideConfigButton ? 'd-none' : '']"
-    />
+    <configurator :toggle="toggleConfigurator" :class="[showConfig ? 'show' : '', hideConfigButton ? 'd-none' : '']" />
+   
   </main>
 </template>
 <style scoped>
@@ -68,7 +59,8 @@ const navClasses = computed(() => {
   z-index: 10000;
   background: rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(4px);
-    /* gray out the background when modal appears */  /* gray out the background when modal appears */
+  /* gray out the background when modal appears */
+  /* gray out the background when modal appears */
   top: 0;
   bottom: 0;
   left: 0;

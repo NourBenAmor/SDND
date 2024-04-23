@@ -17,11 +17,11 @@ const currentDirectory = computed(() => {
   return dir.charAt(0).toUpperCase() + dir.slice(1);
 });
 
-const signout = () =>{
-  console.log("logging" ); 
-  store.dispatch('auth/logout')
+const signout = () => {
+  console.log("logging");
+  store.dispatch("auth/logout");
   // router.push('/signin')
-}
+};
 
 const minimizeSidebar = () => store.commit("sidebarMinimize");
 const toggleConfigurator = () => store.commit("toggleConfigurator");
@@ -33,7 +33,7 @@ const closeMenu = () => {
 };
 </script>
 <template>
-<nav
+  <nav
     class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl"
     :class="isRTL ? 'top-0 position-sticky z-index-sticky' : ''"
     v-bind="$attrs"
@@ -67,14 +67,14 @@ const closeMenu = () => {
           </div>
         </div>
         <ul class="navbar-nav justify-content-end">
-      <li class="nav-item d-flex align-items-center">
-        <router-link
-          :to="{ name: 'Signin' }"
-          class="px-0 nav-link font-weight-bold text-white"
-        >
-          <span @click="signout" class="d-sm-inline d-none">Sign Out</span>
-        </router-link>
-      </li>
+          <li class="nav-item d-flex align-items-center">
+            <router-link
+              :to="{ name: 'Signin' }"
+              class="px-0 nav-link font-weight-bold text-white"
+            >
+              <span @click="signout" class="d-sm-inline d-none">Sign Out</span>
+            </router-link>
+          </li>
           <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
             <a
               href="#"

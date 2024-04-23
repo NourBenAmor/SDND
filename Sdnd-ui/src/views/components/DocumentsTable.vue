@@ -5,7 +5,6 @@
       <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0">My Documents</h6>
         <div class="d-flex align-items-center">
-
           <Dropdown v-model="CurrentDocumentState" :options="DocumentStates" optionLabel="name"
             placeholder="DocumentState" class="dropdown w-full md:w-14rem mt-3 mb-3" />
           <InputText class="searchInput" v-model="filterText" type="text" placeholder="Search" />
@@ -28,7 +27,7 @@
                   Document State
                 </th>
                 <th
-                  class="text-uppercase text-secondary text-center align-middle  text-xxs font-weight-bolder opacity-7">
+                  class="text-uppercase text-secondary text-center align-middle text-xxs font-weight-bolder opacity-7">
                   Description
                 </th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -54,7 +53,27 @@
                 </th>
               </tr>
             </thead>
-            <tbody v-if="paginatedAndFilteredDocuments.length > 0">
+            <tbody v-if="IsLoading">
+              <td>
+                <skeleton />
+              </td>
+              <td>
+                <skeleton />
+              </td>
+              <td>
+                <skeleton />
+              </td>
+              <td>
+                <skeleton />
+              </td>
+              <td>
+                <skeleton />
+              </td>
+              <td>
+                <skeleton />
+              </td>
+            </tbody>
+            <tbody v-else-if="paginatedAndFilteredDocuments.length > 0">
               <tr v-for="(document, index) in paginatedAndFilteredDocuments" :key="index">
                 <td>
                   <div class="d-flex px-2 py-1">
@@ -64,17 +83,19 @@
                   </div>
                 </td>
 
-
                 <td class="align-middle text-center text-sm">
-                  <p class="badge badge-md bg-gradient-success fs-20  mx-auto my-auto">
+                  <p class="badge badge-md bg-gradient-success fs-20 mx-auto my-auto">
                     {{ getDocumentStateString(document.documentState) }}
                   </p>
                 </td>
                 <td class="align-middle text-center">
-                  <span class="text-wrap d-inline-block" style="max-width: 300px;">
+                  <span class="text-wrap d-inline-block" style="max-width: 300px">
                     <span class="text-xs font-weight-bold mb-0">
-                      {{ document.description.length > 42 ? document.description.slice(0, 42) + '...' :
-                      document.description }}
+                      {{
+            document.description.length > 42
+              ? document.description.slice(0, 42) + "..."
+              : document.description
+          }}
                       <span v-if="document.description.length > 42" class="view-all">
                         <a href="#" @click="showFullDescription(document.description)">View All</a>
                       </span>
@@ -82,17 +103,15 @@
                   </span>
                 </td>
 
-
-
                 <td class="align-middle text-center">
                   <span class="text-secondary text-xs font-weight-bold">{{
-                    formatDate(document.addedDate)
-                    }}</span>
+            formatDate(document.addedDate)
+          }}</span>
                 </td>
                 <td class="align-middle text-center">
                   <span class="text-secondary text-xs font-weight-bold">{{
-                    formatDate(document.updatedDate)
-                    }}</span>
+              formatDate(document.updatedDate)
+            }}</span>
                 </td>
                 <td class="align-middle d-flex">
                   <div class="ms-auto text-end">
@@ -100,8 +119,8 @@
                       <i class="fas fa-eye text-green ms-2" aria-hidden="true"></i>{{ " " }}View
                     </button>
 
-                    <Sidebar v-if="docDetailsVisible" v-model:visible="docDetailsVisible" header="Document Details" :documentId="document.id"
-                      position="full">
+                    <Sidebar v-if="docDetailsVisible" v-model:visible="docDetailsVisible" header="Document Details"
+                      :documentId="document.id" position="full">
                       <Document />
                     </Sidebar>
 
@@ -152,7 +171,9 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="fullDescriptionModalLabel">Full Description</h5>
+          <h5 class="modal-title" id="fullDescriptionModalLabel">
+            Full Description
+          </h5>
           <button type="button" class="close" @click="hideFullDescriptionModal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -161,34 +182,37 @@
           <p>{{ fullDescription }}</p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="hideFullDescriptionModal">Close</button>
+          <button type="button" class="btn btn-secondary" @click="hideFullDescriptionModal">
+            Close
+          </button>
         </div>
       </div>
     </div>
   </div>
-
 </template>
 
 <script setup>
+import Skeleton from "primevue/skeleton";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
-import Dropdown from 'primevue/dropdown';
-import InputText from'primevue/inputtext';
-import Sidebar from 'primevue/sidebar';
-import { computed, ref, onMounted,watch } from "vue";
-import {toast} from 'vue3-toastify';
+import Dropdown from "primevue/dropdown";
+import InputText from "primevue/inputtext";
+import Sidebar from "primevue/sidebar";
+import { computed, ref, onMounted, watch } from "vue";
+import { toast } from "vue3-toastify";
 import BaseApiService from "../../services/apiService";
 import AddDocument from "./AddDocument.vue";
 import ConfirmationModalVue from "./ConfirmationModal.vue";
 import Document from "./DocumentViewer/Document.vue";
+const IsLoading = ref(false);
 const documents = ref([]);
 const filterText = ref("");
 const showDeleteModal = ref(false);
 const showAddDocModal = ref(false);
 let docDetailsVisible = ref(false);
 const filters = ref({
-  name: '',
-  description: '',
+  name: "",
+  description: "",
   documentState: null,
   // addedDateBefore: '',
   // addedDateAfter: '',
@@ -204,15 +228,15 @@ const router = useRouter();
 const store = useStore();
 const totalDocuments = computed(() => documents.value.length);
 const totalPages = computed(() =>
-  Math.ceil(totalDocuments.value / documentsPerPage)
+  Math.ceil(totalDocuments.value / documentsPerPage),
 );
 
 const CurrentDocumentState = ref(null);
 const DocumentStates = ref([
-  { name: 'Blank', code: 0 },
-  { name: 'Filled', code: 1 },
-  { name: 'Shared', code: 2 },
-  { name: 'Archived', code: 3 },
+  { name: "Blank", code: 0 },
+  { name: "Filled", code: 1 },
+  { name: "Shared", code: 2 },
+  { name: "Archived", code: 3 },
 ]);
 const changePage = (page) => {
   currentPage.value = page;
@@ -236,7 +260,6 @@ watch(filterText, (newFilterText) => {
   fetchDocuments();
 });
 
-
 watch(CurrentDocumentState, (newVal) => {
   if (newVal.code) {
     filters.value.documentState = newVal.code;
@@ -247,24 +270,24 @@ watch(CurrentDocumentState, (newVal) => {
   fetchDocuments();
 });
 
-const fullDescription = ref('');
+const fullDescription = ref("");
 
 const showFullDescription = (description) => {
   store.state.showOverlay = true;
   fullDescription.value = description;
-  const modal = document.getElementById('fullDescriptionModal');
+  const modal = document.getElementById("fullDescriptionModal");
   if (modal) {
-    modal.classList.add('show');
-    modal.style.display = 'block';
+    modal.classList.add("show");
+    modal.style.display = "block";
   }
 };
 
 const hideFullDescriptionModal = () => {
   store.state.showOverlay = false;
-  const modal = document.getElementById('fullDescriptionModal');
+  const modal = document.getElementById("fullDescriptionModal");
   if (modal) {
-    modal.classList.remove('show');
-    modal.style.display = 'none';
+    modal.classList.remove("show");
+    modal.style.display = "none";
   }
 };
 const paginatedAndFilteredDocuments = computed(() => {
@@ -277,10 +300,14 @@ const paginatedAndFilteredDocuments = computed(() => {
   return filtered.slice(startIndex, endIndex);
 });
 const fetchDocuments = async () => {
+  IsLoading.value = true
   try {
-    const response = await BaseApiService(`Document/me`).list({ params: filters.value });
+    const response = await BaseApiService(`Document/me`).list({
+      params: filters.value,
+    });
     console.log(response.data);
     documents.value = response.data;
+    IsLoading.value = false;
   } catch (error) {
     console.error("Error fetching documents:", error);
   }
@@ -295,7 +322,6 @@ onMounted(() => {
   fetchDocuments();
 });
 
-
 const openEditView = (documentId) => {
   router.push({ name: "EditView", params: { id: documentId } });
 };
@@ -303,16 +329,14 @@ const openEditView = (documentId) => {
 const openAddDocumentView = () => {
   showAddDocModal.value = true;
   store.state.showOverlay = true;
-
 };
-
 
 async function addDocument(newDoc) {
   try {
-    console.log(newDoc)
+    console.log(newDoc);
     const formData = new FormData();
-    formData.append('Name', newDoc.name);
-    formData.append('Description', newDoc.description);
+    formData.append("Name", newDoc.name);
+    formData.append("Description", newDoc.description);
     const response = await BaseApiService(`Document/add`).create(newDoc);
     await hideAllModals();
     fetchDocuments();
@@ -322,17 +346,45 @@ async function addDocument(newDoc) {
     });
 
     console.log(response.data);
+
+
+    // Upload files after document has been added successfully
+    if (newDoc.files && newDoc.files.length > 0) {
+      const documentId = response.data.id;
+      for (const file of newDoc.files) {
+        await uploadFile(documentId, file);
+      }
+    }
   } catch (e) {
     console.log(e);
+  }
+}
+
+async function uploadFile(documentId, file) {
+  try {
+    const formData = new FormData();
+    formData.append("DocumentId", documentId);
+    formData.append("File", file);
+    const response = await BaseApiService(`File/upload`).create(formData);
+    console.log(response.data);
+    toast.success("File Uploaded Successfully !", {
+      autoClose: 1000,
+      position: toast.POSITION.BOTTOM_RIGHT,
+    });
+  } catch (e) {
+    console.log(e);
+    toast.error("Error Uploading File", {
+      autoClose: 1000,
+      position: toast.POSITION.BOTTOM_RIGHT,
+    });
   }
 }
 async function openDocumentView(id) {
   store.state.documentId = id; // Update state
   await new Promise((resolve) => setTimeout(resolve, 0)); // Wait for a tick
-  console.log("store documentid ",store.state.documentId)
+  console.log("store documentid ", store.state.documentId);
   docDetailsVisible.value = true; // Execute after state update
 }
-
 
 const showConfirmDeleteModal = (index) => {
   showDeleteModal.value = true;
@@ -370,17 +422,21 @@ const handleDeleteConfirm = async () => {
 const hideDeleteModal = () => {
   showDeleteModal.value = false;
   store.state.showOverlay = false;
-}
+};
 
 const hideAllModals = () => {
   hideDeleteModal();
   showAddDocModal.value = false;
 };
-watch(() => store.state.showOverlay, (newVal, oldVal) => {
-  if (newVal === false && oldVal === true) {
-    hideAllModals();
-  }
-}, { immediate: true });
+watch(
+  () => store.state.showOverlay,
+  (newVal, oldVal) => {
+    if (newVal === false && oldVal === true) {
+      hideAllModals();
+    }
+  },
+  { immediate: true },
+);
 
 const sortByDate = () => {
   if (sortBy.value === "asc") {
@@ -404,11 +460,14 @@ const sortByDate = () => {
   display: flex;
   flex-direction: column;
 }
-.dropdown , .searchInput {
-  height:40px;
+
+.dropdown,
+.searchInput {
+  height: 40px;
   margin-right: 10px;
   border-radius: 10px;
 }
+
 #fullDescriptionModal {
   z-index: 100001;
 }

@@ -1,16 +1,14 @@
-<script setup>
-</script>
+<script setup></script>
 <template>
   <footer class="py-3 footer">
     <div class="container-fluid">
       <div class="row align-items-center justify-content-lg-between">
         <div class="mb-4 col-lg-6 mb-lg-0">
-        <div class="col-lg-6">
-          <ul
-            class="nav nav-footer justify-content-center justify-content-lg-end"
-          >
-          
-            <!-- <li class="nav-item"> -->
+          <div class="col-lg-6">
+            <ul
+              class="nav nav-footer justify-content-center justify-content-lg-end"
+            >
+              <!-- <li class="nav-item"> -->
               <!-- <a
                 href="https://www.creative-tim.com/presentation"
                 class="nav-link text-muted"
@@ -34,8 +32,8 @@
                 >License</a
               >
             </li> -->
-          </ul>
-        </div>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
