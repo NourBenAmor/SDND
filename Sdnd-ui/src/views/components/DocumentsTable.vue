@@ -348,7 +348,6 @@ async function addDocument(newDoc) {
     console.log(response.data);
 
 
-    // Upload files after document has been added successfully
     if (newDoc.files && newDoc.files.length > 0) {
       const documentId = response.data.id;
       for (const file of newDoc.files) {
@@ -383,7 +382,7 @@ async function openDocumentView(id) {
   store.state.documentId = id; // Update state
   await new Promise((resolve) => setTimeout(resolve, 0)); // Wait for a tick
   console.log("store documentid ", store.state.documentId);
-  docDetailsVisible.value = true; // Execute after state update
+  docDetailsVisible.value = true; 
 }
 
 const showConfirmDeleteModal = (index) => {
@@ -406,7 +405,7 @@ const getDocumentStateString = (documentState) => {
 const handleDeleteConfirm = async () => {
   try {
     const documentId = documents.value[documentIndexToDelete.value].id;
-    const response = await BaseApiService(`Document`).remove(documentId);
+    const response = await BaseApiService(`Document/Delete`).remove(documentId);
     console.log(response);
     documents.value.splice(documentIndexToDelete.value, 1);
     hideDeleteModal();

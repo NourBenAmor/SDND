@@ -97,12 +97,12 @@ const username = ref("");
 const documentId = ref(route.params.id);
 //const src = defineProps("url");
 const src =
-  "https://localhost:7278/api/document/pdf/49c621f7-9749-46df-b419-aae1d45ce60c";
+  "https://localhost:7278/api/document/pdf/c886163f-dcf1-4e07-8b03-0b0635833ef3";
 const viewersrc = ref("../../../web/viewer.html?file=" + src.value);
 const scale = ref(1);
 const fitParent = ref(false);
 const { pdf, pages } = usePDF(src);
-const SignatureToolbar = ref(false);
+//const SignatureToolbar = ref(false);
 //   const showShareModal = (index) => {
 //     showModal.value = true;
 
@@ -123,9 +123,9 @@ const sharedocument = async () => {
     console.error(e);
   }
 };
-const showSignatureToolbar = () => {
+/*const showSignatureToolbar = () => {
   SignatureToolbar.value = !SignatureToolbar.value;
-};
+};*/
 const downloadDocument = async () => {
   try {
     const response = await BaseApiService("Document/Download").get(
