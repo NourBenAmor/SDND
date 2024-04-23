@@ -1,96 +1,111 @@
 <template>
-    <Splitter style="height: 85vh" class="m-0">
-        <SplitterPanel class="flex align-items-center justify-content-center overflow-auto">
-            <div class="d-flex justify-content-between">
-                <TabMenu :model="items">
-                </TabMenu>
+  <Splitter style="height: 85vh" class="m-0">
+    <SplitterPanel class="flex align-items-center justify-content-center overflow-auto">
+      <div class="d-flex justify-content-between">
+        <TabMenu :model="items">
+        </TabMenu>
+      </div>
+      <div v-if="activeitem == 0">
+        <div class="m-5" v-if="!isFetched">
+          <Skeleton class="mb-2"></Skeleton>
+          <Skeleton width="10rem" class="mb-2"></Skeleton>
+          <Skeleton width="5rem" class="mb-2"></Skeleton>
+          <Skeleton height="2rem" class="mb-2"></Skeleton>
+          <Skeleton width="10rem" height="4rem"></Skeleton>
+        </div>
+        <form class="m-5" v-else>
+          <div class="row">
+            <div class="col-12 col-sm-2 bg-white">Title</div>
+            <div class="col-12 col-sm-10">{{ DocumentDetails?.name }}</div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-2">Description</div>
+            <div class="col-12 col-sm-10">{{ DocumentDetails?.description }}</div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-2">State</div>
+            <div class="col-12 col-sm-10">
+              <argon-badge variant="gradient" color="success">
+                {{ getDocumentStateString(DocumentDetails?.documentState) }}
+              </argon-badge>
             </div>
-            <div v-if="activeitem == 0">
-                <div class="m-5" v-if="!isFetched">
-                    <Skeleton class="mb-2"></Skeleton>
-                    <Skeleton width="10rem" class="mb-2"></Skeleton>
-                    <Skeleton width="5rem" class="mb-2"></Skeleton>
-                    <Skeleton height="2rem" class="mb-2"></Skeleton>
-                    <Skeleton width="10rem" height="4rem"></Skeleton>
-                </div>
-                <form class="m-5" v-else>
-                    <div class="row">
-                        <div class="col-12 col-sm-2 bg-white">Title</div>
-                        <div class="col-12 col-sm-10">{{ DocumentDetails?.name }}</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-sm-2">Description</div>
-                        <div class="col-12 col-sm-10">{{ DocumentDetails?.description }}</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-sm-2">State</div>
-                        <div class="col-12 col-sm-10">
-                            <argon-badge variant="gradient" color="success">
-                                {{ getDocumentStateString(DocumentDetails?.documentState) }}
-                            </argon-badge>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-sm-2">Created at</div>
-                        <div class="col-12 col-sm-10">
-                            <argon-badge variant="gradient" color="success">
-                                {{ formatDate(DocumentDetails?.addedDate) }}
-                            </argon-badge>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-sm-2">Last Modified at</div>
-                        <div class="col-12 col-sm-10">
-                            <argon-badge variant="gradient" color="success">
-                                {{ formatDate(DocumentDetails?.updatedDate) }}
-                            </argon-badge>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div v-if="DocumentDetails?.files.length > 0" class="document-files-container card">
-
-                            <DataTable :value="DocumentDetails?.files">
-                                <template #header>
-                                    <div class="text-xl font-bold">Document Files</div>
-                                </template>
-                                <Column v-for="col of FileColumns" :key="col.field" :field="col.field"
-                                    :header="col.header">
-                                </Column>
-                                <Column :key="123456"></Column>
-                                <template #footer>
-                                    <div class="flex justify-content-start">
-                                        <Button icon="fas fa-plus" label="Add" severity="success" />
-                                    </div>
-                                </template>
-                            </DataTable>
-                        </div>
-                    </div>
-                </form>
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-2">Created at</div>
+            <div class="col-12 col-sm-10">
+              <argon-badge variant="gradient" color="success">
+                {{ formatDate(DocumentDetails?.addedDate) }}
+              </argon-badge>
             </div>
-            <div v-if="activeitem == 1">
-                <DocumentEdit :document-id="documentId" docuemnt-states:documentStates />
+          </div>
+          <div class="row">
+            <div class="col-12 col-sm-2">Last Modified at</div>
+            <div class="col-12 col-sm-10">
+              <argon-badge variant="gradient" color="success">
+                {{ formatDate(DocumentDetails?.updatedDate) }}
+              </argon-badge>
             </div>
-            <div class="m-5" v-if="activeitem == 2">
-                <Timeline :value="events">
-                    <template #opposite="slotProps">
-                        <small class="p-text-secondary">{{ slotProps.item.date }}</small>
-                    </template>
-                    <template #content="slotProps">
-                        {{ slotProps.item.status }}
-                    </template>
-                </Timeline>
+          </div>
+          <div class="row">
+            <div v-if="DocumentDetails?.files.length > 0" class="document-files-container card">
+
+              <DataTable :value="DocumentDetails?.files">
+                <template #header>
+                  <div class="text-xl font-bold">Document Files</div>
+                </template>
+                <Column v-for="col of FileColumns" :key="col.field" :field="col.field" :header="col.header">
+                </Column>
+                <Column :key="123456"></Column>
+                <template #footer>
+                  <div class="flex justify-content-start">
+                    <Button icon="fas fa-plus" label="Add" severity="success" />
+                  </div>
+                </template>
+              </DataTable>
             </div>
-            <div class="m-5" v-if="activeitem == 4">
+          </div>
+        </form>
+      </div>
+      <div v-if="activeitem == 1">
+        <DocumentEdit :document-id="documentId" docuemnt-states:documentStates />
+      </div>
+      <div class="m-5" v-if="activeitem == 2">
+        <Timeline :value="events">
+          <template #opposite="slotProps">
+            <small class="p-text-secondary">{{ slotProps.item.date }}</small>
+          </template>
+          <template #content="slotProps">
+            {{ slotProps.item.status }}
+          </template>
+        </Timeline>
+      </div>
+      <div v-if="activeitem === 4">
+        <div class="m-5">
+          <h2>Shared With Me</h2>
+          <form @submit.prevent="shareDocument" class="share-form">
+      <div class="form-group">
+        <label for="username">Username to share with:</label>
+        <!-- Autocomplete input -->
+        <input type="text" class="form-control smaller-input" v-model="sharedUsername" @input="filterUsernames">
+        <!-- Autocomplete dropdown -->
+        <div v-if="isFetched && filteredUsernames.length" class="autocomplete-dropdown">
+          <div v-for="(username, index) in filteredUsernames" :key="index" @click="selectUsername(username)">
+            {{ username }}
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Share Document</button>
+    </form>
+        </div>
+      </div>
+    </SplitterPanel>
+    <SplitterPanel class="flex align-items-center justify-content-center">
 
-            </div>
-        </SplitterPanel>
-        <SplitterPanel class="flex align-items-center justify-content-center">
 
+      <FileView />
 
-            <FileView />
-
-        </SplitterPanel>
-    </Splitter>
+    </SplitterPanel>
+  </Splitter>
 </template>
 
 <script setup>
@@ -112,6 +127,8 @@ import TabMenu from "primevue/tabmenu";
 import BaseApiService from "../../../services/apiService";
 import { onMounted } from "vue";
 import { useStore } from "vuex";
+import { toast } from "vue3-toastify";
+
 //const router = useRouter();
 //const route = useRoute();
 
@@ -121,108 +138,147 @@ src.value = encodeURIComponent("https://localhost:7278/api/document/pdf/e7171698
 const url = ref('');
 url.value = `"/web/viewer.hile${src.value}"`;
 const events = ref([
-    { status: "", date: "", icon: "", color: "#9C27B0" },
-    { status: "", date: "", icon: "", color: "#9C27B0" },
-    {
-        status: "File Added",
-        date: "16/04/2024 16:15",
-        icon: "fa-solid fa-pencil-in-square",
-        color: "#FF9800",
-    },
-    {
-        status: "Document Created",
-        date: "16/04/2024 10:00",
-        icon: "fas fa",
-        color: "#607D8B",
-    },
+  { status: "", date: "", icon: "", color: "#9C27B0" },
+  { status: "", date: "", icon: "", color: "#9C27B0" },
+  {
+    status: "File Added",
+    date: "16/04/2024 16:15",
+    icon: "fa-solid fa-pencil-in-square",
+    color: "#FF9800",
+  },
+  {
+    status: "Document Created",
+    date: "16/04/2024 10:00",
+    icon: "fas fa",
+    color: "#607D8B",
+  },
 ]);
 //const src = ref("https://localhost:7278/api/document/pdf/49c621f7-9749-46df-b419-aae1d45ce60c");
 const store = useStore();
 const documentId = computed(() => store.state.documentId);
 const isFetched = ref("false");
+const sharedUsername = ref('');
+const shareResult = ref('');
+const usernames = ref([]);
+const filteredUsernames = ref([]);
+
 // const props = defineProps({
 //     documentId: String // Enforce string type for clarity and potential validation
 // });
 const DocumentDetails = ref(null);
 onMounted(() => {
-    fetchDocumentDetails(documentId.value);
+  fetchDocumentDetails(documentId.value);
 });
 const getDocumentStateString = (documentState) => {
-    switch (documentState) {
-        case 0:
-            return "Blank";
-        case 1:
-            return "Filled";
-        case 2:
-            return "Shared";
-        case 3:
-            return "Archived";
-    }
+  switch (documentState) {
+    case 0:
+      return "Blank";
+    case 1:
+      return "Filled";
+    case 2:
+      return "Shared";
+    case 3:
+      return "Archived";
+  }
+};
+const filterUsernames = () => {
+  filteredUsernames.value = usernames.value.filter(username => {
+    return username.toLowerCase().includes(sharedUsername.value.toLowerCase());
+  });
 };
 
+const selectUsername = username => {
+  sharedUsername.value = username;
+  filteredUsernames.value = [];
+};
 const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
+  const date = new Date(dateString);
+  return date.toLocaleDateString();
 };
 const fetchDocumentDetails = async (id) => {
-    try {
-        if (id == null) {
-            return;
-        }
-        const response = await BaseApiService(`Document/${id}`).list();
-        console.log(response.data);
-        DocumentDetails.value = response.data;
-        isFetched.value = true;
-    } catch (error) {
-        isFetched.value = false;
-        console.error("Error fetching document:", error);
+  try {
+    if (id == null) {
+      return;
     }
+    
+    const response = await BaseApiService(`Document/${id}`).list();
+    console.log(response.data);
+    DocumentDetails.value = response.data;
+    isFetched.value = true;
+  } catch (error) {
+    isFetched.value = false;
+    console.error("Error fetching document:", error);
+  }
 };
-
-
+const fetchUsernames = async () => {
+  try {
+    const response = await BaseApiService(`Account/usernames`).list();
+    console.log(response.data);
+    usernames.value = response.data;
+    isFetched.value = true;
+  } catch (error) {
+    console.error('Error fetching usernames:', error);
+  }
+};
+const shareDocument = async () => {
+  try {
+    const newDoc = { documentId: documentId.value, username: sharedUsername.value };
+    const response = await BaseApiService('Document/Share').create(newDoc);
+    shareResult.value = response.data;
+    
+    // Use the toast object to show a success message
+    toast.success("Document Shared Successfully !", {
+      duration: 1000, // Auto-close duration in milliseconds
+      position: "bottom-right", // Position of the toast message
+    });
+  } catch (error) {
+    shareResult.value = 'Error sharing document';
+    console.error('Error sharing document:', error);
+  }
+};
 const activeitem = ref(0);
 const items = ref([
-    {
-        label: "Details",
-        icon: "fa-solid fa-bars",
-        command: () => {
-            activeitem.value = 0;
-        },
+  {
+    label: "Details",
+    icon: "fa-solid fa-bars",
+    command: () => {
+      activeitem.value = 0;
     },
-    {
-        label: "Edit",
-        icon: "fa-solid fa-pen-to-square",
-        command: () => {
-            activeitem.value = 1;
-        },
+  },
+  {
+    label: "Edit",
+    icon: "fa-solid fa-pen-to-square",
+    command: () => {
+      activeitem.value = 1;
     },
-    {
-        label: "Version History",
-        icon: "fas fa-history",
-        command: () => {
-            activeitem.value = 2;
-        },
+  },
+  {
+    label: "Version History",
+    icon: "fas fa-history",
+    command: () => {
+      activeitem.value = 2;
     },
-    {
-        label: "Discussions",
-        icon: "fa-solid fa-comments",
-        command: () => {
-            activeitem.value = 3;
-        },
+  },
+  {
+    label: "Discussions",
+    icon: "fa-solid fa-comments",
+    command: () => {
+      activeitem.value = 3;
     },
-    {
-        label: "Shared With",
-        icon: "fa-solid fa-user-group",
-        command: () => {
-            activeitem.value = 4;
-        },
+  },
+  {
+    label: "Shared With",
+    icon: "fa-solid fa-user-group",
+    command: () => {
+      activeitem.value = 4;
     },
+  },
 ]);
 
 const FileColumns = [
-    { field: 'name', header: 'Name' },
-    { field: 'formattedFileSize', header: 'Size' },
-    { field: 'filePath', header: 'Path' }
+  { field: 'name', header: 'Name' },
+  { field: 'formattedFileSize', header: 'Size' },
+  { field: 'filePath', header: 'Path' }
 ];
 // import axios from 'axios'; // Or your preferred HTTP library
 
@@ -287,115 +343,131 @@ const FileColumns = [
 //         role: "Viewer",
 //     },
 // ]);
+onMounted(fetchUsernames);
 
 </script>
 
 <style lang="scss" scoped>
 .details {
-    max-width: 400px;
-    padding: 20px;
-    background-color: #f5f5f5;
-    border-radius: 10px;
+  max-width: 400px;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
 }
 
 .document-info {
-    font-size: 16px;
-    margin-bottom: 10px;
+  font-size: 16px;
+  margin-bottom: 10px;
 }
 
 .overlay-panel {
-    max-width: 30rem;
+  max-width: 30rem;
 }
 
 .overlay-content {
-    padding: 1.5rem;
+  padding: 1.5rem;
 }
 
 @media (max-width: 768px) {
-    .row {
-        flex-wrap: wrap;
-        /* Wrap info on smaller screens */
-    }
+  .row {
+    flex-wrap: wrap;
+    /* Wrap info on smaller screens */
+  }
 
-    .col {
-        flex: 1 0 50%;
-        /* Allow details to take up to 50% width */
-    }
+  .col {
+    flex: 1 0 50%;
+    /* Allow details to take up to 50% width */
+  }
 }
 
 .overlay-content h4 {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 .row {
-    margin-bottom: 2rem;
+  margin-bottom: 2rem;
 }
 
 .col-sm-2,
 .col-sm-5 {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .share-section,
 .invite-section,
 .team-members-section {
-    margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .input-group-append button {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    margin-right: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 1rem;
 }
 
 
 
 
 .document-files-container {
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 10px;
-    margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 20px;
 }
 
 .document-files-title {
-    display: flex;
-    align-items: center;
-    font-weight: bold;
-    margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
 
 .document-files-title .material-icons {
-    margin-right: 5px;
-    color: #666;
-    font-size: 18px;
+  margin-right: 5px;
+  color: #666;
+  font-size: 18px;
 }
 
 .document-files-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .document-files-list li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
 }
 
 .file-icon {
-    margin-right: 10px;
-    color: #999;
-    font-size: 16px;
+  margin-right: 10px;
+  color: #999;
+  font-size: 16px;
 }
 
 .file-name {
-    font-size: 14px;
+  font-size: 14px;
 }
+.autocomplete-dropdown {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+}
+.autocomplete-dropdown div {
+  padding: 5px;
+  cursor: pointer;
+}
+.smaller-input {
+  width: 300px; 
+}
+
 </style>

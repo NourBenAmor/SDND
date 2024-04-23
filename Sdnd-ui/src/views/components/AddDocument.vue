@@ -16,7 +16,7 @@
         @change="handleFileUpload($event, fileInput.id)" />
     </div>
     <div class="button-container">
-      <button class="btn btn-primary" @click="$emit('add-newdocument', newDocument)">
+      <button class="btn btn-primary" @click="handleAdd">
         Add Document
       </button>
       <span v-if="saved" class="text-success">Document added successfully!</span>
@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, watch } from "vue";
+import { ref, defineProps, watch,defineEmits  } from "vue";
 
 const newDocument = ref({
   name: "",
@@ -49,9 +49,19 @@ watch(newDocument, async () => {
 defineProps({
   show: Boolean,
 });
+const emit = defineEmits(['add-newdocument']);
 
+function handleAdd() {
+  emit('add-newdocument', newDocument.value);
+  newDocument.value = {
+    name: "",
+    contentType: "",
+    description: "",
+    creationDate: "",
+    files: []
+  };
+}
 
-defineEmits(["add-newdocument"]);
 
 const handleFileUpload = (event) => {
   const file = event.target.files[0];

@@ -9,7 +9,6 @@ import "./assets/css/nucleo-svg.css";
 import Vue3Signature from "vue3-signature";
 import ArgonDashboard from "./argon-dashboard";
 import PrimeVue from "primevue/config";
-import ViewerPlugin from "pdf-annotate-sdnd";
 //in main.js
 import "primevue/resources/themes/aura-light-indigo/theme.css";
 
@@ -17,7 +16,6 @@ const appInstance = createApp(App);
 appInstance.use(Vue3Toasity, {
   autoClose: 3000,
 });
-appInstance.use(ViewerPlugin);
 appInstance.use(Vue3Signature);
 appInstance.use(store);
 appInstance.use(PrimeVue, {
