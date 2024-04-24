@@ -36,8 +36,10 @@
     </div>
 
     <div class="file-container">
-
-      <div v-for="page in pages" :key="page">
+      <div v-if="src === 'undefined'" class="m-0 p-0">
+        <Skeleton width="85%" height="85%" />
+      </div>
+      <div v-else v-for="page in pages" :key="page">
         <VuePDF :pdf="pdf" :scale="scale" :page="page" style="margin-bottom: 10px" :fit-parent="fitParent">
           <div>Loading...</div>
         </VuePDF>
@@ -89,25 +91,25 @@ import { ref } from "vue";
 import BaseApiService from "../../../services/apiService";
 import { useRouter, useRoute } from "vue-router";
 import { VuePDF, usePDF } from "@tato30/vue-pdf";
-
+import Skeleton from "primevue/skeleton";
 // const showModal = ref(false);
 const router = useRouter();
 const route = useRoute();
 const username = ref("");
 const documentId = ref(route.params.id);
-//const src = defineProps("url");
+const props = defineProps(['FileId']);
+
 const src =
-  "https://localhost:7278/api/document/pdf/c886163f-dcf1-4e07-8b03-0b0635833ef3";
+  `https://localhost:7278/api/document/pdf/${props.FileId}`;
 const viewersrc = ref("../../../web/viewer.html?file=" + src.value);
 const scale = ref(1);
 const fitParent = ref(false);
 const { pdf, pages } = usePDF(src);
-//const SignatureToolbar = ref(false);
+// const SignatureToolbar = ref(false);
 //   const showShareModal = (index) => {
 //     showModal.value = true;
 
 //   };
-
 const sharedocument = async () => {
   try {
     const ShareRequest = {
@@ -123,9 +125,9 @@ const sharedocument = async () => {
     console.error(e);
   }
 };
-/*const showSignatureToolbar = () => {
-  SignatureToolbar.value = !SignatureToolbar.value;
-};*/
+// const showSignatureToolbar = () => {
+//   SignatureToolbar.value = !SignatureToolbar.value;
+// };
 const downloadDocument = async () => {
   try {
     const response = await BaseApiService("Document/Download").get(
@@ -150,13 +152,14 @@ const downloadDocument = async () => {
 
 <style scoped>
 .container {
-  width: fit-content;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: fixed;
   height: 100vh;
+  margin: 0px;
+  padding: 0px 0px 0px 12px;
 }
 
 .button-container {

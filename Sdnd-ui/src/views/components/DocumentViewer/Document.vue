@@ -1,6 +1,6 @@
 <template>
-  <Splitter style="height: 85vh" class="m-0">
-    <SplitterPanel class="flex align-items-center justify-content-center overflow-auto">
+  <Splitter style="height: 90vh; " class="m-0">
+    <SplitterPanel class="flex align-items-center justify-content-center overflow-auto ">
       <div class="d-flex justify-content-between">
         <TabMenu :model="items">
         </TabMenu>
@@ -51,16 +51,30 @@
 
               <DataTable :value="DocumentDetails?.files">
                 <template #header>
-                  <div class="text-xl font-bold">Document Files</div>
+                  <div class="d-flex  align-items-center  justify-content-between">
+                    <h6 class="text-xl font-bold p-0 m-0">Document Files</h6>
+                    <Button icon="fas fa-plus" label="Add New File" severity="success" @click="fileInput.click()" />
+                    <input type="file" ref="fileInput" class="d-none" @change="handleFileUpload" />
+                  </div>
                 </template>
                 <Column v-for="col of FileColumns" :key="col.field" :field="col.field" :header="col.header">
+                  <template v-if="col.field === 'actions'" #body="slotProps">
+                    <div class="d-flex ml-0">
+                      <Button icon="fas fa-eye" class="p-button-rounded p-button-text"
+                        @click="viewFile(slotProps.data)" />
+                      <Button icon="fas fa-pencil" class="p-button-rounded p-button-text"
+                        @click="editFile(slotProps.data)" />
+                      <Button icon="fas fa-trash" class="p-button-rounded p-button-text"
+                        @click="deleteFile(slotProps.data)" />
+                    </div>
+                  </template>
                 </Column>
-                <Column :key="123456"></Column>
-                <template #footer>
+                <!-- <Column :key="123456" :field="actions.field" :header="actions.header"></Column> -->
+                <!-- <template #footer>
                   <div class="flex justify-content-start">
                     <Button icon="fas fa-plus" label="Add" severity="success" />
                   </div>
-                </template>
+                </template> -->
               </DataTable>
             </div>
           </div>
@@ -83,27 +97,24 @@
         <div class="m-5">
           <h2>Shared With Me</h2>
           <form @submit.prevent="shareDocument" class="share-form">
-      <div class="form-group">
-        <label for="username">Username to share with:</label>
-        <!-- Autocomplete input -->
-        <input type="text" class="form-control smaller-input" v-model="sharedUsername" @input="filterUsernames">
-        <!-- Autocomplete dropdown -->
-        <div v-if="isFetched && filteredUsernames.length" class="autocomplete-dropdown">
-          <div v-for="(username, index) in filteredUsernames" :key="index" @click="selectUsername(username)">
-            {{ username }}
-          </div>
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary">Share Document</button>
-    </form>
+            <div class="form-group">
+              <label for="username">Username to share with:</label>
+              <!-- Autocomplete input -->
+              <input type="text" class="form-control smaller-input" v-model="sharedUsername" @input="filterUsernames">
+              <!-- Autocomplete dropdown -->
+              <div v-if="isFetched && filteredUsernames.length" class="autocomplete-dropdown">
+                <div v-for="(username, index) in filteredUsernames" :key="index" @click="selectUsername(username)">
+                  {{ username }}
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Share Document</button>
+          </form>
         </div>
       </div>
     </SplitterPanel>
-    <SplitterPanel class="flex align-items-center justify-content-center">
-
-
-      <FileView />
-
+    <SplitterPanel class="flex align-items-center justify-content-center ">
+      <FileView :src="src" />
     </SplitterPanel>
   </Splitter>
 </template>
@@ -132,9 +143,10 @@ import { toast } from "vue3-toastify";
 //const router = useRouter();
 //const route = useRoute();
 
+const fileInput = ref(null);
+const fileId = ref('e7171698-1f32-465a-b632-7223c0e09cc0');
+const src = ref(`https://localhost:7278/api/document/pdf/${fileId.value}`);
 
-const src = ref('')
-src.value = encodeURIComponent("https://localhost:7278/api/document/pdf/e7171698-1f32-465a-b632-7223c0e09cc0");
 const url = ref('');
 url.value = `"/web/viewer.hile${src.value}"`;
 const events = ref([
@@ -200,7 +212,7 @@ const fetchDocumentDetails = async (id) => {
     if (id == null) {
       return;
     }
-    
+
     const response = await BaseApiService(`Document/${id}`).list();
     console.log(response.data);
     DocumentDetails.value = response.data;
@@ -225,7 +237,7 @@ const shareDocument = async () => {
     const newDoc = { documentId: documentId.value, username: sharedUsername.value };
     const response = await BaseApiService('Document/Share').create(newDoc);
     shareResult.value = response.data;
-    
+
     // Use the toast object to show a success message
     toast.success("Document Shared Successfully !", {
       duration: 1000, // Auto-close duration in milliseconds
@@ -274,12 +286,37 @@ const items = ref([
     },
   },
 ]);
+const emit = defineEmits(['addfile-emit']);
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+  console.log("file upload trigered", documentId.value, file.name);
+  await emit('addfile-emit', documentId.value, file);
+  fetchDocumentDetails(documentId.value);
+};
 
 const FileColumns = [
   { field: 'name', header: 'Name' },
   { field: 'formattedFileSize', header: 'Size' },
-  { field: 'filePath', header: 'Path' }
+  { field: 'filePath', header: 'Path' },
+  { field: 'actions', header: 'Actions' }
 ];
+
+const deleteFile = (file) => {
+  // Implement file deletion logic here
+  console.log('Deleting file:', file);
+};
+
+const editFile = (file) => {
+  // Implement file editing logic here
+  console.log('Editing file:', file);
+};
+
+const viewFile = (file) => {
+  // Implement file viewing logic here
+  fileId.value = file.id;
+  console.log('Viewing file:', file);
+};
+
 // import axios from 'axios'; // Or your preferred HTTP library
 
 // const isUploading = ref(false); // Optional flag for upload status
@@ -355,18 +392,7 @@ onMounted(fetchUsernames);
   border-radius: 10px;
 }
 
-.document-info {
-  font-size: 16px;
-  margin-bottom: 10px;
-}
 
-.overlay-panel {
-  max-width: 30rem;
-}
-
-.overlay-content {
-  padding: 1.5rem;
-}
 
 @media (max-width: 768px) {
   .row {
@@ -380,12 +406,10 @@ onMounted(fetchUsernames);
   }
 }
 
-.overlay-content h4 {
-  margin-top: 0;
-}
+
 
 .row {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .col-sm-2,
@@ -455,6 +479,7 @@ onMounted(fetchUsernames);
 .file-name {
   font-size: 14px;
 }
+
 .autocomplete-dropdown {
   position: absolute;
   background-color: white;
@@ -462,12 +487,13 @@ onMounted(fetchUsernames);
   max-height: 150px;
   overflow-y: auto;
 }
+
 .autocomplete-dropdown div {
   padding: 5px;
   cursor: pointer;
 }
-.smaller-input {
-  width: 300px; 
-}
 
+.smaller-input {
+  width: 300px;
+}
 </style>

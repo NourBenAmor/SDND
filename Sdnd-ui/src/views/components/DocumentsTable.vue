@@ -121,7 +121,7 @@
 
                     <Sidebar v-if="docDetailsVisible" v-model:visible="docDetailsVisible" header="Document Details"
                       :documentId="document.id" position="full">
-                      <Document />
+                      <Document @addfile-emit="uploadFile" />
                     </Sidebar>
 
                     <a class="btn btn-link text-dark px-3 mb-0" @click="openEditView(document.id)">
@@ -361,12 +361,13 @@ async function addDocument(newDoc) {
 
 async function uploadFile(documentId, file) {
   try {
+    console.log(documentId, file.name, "Ready to be added");
     const formData = new FormData();
     formData.append("DocumentId", documentId);
     formData.append("File", file);
     const response = await BaseApiService(`File/upload`).create(formData);
     console.log(response.data);
-    toast.success("File Uploaded Successfully !", {
+    toast.success(`"${file.FileName} Uploaded Successfully !"`, {
       autoClose: 1000,
       position: toast.POSITION.BOTTOM_RIGHT,
     });
@@ -382,7 +383,7 @@ async function openDocumentView(id) {
   store.state.documentId = id; // Update state
   await new Promise((resolve) => setTimeout(resolve, 0)); // Wait for a tick
   console.log("store documentid ", store.state.documentId);
-  docDetailsVisible.value = true; 
+  docDetailsVisible.value = true;
 }
 
 const showConfirmDeleteModal = (index) => {
