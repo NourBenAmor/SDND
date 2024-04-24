@@ -36,7 +36,6 @@
 
 	<ItemGroup>
 		<Folder Include="wwwroot\" />
-		<Folder Include="Migrations\" />
 		<Folder Include="Resource\AllFiles\" />
 		<!-- Conservez uniquement un élément <Folder Include="wwwroot\" /> -->
 	</ItemGroup>

@@ -65,7 +65,39 @@ public class DocumentController : ControllerBase
         
         return Ok(documents);
     }
+    
+    [HttpGet("{id}")]
+    public async Task<ActionResult<OneDocumentResponseDto>> GetDocumentById(Guid id)
+    {
+        if (string.IsNullOrEmpty(id.ToString()))
+        {
+            return NotFound("Document ID invalid");
+        }
 
+        // Fetch the document and handle not found case
+        var document = await _context.Documents.FindAsync(id);
+        if (document == null)
+        {
+            return NotFound($"Document with ID {id} not found.");
+        }
+
+        // Fetch document files using the file service
+        var documentFiles = await _fileService.GetDocFilesByDocumentId(id);
+
+        // Create and populate the response DTO
+        var responseDto = new OneDocumentResponseDto
+        {
+            Name = document.Name,
+            Description = document.Description ?? "", // Use null-coalescing for optional Description
+            OwnerId = document.OwnerId,
+            AddedDate = document.AddedDate,
+            UpdatedDate = document.UpdatedDate,
+            DocumentState = document.DocumentState,
+            Files = documentFiles // Assign the retrieved document files to the Files collection
+        };
+
+        return Ok(responseDto);
+    }
 
     [HttpDelete("Delete/{id}")]
     public async Task<IActionResult> DeleteDocument(Guid id)
@@ -187,39 +219,7 @@ public class DocumentController : ControllerBase
             return StatusCode(500); // Return 500 Internal Server Error
         }
     }
-    [HttpGet("{id}")]
-
-    public async Task<ActionResult<OneDocumentResponseDto>> GetDocumentById(Guid id)
-    {
-        if (string.IsNullOrEmpty(id.ToString()))
-        {
-            return NotFound("Document ID invalid");
-        }
-
-        // Fetch the document and handle not found case
-        var document = await _context.Documents.FindAsync(id);
-        if (document == null)
-        {
-            return NotFound($"Document with ID {id} not found.");
-        }
-
-        // Fetch document files using the file service
-        var documentFiles = await _fileService.GetDocFilesByDocumentId(id);
-
-        // Create and populate the response DTO
-        var responseDto = new OneDocumentResponseDto
-        {
-            Name = document.Name,
-            Description = document.Description ?? "", // Use null-coalescing for optional Description
-            OwnerId = document.OwnerId,
-            AddedDate = document.AddedDate,
-            UpdatedDate = document.UpdatedDate,
-            DocumentState = document.DocumentState,
-            Files = documentFiles // Assign the retrieved document files to the Files collection
-        };
-
-        return Ok(responseDto);
-    }
+    
     [HttpPut("UpdateData/{id}")]
     public async Task<IActionResult> UpdateDocumentData(Guid id, [FromBody] DocumentUpdateModelDto model)
     {
