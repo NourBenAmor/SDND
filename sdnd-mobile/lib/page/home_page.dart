@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:airsafe/page/synchronisation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-
 import 'camera_page.dart';
 import 'document_details.dart';
 import 'editing_page.dart';
@@ -266,6 +266,7 @@ class _HomePageState extends State<HomePage> {
       print('Error creating document: $e');
     }
   }
+
   void _deleteDocument(BuildContext context, String documentId) async {
     final url = Uri.parse('https://10.0.2.2:7278/api/Document/Delete/$documentId');
 
@@ -318,10 +319,74 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+
+  void _searchDocuments(String searchQuery) async {
+    if (searchQuery.isEmpty) {
+      _fetchDocuments(_token); // Reload all documents if search query is empty
+      return;
+    }
+
+    final url = Uri.parse('https://10.0.2.2:7278/api/Document/filterByName?Name=$searchQuery');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $_token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final dynamic responseBody = jsonDecode(response.body);
+        if (responseBody != null && responseBody is List<dynamic>) {
+          final List<dynamic> data = responseBody;
+          setState(() {
+            _documents = data.map((doc) {
+              List<String> files = (doc['files'] as List<dynamic>?)
+                  ?.map<String>((file) => file['path'].toString())
+                  .toList() ?? [];
+
+              return Document(
+                id: doc['id'].toString(), // Convert GUID to String
+                documentId: doc['documentId'].toString(),
+                name: doc['name'],
+                description: doc['description'].toString() ?? '',
+                ownerId: doc['ownerId'].toString() ?? '',
+                addedDate: DateTime.parse(doc['addedDate'].toString()),
+                updatedDate: DateTime.parse(doc['updatedDate'].toString()),
+                documentState: doc['documentState'].toString(),
+                files: files,
+              );
+            }).toList();
+          });
+        } else {
+          print('Response body from API is null or not a List');
+        }
+      } else {
+        throw Exception('Failed to search documents (Status Code: ${response.statusCode})');
+      }
+    } catch (e) {
+      print('Error searching documents: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(''),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SynchronizationPage()),
+              );
+            },
+            icon: Icon(Icons.settings),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Container(
@@ -338,7 +403,41 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(child: Container()),
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 3,
+                          offset: Offset(0, 2), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.search),
+                        SizedBox(width: 8.0),
+                        Expanded(
+                          child: TextField(
+                            onChanged: (value) {
+                              _searchDocuments(value);
+                            },
+                            decoration: InputDecoration(
+                              hintText: 'Search',
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 Row(
                   children: [
                     IconButton(

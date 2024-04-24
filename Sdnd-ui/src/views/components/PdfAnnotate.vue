@@ -53,11 +53,11 @@ const addWaterMark = () => {
   });
 };
 
-const fromDataURL = (url) => {
+/*const fromDataURL = (url) => {
   signature1.value.fromDataURL(
     "https://avatars2.githubusercontent.com/u/17644818?s=460&v=4",
   );
-};
+};*/
 
 const handleDisabled = () => {
   state.disabled = !state.disabled;
