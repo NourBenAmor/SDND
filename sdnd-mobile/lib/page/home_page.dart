@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'addDocument.dart';
 import 'camera_page.dart';
 import 'document_details.dart';
 import 'editing_page.dart';
@@ -189,51 +190,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showCreateDocumentDialog(BuildContext context) {
-    String name = '';
-    String description = '';
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Create a New Document'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                onChanged: (value) {
-                  name = value;
-                },
-                decoration: InputDecoration(labelText: 'Name'),
-              ),
-              TextField(
-                onChanged: (value) {
-                  description = value;
-                },
-                decoration: InputDecoration(labelText: 'Description'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                _createDocument(name, description);
-                Navigator.pop(context);
-              },
-              child: Text('Create'),
-            ),
-          ],
-        );
-      },
+  void _navigateToCreateDocumentPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CreateDocumentPage(createDocumentCallback: _createDocument)),
     );
   }
+
 
   Future<void> _createDocument(String name, String description) async {
     if (name.isEmpty || description.isEmpty) {
@@ -415,7 +378,7 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: 1,
                           blurRadius: 3,
-                          offset: Offset(0, 2), // changes position of shadow
+                          offset: Offset(0, 2),
                         ),
                       ],
                     ),
@@ -442,7 +405,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     IconButton(
                       onPressed: () {
-                        _showCreateDocumentDialog(context);
+                        _navigateToCreateDocumentPage(context); // Utilisez la nouvelle méthode
                       },
                       icon: Icon(Icons.create_new_folder),
                       tooltip: 'Create a new folder',
