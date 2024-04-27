@@ -70,7 +70,7 @@ public class FileController : ControllerBase
         
         var newDocFile = new DocFile
         {
-            Name = file.Name,
+            Name = file.FileName,
             FileSize = file.Length,
             DocumentId = documentId
         };

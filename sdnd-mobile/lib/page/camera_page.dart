@@ -52,10 +52,10 @@ class _CameraPageState extends State<CameraPage> {
       bool success = await EdgeDetection.detectEdge(
         capturedImage.path,
         canUseGallery: true,
-        androidScanTitle: 'Scanning',
-        androidCropTitle: 'Crop',
-        androidCropBlackWhiteTitle: 'Black ',
-        androidCropReset: 'Reset',
+        androidScanTitle: '',
+        androidCropTitle: '',
+        androidCropBlackWhiteTitle: ' ',
+        androidCropReset: '',
       );
 
       if (success) {
