@@ -75,9 +75,37 @@ const registerUser = async () => {
   }
 };
 
+const passwordErrors = computed(() => {
+  const errors = [];
+  const password = registerForm.value.password;
+
+  if (password.length < 6) {
+    errors.push("Password must be at least 6 characters long.");
+  }
+
+  if (!/[a-z]/.test(password)) {
+    errors.push("Password must contain at least one lowercase letter.");
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    errors.push("Password must contain at least one uppercase letter.");
+  }
+
+  if (!/\d/.test(password)) {
+    errors.push("Password must contain at least one digit.");
+  }
+  if (!/\W/.test(password)) {
+    errors.push("Password must contain at least one non-alphanumeric character.");
+  }
+
+  return errors;
+});
+
 const handleSubmit = async () => {
-  await registerUser();
-};
+  if (passwordErrors.value.length === 0) {
+    await registerUser();
+  }
+}
 const store = useStore();
 onBeforeMount(() => {
   store.state.hideConfigButton = true;
@@ -106,7 +134,7 @@ onBeforeUnmount(() => {
     <div
       class="page-header align-items-start min-vh-50 pt-5 pb-11 m-3 border-radius-lg"
     >
-      <span class="mask bg-gradient-dark opacity-6"></span>
+      <span class="mask bg-gradient-dark capacity=6"></span>
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-lg-5 text-center mx-auto">
@@ -143,13 +171,23 @@ onBeforeUnmount(() => {
                     aria-label="Email"
                     v-model="registerForm.email"
                   />
-                  <ArgonInput
-                    id="password"
-                    type="password"
-                    placeholder="Password"
-                    aria-label="Password"
-                    v-model="registerForm.password"
-                  />
+                  <div class="form-group">
+    <label for="password">Password</label>
+    <ArgonInput
+      id="password"
+      type="password"
+      placeholder="Password"
+      aria-label="Password"
+      v-model="registerForm.password"
+    />
+
+    <ul v-if="passwordErrors.length > 0" class="error-list">
+      <li v-for="error in passwordErrors" :key="error">
+        {{ error }}
+      </li>
+    </ul>
+  </div>
+                  
                   <ArgonCheckbox checked>
                     <label class="form-check-label" for="flexCheckDefault">
                       I agree the
