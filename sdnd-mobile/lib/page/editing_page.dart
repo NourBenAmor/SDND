@@ -87,16 +87,17 @@ class _EditingPageState extends State<EditingPage> {
         title: const Text('Editing Page'),
         actions: [],
       ),
-      body: Column(
+    body: SingleChildScrollView(
+
+    child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(
-            child: Center(
-              child: widget.imageFile != null
-                  ? Image.file(widget.imageFile!)
-                  : Text('No image available'),
-            ),
+          Center(
+            child: widget.imageFile != null
+                ? Image.file(widget.imageFile!)
+                : Text('No image available'),
           ),
+
           GestureDetector(
             onTap: copyTextToClipboard,
             child: Container(
@@ -120,6 +121,10 @@ class _EditingPageState extends State<EditingPage> {
                     icon: Icon(Icons.copy),
                     onPressed: copyTextToClipboard,
                   ),
+                  Text(
+                    'Copy ',
+                    style: TextStyle(fontSize: 12),
+                  )
                 ],
               ),
             ),
@@ -147,6 +152,7 @@ class _EditingPageState extends State<EditingPage> {
 
         ],
       ),
+    ),
     );
   }
 }

@@ -102,11 +102,13 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             _documents = data.map((doc) {
               List<String> files = (doc['files'] as List<dynamic>?)
-                  ?.map<String>((file) => file['path'].toString())
-                  .toList() ?? [];
+                      ?.map<String>((file) => file['path'].toString())
+                      .toList() ??
+                  [];
 
               return Document(
-                id: doc['id'].toString(), // Convert GUID to String
+                id: doc['id'].toString(),
+                // Convert GUID to String
                 documentId: doc['documentId'].toString(),
                 name: doc['name'],
                 description: doc['description'].toString() ?? '',
@@ -122,7 +124,8 @@ class _HomePageState extends State<HomePage> {
           print('Response body from API is null or not a List');
         }
       } else {
-        throw Exception('Failed to load documents (Status Code: ${response.statusCode})');
+        throw Exception(
+            'Failed to load documents (Status Code: ${response.statusCode})');
       }
     } on SocketException catch (e) {
       print('Socket Exception: $e');
@@ -147,7 +150,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> scanImage(BuildContext context, XFile photo) async {
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-      File rotatedImage = await FlutterExifRotation.rotateImage(path: photo.path);
+      File rotatedImage =
+          await FlutterExifRotation.rotateImage(path: photo.path);
       photo = XFile(rotatedImage.path);
     }
 
@@ -169,12 +173,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _navigateToDocumentDetailsPage(
-      BuildContext context,
-      String documentId,
-      String documentName,
-      String documentDescription,
-      List<String> documentFiles,
-      ) {
+    BuildContext context,
+    String documentId,
+    String documentName,
+    String documentDescription,
+    List<String> documentFiles,
+  ) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -260,7 +264,8 @@ class _HomePageState extends State<HomePage> {
         print('Document created successfully');
         _fetchDocuments(widget.token);
       } else {
-        print('Failed to create document (Status Code: ${response.statusCode})');
+        print(
+            'Failed to create document (Status Code: ${response.statusCode})');
       }
     } catch (e) {
       print('Error creating document: $e');
@@ -268,7 +273,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _deleteDocument(BuildContext context, String documentId) async {
-    final url = Uri.parse('https://10.0.2.2:7278/api/Document/Delete/$documentId');
+    final url =
+        Uri.parse('https://10.0.2.2:7278/api/Document/Delete/$documentId');
 
     try {
       final response = await http.delete(
@@ -286,7 +292,8 @@ class _HomePageState extends State<HomePage> {
         });
         print('Document deleted successfully');
       } else {
-        print('Failed to delete document (Status Code: ${response.statusCode})');
+        print(
+            'Failed to delete document (Status Code: ${response.statusCode})');
       }
     } catch (e) {
       print('Error deleting document: $e');
@@ -326,7 +333,8 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    final url = Uri.parse('https://10.0.2.2:7278/api/Document/filterByName?Name=$searchQuery');
+    final url = Uri.parse(
+        'https://10.0.2.2:7278/api/Document/filterByName?Name=$searchQuery');
 
     try {
       final response = await http.get(
@@ -343,11 +351,13 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             _documents = data.map((doc) {
               List<String> files = (doc['files'] as List<dynamic>?)
-                  ?.map<String>((file) => file['path'].toString())
-                  .toList() ?? [];
+                      ?.map<String>((file) => file['path'].toString())
+                      .toList() ??
+                  [];
 
               return Document(
-                id: doc['id'].toString(), // Convert GUID to String
+                id: doc['id'].toString(),
+                // Convert GUID to String
                 documentId: doc['documentId'].toString(),
                 name: doc['name'],
                 description: doc['description'].toString() ?? '',
@@ -363,11 +373,27 @@ class _HomePageState extends State<HomePage> {
           print('Response body from API is null or not a List');
         }
       } else {
-        throw Exception('Failed to search documents (Status Code: ${response.statusCode})');
+        throw Exception(
+            'Failed to search documents (Status Code: ${response.statusCode})');
       }
     } catch (e) {
       print('Error searching documents: $e');
     }
+  }
+
+  void _showFullDescriptionModal(BuildContext context, String description) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            description,
+            style: TextStyle(fontSize: 18, color: Colors.black54),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -412,7 +438,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(8.0),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
+                          color: Colors.yellow.withOpacity(0.5),
                           spreadRadius: 1,
                           blurRadius: 3,
                           offset: Offset(0, 2), // changes position of shadow
@@ -460,7 +486,8 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => MultipleImage()),
+                          MaterialPageRoute(
+                              builder: (context) => MultipleImage()),
                         );
                       },
                       icon: Icon(Icons.photo_library),
@@ -474,42 +501,108 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: _documents.isNotEmpty
                 ? ListView.builder(
-              itemCount: _documents.length,
-              itemBuilder: (context, index) {
-                final document = _documents[index];
-                return ListTile(
-                  leading: Icon(Icons.folder),
-                  title: Text(document.name),
-                  subtitle: Text(document.description),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () {
-                          _showDeleteConfirmationDialog(context, document.id);
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.share),
-                        onPressed: () {
-                          //_shareFolder(index);
-                        },
-                      ),
-                    ],
-                  ),
-                  onTap: () {
-                    _navigateToDocumentDetailsPage(
-                      context,
-                      document.id,
-                      document.name,
-                      document.description,
-                      document.files,
-                    );
-                  },
-                );
-              },
-            )
+                    itemCount: _documents.length,
+                    itemBuilder: (context, index) {
+                      final document = _documents[index];
+                      return Card(
+                          elevation: 0,
+                          margin:
+                              EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                8),
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  // Set shadow color to yellow with opacity
+                                  spreadRadius: 5,
+                                  // Spread radius of the shadow
+                                  blurRadius: 10,
+                                  // Blur radius of the shadow
+                                  offset: Offset(0, 0), // Offset of the shadow
+                                ),
+                              ],
+                            ),
+                            child: ListTile(
+                              title: Text(
+                                document.name,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Description:',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    document.description.length > 50
+                                        ? '${document.description.substring(0, 50)}...'
+                                        : document.description,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                  if (document.description.length > 50)
+                                    TextButton(
+                                      onPressed: () =>
+                                          _showFullDescriptionModal(
+                                        context,
+                                        document.description,
+                                      ),
+                                      child: Text(
+                                        'View More',
+                                        style: TextStyle(
+                                          color: Colors.blue,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.delete),
+                                    onPressed: () {
+                                      _showDeleteConfirmationDialog(
+                                          context, document.id);
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.share),
+                                    onPressed: () {
+                                      //_shareFolder(index);
+                                    },
+                                  ),
+                                ],
+                              ),
+                              onTap: () {
+                                _navigateToDocumentDetailsPage(
+                                  context,
+                                  document.id,
+                                  document.name,
+                                  document.description,
+                                  document.files,
+                                );
+                              },
+                            ),
+                          ));
+                    },
+                  )
                 : Center(child: Text('No documents found')),
           ),
         ],
