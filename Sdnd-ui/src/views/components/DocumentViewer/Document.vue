@@ -1,6 +1,6 @@
 <template>
   <Splitter style="height: 90vh; " class="m-0">
-    <SplitterPanel class="flex align-items-center justify-content-center overflow-auto ">
+    <SplitterPanel class="flex align-items-center justify-content-center overflow-auto  splitter">
       <div class="d-flex justify-content-between">
         <TabMenu :model="items">
         </TabMenu>
@@ -79,7 +79,7 @@
             </div>
           </div>
         </form>
-      </div>
+      </div>fg
       <div v-if="activeitem == 1">
         <DocumentEdit :document-id="documentId" docuemnt-states:documentStates />
       </div>
@@ -114,7 +114,8 @@
       </div>
     </SplitterPanel>
     <SplitterPanel class="flex align-items-center justify-content-center ">
-      <FileView :src="src" />
+
+      <FileView :selected="activePdf || 0" :pdfSources="pdfSources" />
     </SplitterPanel>
   </Splitter>
 </template>
@@ -133,7 +134,7 @@ import Skeleton from "primevue/skeleton";
 import ArgonBadge from "@/components/ArgonBadge.vue";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import TabMenu from "primevue/tabmenu";
 import BaseApiService from "../../../services/apiService";
 import { onMounted } from "vue";
@@ -144,11 +145,11 @@ import { toast } from "vue3-toastify";
 //const route = useRoute();
 
 const fileInput = ref(null);
-const fileId = ref('e7171698-1f32-465a-b632-7223c0e09cc0');
-const src = ref(`https://localhost:7278/api/document/pdf/${fileId.value}`);
+// const fileId = ref('e7171698-1f32-465a-b632-7223c0e09cc0');
+//const src = ref(`https://localhost:7278/api/document/pdf/${fileId.value}`);
 
-const url = ref('');
-url.value = `"/web/viewer.hile${src.value}"`;
+//const url = ref('');
+//url.value = `"/web/viewer.hile${src.value}"`;
 const events = ref([
   { status: "", date: "", icon: "", color: "#9C27B0" },
   { status: "", date: "", icon: "", color: "#9C27B0" },
@@ -173,13 +174,19 @@ const sharedUsername = ref('');
 const shareResult = ref('');
 const usernames = ref([]);
 const filteredUsernames = ref([]);
-
+const activePdf = ref(0);
+const pdfSources = ref([]);
+const DocumentDetails = ref(null);
 // const props = defineProps({
 //     documentId: String // Enforce string type for clarity and potential validation
 // });
-const DocumentDetails = ref(null);
-onMounted(() => {
-  fetchDocumentDetails(documentId.value);
+onMounted(async () => {
+  isFetched.value = false;
+  await fetchDocumentDetails(documentId.value);
+  if (DocumentDetails.value.files.length > 0) {
+    pdfSources.value = DocumentDetails.value.files.map(file => file.id);
+    console.log(pdfSources.value);
+  }
 });
 const getDocumentStateString = (documentState) => {
   switch (documentState) {
@@ -290,8 +297,9 @@ const emit = defineEmits(['addfile-emit']);
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   console.log("file upload trigered", documentId.value, file.name);
-  await emit('addfile-emit', documentId.value, file);
-  fetchDocumentDetails(documentId.value);
+  emit('addfile-emit', documentId.value, file);
+  await new Promise(resolve => setTimeout(resolve, 100));
+  await fetchDocumentDetails(documentId.value);
 };
 
 const FileColumns = [
@@ -313,73 +321,16 @@ const editFile = (file) => {
 
 const viewFile = (file) => {
   // Implement file viewing logic here
-  fileId.value = file.id;
+  activePdf.value = pdfSources.value.indexOf(file.id);
+  console.log('newactiveval', activePdf.value);
   console.log('Viewing file:', file);
 };
-
-// import axios from 'axios'; // Or your preferred HTTP library
-
-// const isUploading = ref(false); // Optional flag for upload status
-
-// const handleIframeMessage = async (event) => {
-//     if (event.origin !== window.location.origin) {
-//         // Handle potential security violations (consider logging or ignoring)
-//         return;
-//     }
-
-//     const { filename, blobUrl } = event.data;
-
-//     isUploading.value = true; // Set uploading flag (optional)
-//     console.log("data got from iframe");
-//     console.log("filename", filename);
-//     console.log("blobUrl", blobUrl);
-//     const formData = new FormData();
-//     formData.append('file', new Blob([blobUrl], { type: 'application/pdf' }), filename); // Ensure content type for PDF
-
-//     try {
-//         const response = await axios.post('/api/Annotation/NewVersion', formData, {
-//             headers: {
-//                 'Content-Type': 'multipart/form-data', // Set request content type
-//             },
-//         });
-
-//         isUploading.value = false; // Reset uploading flag (optional)
-//         console.log('File uploaded successfully!', response.data);
-//         // Handle successful API response (e.g., notify iframe)
-//     } catch (error) {
-//         isUploading.value = false; // Reset uploading flag (optional)
-//         console.error('Error uploading file:', error);
-//         // Handle API call errors
-//     }
-// };
-
-// onMounted(() => {
-//     window.addEventListener('message', handleIframeMessage);
-// });
-
-// Expose isUploading for potential UI updates (optional)
-// const url = ref(`https://localhost:7278/api/Document/pdf/${DocumentDetails.value?.files[0]?.id}`);
-// const op = ref();
-// const members = ref([
-//     {
-//         name: "Amy Elsner",
-//         image: "amyelsner.png",
-//         email: "amy@email.com",
-//         role: "Owner",
-//     },
-//     {
-//         name: "Bernardo Dominic",
-//         image: "bernardodominic.png",
-//         email: "bernardo@email.com",
-//         role: "Editor",
-//     },
-//     {
-//         name: "Ioni Bowcher",
-//         image: "ionibowcher.png",
-//         email: "ioni@email.com",
-//         role: "Viewer",
-//     },
-// ]);
+watch(pdfSources, async (NewVal, OldVal) => {
+  console.log("pdfSources changed from ", OldVal, 'to', NewVal);
+});
+watch(activePdf, async (NewVal, OldVal) => {
+  console.log("selectedPdf changed from ", OldVal, 'to', NewVal);
+});
 onMounted(fetchUsernames);
 
 </script>
@@ -495,5 +446,17 @@ onMounted(fetchUsernames);
 
 .smaller-input {
   width: 300px;
+}
+
+.splitter::-webkit-scrollbar {
+  background-color: #f3f3f3;
+}
+
+.splitter::-webkit-scrollbar-thumb {
+  background-color: #dbdbdbce;
+}
+
+.splitter {
+  margin-right: 5px;
 }
 </style>

@@ -30,23 +30,24 @@
         </button>
         <button @click="addAnnotation" class="btn btn-link text-secondary px-1 mb-0 mx-2">
           <i class="fas fa-pen text-primary me-1" aria-hidden="true"></i>
-          <a style="text-decoration: none; color: inherit" :href="viewersrc" target="_blank">Add Annotations</a>
+          <a style="text-decoration: none; color: inherit" target="_blank">Add Annotations</a>
         </button>
       </div>
     </div>
-
     <div class="file-container">
-      <div v-if="src === 'undefined'" class="m-0 p-0">
-        <Skeleton width="85%" height="85%" />
+      <div v-if="!pdfSources">
+        <h1> No available Pdfs </h1>
       </div>
       <div v-else v-for="page in pages" :key="page">
         <VuePDF :pdf="pdf" :scale="scale" :page="page" style="margin-bottom: 10px" :fit-parent="fitParent">
-          <div>Loading...</div>
+          <div class="spinner-grow m-0 9-0" style="width:100%; height:100%;" role="status">
+            <span class="sr-only m-0 p-0">Loading...</span>
+          </div>
         </VuePDF>
       </div>
     </div>
 
-    <!-- Modal -->
+
     <div class="modal fade dark" id="exampleModalMessage" tabindex="-1" role="dialog"
       aria-labelledby="exampleModalMessageTitle" aria-hidden="true" data-bs-backdrop="false">
       <div class="modal-dialog modal-dialog-centered" role="document">
@@ -66,10 +67,10 @@
                 <input type="text" class="form-control" placeholder="Write a valid Username" id="recipient-name"
                   v-model="username" />
               </div>
-              <!-- <div class="form-group">
+              <div class="form-group">
                 <label for="message-text" class="col-form-label">Message:</label>
                 <textarea class="form-control" id="message-text"></textarea>
-              </div> -->
+              </div>
             </form>
           </div>
           <div class="modal-footer">
@@ -87,47 +88,69 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import BaseApiService from "../../../services/apiService";
-import { useRouter, useRoute } from "vue-router";
+import { useStore } from "vuex";
 import { VuePDF, usePDF } from "@tato30/vue-pdf";
-import Skeleton from "primevue/skeleton";
 // const showModal = ref(false);
-const router = useRouter();
-const route = useRoute();
+const store = useStore();
 const username = ref("");
-const documentId = ref(route.params.id);
-const props = defineProps(['FileId']);
+const props = defineProps({
+  pdfSources: Array,
+  selected: Number
+});
+const documentId = computed(() => store.state.documentId);
 
-const src =
-  `https://localhost:7278/api/document/pdf/${props.FileId}`;
-const viewersrc = ref("../../../web/viewer.html?file=" + src.value);
+const src = ref('');
+const { pdf, pages } = usePDF(src);
+
+import { watch } from 'vue';
+
+watch(() => props.selected, (newValue) => {
+  console.log('fichier', newValue);
+  if (props.pdfSources && props.pdfSources.length > 0) {
+    const selectedSource = props.pdfSources[newValue];
+    if (selectedSource) {
+      src.value = `https://localhost:7278/api/document/pdf/${selectedSource}`;
+      console.log(src.value);
+
+    }
+    else {
+      // Handle the case when props.selected is an invalid index
+      console.log('Invalid index:', props.selected);
+    }
+  }
+  else {
+    // Handle the case when props.pdfSources is an empty array
+    console.log('No PDF sources provided');
+  }
+});
 const scale = ref(1);
 const fitParent = ref(false);
-const { pdf, pages } = usePDF(src);
+
 // const SignatureToolbar = ref(false);
 //   const showShareModal = (index) => {
 //     showModal.value = true;
 
 //   };
-const sharedocument = async () => {
-  try {
-    const ShareRequest = {
-      username: username.value,
-      documentId: documentId.value,
-    };
-    console.log(ShareRequest);
-    const response =
-      await BaseApiService(`Document/Share`).create(ShareRequest);
-    console.log(response.data);
-    router.push("/shared-documents");
-  } catch (e) {
-    console.error(e);
-  }
-};
+// const sharedocument = async () => {
+//   try {
+//     const ShareRequest = {
+//       username: username.value,
+//       documentId: documentId.value,
+//     };
+//     console.log(ShareRequest);
+//     const response =
+//       await BaseApiService(`Document/Share`).create(ShareRequest);
+//     console.log(response.data);
+//     router.push("/shared-documents");
+//   } catch (e) {
+//     console.error(e);
+//   }
+// };
 // const showSignatureToolbar = () => {
 //   SignatureToolbar.value = !SignatureToolbar.value;
-// };
+// }; -->
 const downloadDocument = async () => {
   try {
     const response = await BaseApiService("Document/Download").get(
@@ -159,7 +182,7 @@ const downloadDocument = async () => {
   justify-content: center;
   height: 100vh;
   margin: 0px;
-  padding: 0px 0px 0px 12px;
+  padding: 0px 0px 0px 0px;
 }
 
 .button-container {
