@@ -92,10 +92,18 @@ class _EditingPageState extends State<EditingPage> {
       appBar: AppBar(
         title: Text(''),
       ),
-      body: Center(
-        child: widget.imageFile != null
-            ? Image.file(widget.imageFile!)
-            : Container(), // Remplacer par votre contenu principal
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: widget.imageFile != null
+                  ? Image.file(widget.imageFile!)
+                  : Text('No image available'),
+            ),
+
+          ],
+        ),
       ),
       bottomNavigationBar: BottomAppBar(
         color: Colors.grey[100], // Fond de la barre de navigation en bas en jaune clair
@@ -103,44 +111,46 @@ class _EditingPageState extends State<EditingPage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ElevatedButton.icon(
-              onPressed: () {
-                // Call the function to generate the PDF when the user presses the import button
-                generatePdf(context);
+              onPressed: () async {
+                await generatePdf(context);
               },
+              icon: Icon(Icons.file_upload),
+              label: Text('Import PDF'),
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white, backgroundColor: Colors.yellow[700], // Texte en blanc
+                foregroundColor: Colors.white, backgroundColor: Colors.yellow[700],
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8), // Bord arrondi
-                  // Vous pouvez ajouter une ombre ou d'autres styles ici si nécessaire
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ),
-              icon: Icon(Icons.file_upload, size: 24),
-              label: Text(
-                'Import PDF',
-                style: TextStyle(fontSize: 16),
               ),
             ),
             ElevatedButton.icon(
-              onPressed: navigateToTextDisplayPage,
+              onPressed: () {
+                navigateToTextDisplayPage();
+              },
               icon: Icon(Icons.text_fields),
               label: Text('Generate Text'),
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white, backgroundColor: Colors.yellow[700], // Texte en blanc
+                foregroundColor: Colors.white, backgroundColor: Colors.yellow[700],
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8), // Bord arrondi
-                  // Vous pouvez ajouter une ombre ou d'autres styles ici si nécessaire
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
             ),
           ],
         ),
       ),
+
     );
   }
 
-
-
-
+  void copyTextToClipboard() {
+    Clipboard.setData(ClipboardData(text: recognizedText));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Text copied to clipboard'),
+      ),
+    );
+  }
 }

@@ -90,6 +90,41 @@ class _SignupPageState extends State<SignupPage> {
                         },
                         suffixIcon: true,
                       ),
+                      const SizedBox(height: 8,), // Add some spacing
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Password Requirements:',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            '- At least 6 characters long',
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
+                          Text(
+                            '- Contains at least one lowercase letter',
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
+                          Text(
+                            '- Contains at least one uppercase letter',
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
+                          Text(
+                            '- Contains at least one digit',
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
+                          Text(
+                            '- Contains at least one non-alphanumeric character',
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
+                        ],
+                      ),
+
                       const SizedBox(height: 22,),
                       CustomFormButton(innerText: 'Signup', onPressed: _handleSignupUser,),
                       const SizedBox(height: 18,),
@@ -134,6 +169,15 @@ class _SignupPageState extends State<SignupPage> {
 
       final jsonData = jsonEncode(userData);
 
+      // Validate password requirements
+      final passwordErrors = _validatePassword(_passwordController.text);
+      if (passwordErrors.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(passwordErrors.join('\n'))),
+        );
+        return; // Stop execution if password requirements are not met
+      }
+
       try {
         final response = await http.post(
           Uri.parse('https://10.0.2.2:7278/api/Account/register'),
@@ -143,9 +187,7 @@ class _SignupPageState extends State<SignupPage> {
           body: jsonData,
         );
 
-
         if (response.statusCode == 200) {
-
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Align(
@@ -166,7 +208,6 @@ class _SignupPageState extends State<SignupPage> {
             ),
           );
 
-
           // Delay navigation to allow SnackBar display
           await Future.delayed(Duration(seconds: 2));
           Navigator.push(
@@ -186,5 +227,32 @@ class _SignupPageState extends State<SignupPage> {
       }
     }
   }
+
+  List<String> _validatePassword(String password) {
+    final errors = <String>[];
+
+    if (password.length < 6) {
+      errors.add("Password must be at least 6 characters long.");
+    }
+
+    if (!password.contains(RegExp(r'[a-z]'))) {
+      errors.add("Password must contain at least one lowercase letter.");
+    }
+
+    if (!password.contains(RegExp(r'[A-Z]'))) {
+      errors.add("Password must contain at least one uppercase letter.");
+    }
+
+    if (!password.contains(RegExp(r'\d'))) {
+      errors.add("Password must contain at least one digit.");
+    }
+
+    if (!password.contains(RegExp(r'\W'))) {
+      errors.add("Password must contain at least one non-alphanumeric character.");
+    }
+
+    return errors;
+  }
+
 
 }

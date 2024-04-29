@@ -6,6 +6,8 @@ import Navbar from "@/examples/PageLayout/Navbar.vue";
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonSwitch from "@/components/ArgonSwitch.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
+import AnimatedSVG from "./components/AnimatedSVG.vue";
+
 // import BaseApiService from "../data/apiService";
 const body = document.getElementsByTagName("body")[0];
 const loginData = ref({
@@ -23,6 +25,7 @@ onMounted(() => {
     router.push("/"); // Assuming profile is accessible from root path
   }
 });
+
 
 const login = async () => {
   try {
@@ -106,8 +109,8 @@ onBeforeUnmount(() => {
                     <argon-switch id="rememberMe" name="remember-me">Remember me</argon-switch>
 
                     <div class="text-center">
-                      <argon-button type="submit" class="mt-4" variant="gradient" color="success" fullWidth
-                        size="lg">Sign in</argon-button>
+                      <argon-button type="submit" class="mt-4" color="success" fullWidth size="lg">Sign
+                        in</argon-button>
                     </div>
                   </form>
                 </div>
@@ -117,7 +120,7 @@ onBeforeUnmount(() => {
                     <router-link class="nav-link me-2" to="/signup">
                       <span v-if="IsLoading" class="spinner-border spinner-border-sm" role="status"
                         aria-hidden="true"></span>
-                      <a v-else href="#" class="text-success text-gradient font-weight-bold">Sign up</a>
+                      <a v-else href="#" class="text-success font-weight-bold">Sign up</a>
                     </router-link>
                   </p>
                 </div>
@@ -125,14 +128,27 @@ onBeforeUnmount(() => {
             </div>
             <div
               class="top-0 my-auto text-center col-6 d-lg-flex d-none h-100 pe-0 position-absolute end-0 justify-content-center flex-column">
+
               <div
-                class="position-relative bg-gradient-success h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center overflow-hidden"
-                style="background-size: cover"></div>
+                class="position-relative bg-gradient-custom h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center overflow-hidden"
+                style="background-size: cover">
+                <AnimatedSVG />
+
+              </div>
+
             </div>
           </div>
         </div>
       </div>
     </section>
   </main>
+  
 </template>
+<style scoped>
+.bg-gradient-custom {
+  background-color: #f5d246;
+  
+}
+</style>
+
 ../services/apiService

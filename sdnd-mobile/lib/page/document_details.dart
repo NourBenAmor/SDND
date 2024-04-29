@@ -173,64 +173,66 @@ class _DocumentDetailsState extends State<DocumentDetails> {
         backgroundColor: Colors.yellow[700], // Adjusted to yellow shade
         elevation: 0,
       ),
-      body: Container(
-        color: Colors.grey[200],
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Name:',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            SizedBox(height: 5),
-            Text(
-              '${widget.documentName}',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.blueGrey,
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Description:',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            SizedBox(height: 5),
-            Container(
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                '${widget.documentDescription}',
+      body: SingleChildScrollView(
+        child: Container(
+          color: Colors.grey[200],
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Name:',
                 style: TextStyle(
                   fontSize: 18,
-                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Files:',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+              SizedBox(height: 5),
+              Text(
+                '${widget.documentName}',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.blueGrey,
+                ),
               ),
-            ),
-            SizedBox(height: 10),
-            Expanded(
-              child: ListView.builder(
+              SizedBox(height: 20),
+              Text(
+                'Description:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(height: 5),
+              Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${widget.documentDescription}',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black54,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Files:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(height: 10),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
                 itemCount: documentFilesMap.length,
                 itemBuilder: (context, index) {
                   final List<String> fileIds = documentFilesMap.keys.toList();
@@ -256,8 +258,8 @@ class _DocumentDetailsState extends State<DocumentDetails> {
                   );
                 },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(

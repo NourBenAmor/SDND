@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:pdf_thumbnail/pdf_thumbnail.dart';
-import 'tab_page.dart'; // Import your TabPage here
+
+import 'package:airsafe/page/pdf_View.dart'; // Assurez-vous que ce package est correctement importé
 
 class ListPDFsScreen extends StatefulWidget {
   const ListPDFsScreen({Key? key}) : super(key: key);
-
 
   @override
   State<ListPDFsScreen> createState() => _ListPDFsScreenState();
@@ -17,8 +17,7 @@ class _ListPDFsScreenState extends State<ListPDFsScreen> {
 
   Future<void> _loadPdfFiles() async {
     Directory downloadsDirectory = Directory('/storage/emulated/0/Download');
-    List<FileSystemEntity> entities =
-    downloadsDirectory.listSync(recursive: false);
+    List<FileSystemEntity> entities = downloadsDirectory.listSync(recursive: false);
     List<File> pdfFiles = [];
     for (FileSystemEntity entity in entities) {
       if (entity is File && entity.path.endsWith('.pdf')) {
@@ -57,7 +56,11 @@ class _ListPDFsScreenState extends State<ListPDFsScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => TabPage(), // Pass your token to the TabPage
+                    builder: (context) => PDFViewScreen(
+                      isNet: false,
+                      name: "PDF",
+                      path: mypdfs[index].path,
+                    ),
                   ),
                 );
               },
@@ -74,8 +77,7 @@ class _ListPDFsScreenState extends State<ListPDFsScreen> {
                     currentPage: 1,
                     height: 150,
                     backgroundColor: Colors.transparent,
-                    loadingIndicator:
-                    Center(child: CircularProgressIndicator()),
+                    loadingIndicator: Center(child: CircularProgressIndicator()),
                   ),
                 ),
               ),
