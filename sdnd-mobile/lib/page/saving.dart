@@ -39,7 +39,7 @@ class _SavingPageState extends State<SavingPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ListPdfPage(), // Remplacez ListPdfPage par votre nom de page
+            builder: (context) => ListPDFsScreen(), // Remplacez ListPdfPage par votre nom de page
           ),
         );
       } catch (e) {
@@ -155,3 +155,4 @@ class _SavingPageState extends State<SavingPage> {
     );
   }
 }
+

@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'package:airsafe/page/ocr_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:pdf/widgets.dart' as pdfLib;
 import 'saving.dart'; // Import the SavingPage
+// Import the TextDisplayPage
 
 class EditingPage extends StatefulWidget {
   final File? imageFile; // Change to nullable File
@@ -53,7 +55,8 @@ class _EditingPageState extends State<EditingPage> {
             );
           } else {
             return pdfLib.Center(
-              child: pdfLib.Text('No image available'), // Utiliser pdfLib.Text au lieu de Text
+              child: pdfLib.Text(
+                  'No image available'), // Utiliser pdfLib.Text au lieu de Text
             );
           }
         },
@@ -71,11 +74,14 @@ class _EditingPageState extends State<EditingPage> {
     );
   }
 
-  void copyTextToClipboard() {
-    Clipboard.setData(ClipboardData(text: recognizedText));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Text copied to clipboard'),
+
+  void navigateToTextDisplayPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            TextDisplayPage(
+                text: recognizedText), // Pass recognizedText instead of recognizedText object
       ),
     );
   }
@@ -84,69 +90,57 @@ class _EditingPageState extends State<EditingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Editing Page'),
-        actions: [],
+        title: Text(''),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            child: Center(
-              child: widget.imageFile != null
-                  ? Image.file(widget.imageFile!)
-                  : Text('No image available'),
-            ),
-          ),
-          GestureDetector(
-            onTap: copyTextToClipboard,
-            child: Container(
-              margin: EdgeInsets.all(16.0),
-              padding: EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[200], // Couleur de fond
-                borderRadius: BorderRadius.circular(8.0), // Bordures arrondies
+      body: Center(
+        child: widget.imageFile != null
+            ? Image.file(widget.imageFile!)
+            : Container(), // Remplacer par votre contenu principal
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.grey[100], // Fond de la barre de navigation en bas en jaune clair
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton.icon(
+              onPressed: () {
+                // Call the function to generate the PDF when the user presses the import button
+                generatePdf(context);
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: Colors.yellow[700], // Texte en blanc
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8), // Bord arrondi
+                  // Vous pouvez ajouter une ombre ou d'autres styles ici si nécessaire
+                ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Text(
-                      recognizedText,
-                      style: TextStyle(fontSize: 18),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.copy),
-                    onPressed: copyTextToClipboard,
-                  ),
-                ],
+              icon: Icon(Icons.file_upload, size: 24),
+              label: Text(
+                'Import PDF',
+                style: TextStyle(fontSize: 16),
               ),
             ),
-          ),
-          ElevatedButton.icon(
-            onPressed: () {
-              // Call the function to generate the PDF when the user presses the import button
-              generatePdf(context);
-            },
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor: Colors.yellow[700], // Set text color
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8), // Rounded border
-                // You can add shadow or other styling here if needed
+            ElevatedButton.icon(
+              onPressed: navigateToTextDisplayPage,
+              icon: Icon(Icons.text_fields),
+              label: Text('Generate Text'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: Colors.yellow[700], // Texte en blanc
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8), // Bord arrondi
+                  // Vous pouvez ajouter une ombre ou d'autres styles ici si nécessaire
+                ),
               ),
             ),
-            icon: Icon(Icons.file_upload, size: 24, color: Colors.white),
-            label: Text(
-              'Import PDF',
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
-
-        ],
+          ],
+        ),
       ),
     );
   }
+
+
+
+
 }

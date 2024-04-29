@@ -77,7 +77,9 @@ dependencies:
   flutter_launcher_icons: "^0.13.1"
   file_picker: ^8.0.1
   tflite_flutter: ^0.10.4
-  flutter_signature_pad: ^3.0.1
+  flutter_native_image: ^0.0.6+1
+  flutter_cached_pdfview: ^0.4.2
+
 
 
 

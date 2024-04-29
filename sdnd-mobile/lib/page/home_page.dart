@@ -13,6 +13,7 @@ import 'editing_page.dart';
 import 'file_list.dart';
 import 'multiple_image.dart';
 
+
 class Document {
   final String id;
   final String documentId;
@@ -165,7 +166,7 @@ class _HomePageState extends State<HomePage> {
   void _navigateToListPdfPage(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ListPdfPage()),
+      MaterialPageRoute(builder: (context) => ListPDFsScreen()),
     );
   }
 
@@ -332,6 +333,7 @@ class _HomePageState extends State<HomePage> {
       print('Error searching documents: $e');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

@@ -1,29 +1,24 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:esys_flutter_share_plus/esys_flutter_share_plus.dart';
+import 'package:pdf_thumbnail/pdf_thumbnail.dart';
+import 'tab_page.dart'; // Import your TabPage here
+
+class ListPDFsScreen extends StatefulWidget {
+  const ListPDFsScreen({Key? key}) : super(key: key);
 
 
-
-class ListPdfPage extends StatefulWidget {
   @override
-  _ListPdfPageState createState() => _ListPdfPageState();
+  State<ListPDFsScreen> createState() => _ListPDFsScreenState();
 }
 
-class _ListPdfPageState extends State<ListPdfPage> {
-  List<File> _pdfFiles = [];
-  TextEditingController _editingController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPdfFiles();
-  }
-
+class _ListPDFsScreenState extends State<ListPDFsScreen> {
+  List<File> mypdfs = [];
 
   Future<void> _loadPdfFiles() async {
-    // Charger la liste des fichiers PDF depuis le répertoire de téléchargement sur Android
     Directory downloadsDirectory = Directory('/storage/emulated/0/Download');
-    List<FileSystemEntity> entities = downloadsDirectory.listSync(recursive: false);
+    List<FileSystemEntity> entities =
+    downloadsDirectory.listSync(recursive: false);
     List<File> pdfFiles = [];
     for (FileSystemEntity entity in entities) {
       if (entity is File && entity.path.endsWith('.pdf')) {
@@ -31,136 +26,62 @@ class _ListPdfPageState extends State<ListPdfPage> {
       }
     }
     setState(() {
-      _pdfFiles = pdfFiles;
+      mypdfs = pdfFiles;
     });
   }
 
-  void _renamePdfFile(int index) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        String currentName = _pdfFiles[index].path.split('/').last; // Nom actuel du fichier PDF
-        _editingController.text = currentName; // Initialiser le contrôleur de texte avec le nom actuel
-        return AlertDialog(
-          title: Text("Renommer le fichier"),
-          content: TextField(
-            controller: _editingController,
-            decoration: InputDecoration(hintText: 'Nouveau nom'),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text("Annuler"),
-              onPressed: () {
-                Navigator.of(context).pop(); // Fermer la boîte de dialogue
-              },
-            ),
-            TextButton(
-              child: Text("Valider"),
-              onPressed: () {
-                File oldFile = _pdfFiles[index];
-                String newPath = oldFile.path.replaceFirst(oldFile.path.split('/').last, _editingController.text);
-                oldFile.renameSync(newPath); // Renommer le fichier sur le système de fichiers
-                setState(() {
-                  _pdfFiles[index] = File(newPath); // Mettre à jour la liste avec le nouveau nom
-                });
-                Navigator.of(context).pop(); // Fermer la boîte de dialogue
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _deletePdfFile(int index) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Confirmation"),
-          content: Text("Êtes-vous sûr de vouloir supprimer ce fichier ?"),
-          actions: <Widget>[
-            TextButton(
-              child: Text("Annuler"),
-              onPressed: () {
-                Navigator.of(context).pop(); // Ferme la boîte de dialogue
-              },
-            ),
-            TextButton(
-              child: Text("Supprimer"),
-              onPressed: () {
-                File fileToDelete = _pdfFiles[index];
-                fileToDelete.deleteSync(); // Supprimer le fichier du système de fichiers
-                _pdfFiles.removeAt(index); // Supprimer le fichier de la liste
-                setState(() {}); // Mettre à jour l'interface utilisateur
-                Navigator.of(context).pop(); // Ferme la boîte de dialogue
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _sharePdfFile(File file) async {
-    await Share.file('Share PDF', 'pdf_file.pdf', file.readAsBytesSync(), 'application/pdf');
+  @override
+  void initState() {
+    super.initState();
+    _loadPdfFiles();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Liste des PDF'),
+        title: Text("PDFs"),
       ),
-      body: _pdfFiles != null
-          ? ListView.builder(
-        itemCount: _pdfFiles.length,
-        itemBuilder: (context, index) {
-          File pdfFile = _pdfFiles[index];
-          return ListTile(
-            title: GestureDetector(
-              onDoubleTap: () {
-                _renamePdfFile(index);
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: GridView.builder(
+          itemCount: mypdfs.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+          ),
+          itemBuilder: (context, index) {
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TabPage(), // Pass your token to the TabPage
+                  ),
+                );
               },
-              child: Text(
-                pdfFile.path.split('/').last, // Nom du fichier PDF
-                style: TextStyle(fontWeight: FontWeight.bold),
+              child: Container(
+                height: 50,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(width: 1),
+                ),
+                child: Center(
+                  child: PdfThumbnail.fromFile(
+                    mypdfs[index].path,
+                    currentPage: 1,
+                    height: 150,
+                    backgroundColor: Colors.transparent,
+                    loadingIndicator:
+                    Center(child: CircularProgressIndicator()),
+                  ),
+                ),
               ),
-            ),
-            leading: Icon(Icons.picture_as_pdf),
-            subtitle: Text(
-              'Taille: ${(pdfFile.lengthSync() / 1024).toStringAsFixed(2)} KB', // Taille du fichier PDF
-            ),
-            trailing: PopupMenuButton<String>(
-              onSelected: (String choice) {
-                if (choice == 'Delete') {
-                  _deletePdfFile(index);
-                } else if (choice == 'Share') {
-                  _sharePdfFile(pdfFile);
-                }
-              },
-              itemBuilder: (BuildContext context) {
-                return ['Delete', 'Share'].map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Row(
-                      children: <Widget>[
-                        choice == 'Delete'
-                            ? Icon(Icons.delete)
-                            : Icon(Icons.share),
-                        SizedBox(width: 8),
-                        Text(choice),
-                      ],
-                    ),
-                  );
-                }).toList();
-              },
-            ),
-          );
-        },
-      )
-          : Center(
-        child: CircularProgressIndicator(),
+            );
+          },
+        ),
       ),
     );
   }

@@ -8,43 +8,56 @@ import 'file_list.dart';
 import 'about.dart';
 
 
-class TabPage extends StatefulWidget {
-  final String token; // Add token as a parameter to the TabPage widget
+// Add your imports here
 
-  const TabPage({Key? key, required this.token}) : super(key: key);
+// Add your imports here
+
+class TabPage extends StatefulWidget {
+
+  const TabPage({Key? key}) : super(key: key);
+
   @override
   State<TabPage> createState() => _TabPageState();
 }
 
 class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final List<CustomTab> myTabs = <CustomTab>[
-    CustomTab(
-        text: 'Home',
-        icon: 'images/icon-home-gray.png',
-        selectedIcon: 'images/icon-home-orange.png'),
-    CustomTab(
-        text: 'Scan History',
-        icon: 'images/icon-history-gray.png',
-        selectedIcon: 'images/icon-history-orange.png'),
-
-
-    CustomTab(
-        text: 'Paramètres', // Ajouter un nouvel onglet pour les paramètres
-        icon: 'images/param.png',
-        selectedIcon: 'images/param.png'),
-    CustomTab(
-        text: 'About',
-        icon: 'images/icon-about-gray.png',
-        selectedIcon: 'images/icon-about-orange.png'),
-  ];
+  final List<CustomTab> myTabs = <CustomTab>[];
 
   int selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: myTabs.length); // Mettre à jour la longueur du contrôleur de tabulation
+    _tabController = TabController(vsync: this, length: myTabs.length);
+
+    // Initialize myTabs here after accessing widget.token
+    myTabs.addAll([
+      CustomTab(
+        text: 'Accueil',
+        icon: 'images/icon-home.png',
+        selectedIcon: 'images/icon-home-selected.png',
+        page: HomePage(token: '',),
+      ),
+      CustomTab(
+        text: 'Historique',
+        icon: 'images/icon-history.png',
+        selectedIcon: 'images/icon-history-selected.png',
+        page: ListPDFsScreen(),
+      ),
+      CustomTab(
+        text: 'Paramètres',
+        icon: 'images/icon-settings.png',
+        selectedIcon: 'images/icon-settings-selected.png',
+        page: SynchronizationPage(),
+      ),
+      CustomTab(
+        text: 'À propos',
+        icon: 'images/icon-about.png',
+        selectedIcon: 'images/icon-about-selected.png',
+        page: AboutPage(),
+      ),
+    ]);
   }
 
   @override
@@ -52,12 +65,7 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
     return Scaffold(
       body: TabBarView(
         controller: _tabController,
-        children: [
-          HomePage(token: widget.token), // Pass the token to HomePage
-          ListPdfPage(),
-          SynchronizationPage(),
-          AboutPage(),
-        ],
+        children: myTabs.map((tab) => tab.page).toList(),
       ),
       bottomNavigationBar: SizedBox(
         height: 83,
@@ -70,9 +78,11 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
             });
           },
           tabs: myTabs.map((CustomTab tab) {
-            return MyTab(
-              tab: tab,
-              isSelected: myTabs.indexOf(tab) == selectedIndex,
+            return Tab(
+              child: MyTab(
+                tab: tab,
+                isSelected: myTabs.indexOf(tab) == selectedIndex,
+              ),
             );
           }).toList(),
         ),
@@ -81,27 +91,29 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin {
   }
 }
 
-
 class MyTab extends StatelessWidget {
   final CustomTab tab;
   final bool isSelected;
 
-  const MyTab({super.key, required this.tab, required this.isSelected});
+  const MyTab({Key? key, required this.tab, required this.isSelected}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Tab(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Image.asset(
-            isSelected ? tab.selectedIcon : tab.icon,
-            width: 48,
-            height: 32,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Image.asset(
+          isSelected ? tab.selectedIcon : tab.icon,
+          width: 48,
+          height: 32,
+        ),
+        Text(
+          tab.text,
+          style: TextStyle(
+            color: isSelected ? Colors.blue : Colors.black,
           ),
-
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -110,7 +122,12 @@ class CustomTab {
   final String text;
   final String icon;
   final String selectedIcon;
+  final Widget page;
 
-  CustomTab(
-      {required this.text, required this.icon, required this.selectedIcon});
+  CustomTab({
+    required this.text,
+    required this.icon,
+    required this.selectedIcon,
+    required this.page,
+  });
 }

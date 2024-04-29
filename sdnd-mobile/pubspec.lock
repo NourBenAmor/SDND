@@ -345,6 +345,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.1"
+  flutter_cached_pdfview:
+    dependency: "direct main"
+    description:
+      name: flutter_cached_pdfview
+      sha256: e0019798549828fec482585137cd91c35f19d64b4b4fd5b475b4a1eea9507463
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.2"
   flutter_downloader:
     dependency: "direct main"
     description:
@@ -385,6 +393,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  flutter_native_image:
+    dependency: "direct main"
+    description:
+      name: flutter_native_image
+      sha256: "0ff23d6222064259df8f85ea56925627ea1ec8658814672c5b6c23fc9174c65e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.6+1"
   flutter_pdfview:
     dependency: "direct main"
     description:
@@ -449,14 +465,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
-  flutter_signature_pad:
-    dependency: "direct main"
-    description:
-      name: flutter_signature_pad
-      sha256: "7ada1f161b745c3f2391cf09bc2d8ed0ba6fba75e41b6098b3cac480ea0cbdff"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
   flutter_staggered_animations:
     dependency: "direct main"
     description:

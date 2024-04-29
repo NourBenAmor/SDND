@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:airsafe/page/saving.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:open_file/open_file.dart'; // Import the open_file package
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -16,12 +16,20 @@ class MultipleImage extends StatefulWidget {
 class _MultipleImageState extends State<MultipleImage> {
   final picker = ImagePicker();
   List<File> _image = [];
+  final BoxDecoration _imageDecoration = BoxDecoration(
+    border: Border.all(
+      width: 1,
+      color: Colors.black,
+      style: BorderStyle.solid,
+    ),
+    borderRadius: BorderRadius.circular(12),
+  );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Image to PDF"),
+        title: Text(""),
         actions: [
           IconButton(
             icon: Icon(Icons.picture_as_pdf),
@@ -31,31 +39,93 @@ class _MultipleImageState extends State<MultipleImage> {
           )
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: pickImages,
-      ),
-      body: _image.isNotEmpty
-          ? ListView.builder(
-        itemCount: _image.length,
-        itemBuilder: (context, index) => Container(
-          height: 400,
-          width: double.infinity,
-          margin: EdgeInsets.all(8),
-          child: Image.file(
-            _image[index],
-            fit: BoxFit.cover,
-          ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16),
+            InkWell(
+              onTap: pickImages,
+              child: Container(
+                alignment: Alignment.center,
+                width: 200.0,
+                height: 200.0,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    width: 1,
+                    color: Colors.black,
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text(
+                    "  Cliquer  ici ",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20.0,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            Expanded(
+              child: _image.isNotEmpty
+                  ? GridView.builder(
+                gridDelegate:
+                SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                ),
+                itemCount: _image.length,
+                itemBuilder: (context, index) => Stack(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.all(4),
+                      decoration: _imageDecoration,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(
+                          _image[index],
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: GestureDetector(
+                        onTap: () {
+                          removeImage(index);
+                        },
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+                  : Center(
+                child: Text("No images selected"),
+              ),
+            ),
+          ],
         ),
-      )
-          : Center(
-        child: Text("No images selected"),
       ),
     );
   }
 
   Future<void> pickImages() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile =
+    await picker.pickImage(source: ImageSource.gallery);
     setState(() {
       if (pickedFile != null) {
         _image.add(File(pickedFile.path));
@@ -65,8 +135,14 @@ class _MultipleImageState extends State<MultipleImage> {
     });
   }
 
+  void removeImage(int index) {
+    setState(() {
+      _image.removeAt(index);
+    });
+  }
+
   Future<void> createPdfFile() async {
-    final pdf = pw.Document(); // Initialize PDF document
+    final pdf = pw.Document();
 
     for (var img in _image) {
       final image = pw.MemoryImage(img.readAsBytesSync());
@@ -84,10 +160,8 @@ class _MultipleImageState extends State<MultipleImage> {
       final saveFile = File('${dir?.path}/$fileName');
       await saveFile.writeAsBytes(await pdf.save());
 
-      // Open the downloaded PDF file
       await openDownloadedFile(saveFile);
 
-      // Navigate to SavingPage after saving the PDF
       Navigator.push(
         context,
         MaterialPageRoute(

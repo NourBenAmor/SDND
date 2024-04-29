@@ -22,11 +22,10 @@ class _CameraPageState extends State<CameraPage> {
   @override
   void initState() {
     super.initState();
-    _cameraFuture = _initializeCameraAndDetectEdge(); // Initialise la caméra et détecte les contours automatiquement
+    _cameraFuture = _initializeCameraAndDetectEdge();
   }
 
   Future<void> _initializeCameraAndDetectEdge() async {
-    // Initialisation de la caméra
     final cameras = await availableCameras();
     final camera = cameras.first;
 
@@ -37,7 +36,6 @@ class _CameraPageState extends State<CameraPage> {
 
     await _cameraController.initialize();
 
-    // Détecte les contours directement après l'initialisation de la caméra
     await _captureAndDetectEdge();
   }
 
@@ -48,7 +46,6 @@ class _CameraPageState extends State<CameraPage> {
 
     try {
       final XFile capturedImage = await _cameraController.takePicture();
-      // Appel de la détection des contours
       bool success = await EdgeDetection.detectEdge(
         capturedImage.path,
         canUseGallery: true,
@@ -59,6 +56,9 @@ class _CameraPageState extends State<CameraPage> {
       );
 
       if (success) {
+        setState(() {
+          _imagePath = capturedImage.path;
+        });
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -66,8 +66,6 @@ class _CameraPageState extends State<CameraPage> {
           ),
         );
       }
-
-
     } catch (e) {
       print('Erreur lors de la capture de l\'image: $e');
     }
@@ -87,15 +85,14 @@ class _CameraPageState extends State<CameraPage> {
         future: _cameraFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return Visibility(
-              visible: _imagePath != null,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Image.file(
-                  File(_imagePath ?? ''),
-                ),
+            return _imagePath != null
+                ? Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.file(
+                File(_imagePath!),
               ),
-            );
+            )
+                : CameraPreview(_cameraController);
           } else {
             return const Center(
               child: CircularProgressIndicator(),
