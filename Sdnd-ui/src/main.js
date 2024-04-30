@@ -11,7 +11,6 @@ import ArgonDashboard from "./argon-dashboard";
 import PrimeVue from "primevue/config";
 //in main.js
 import "primevue/resources/themes/aura-light-indigo/theme.css";
-
 const appInstance = createApp(App);
 appInstance.use(Vue3Toasity, {
   autoClose: 3000,

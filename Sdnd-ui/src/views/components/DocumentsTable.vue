@@ -14,7 +14,6 @@
           </button>
         </div>
       </div>
-
       <div class="card-body px-0 pt-0 pb-2">
         <div class="table-responsive p-0">
           <table class="table align-items-center mb-0">
@@ -149,6 +148,7 @@
     <ConfirmationModalVue :show="showDeleteModal" message="Are you sure you want to delete this document ?"
       @confirm="handleDeleteConfirm" @cancel="hideAllModals" />
   </div>
+  <SignaturePdf />
   <nav aria-label="Page navigation example" class="d-flex justify-content-center">
     <ul class="pagination mt-3">
       <li class="page-item" :class="{ disabled: currentPage === 1 }">
@@ -203,7 +203,7 @@ import { toast } from "vue3-toastify";
 import BaseApiService from "../../services/apiService";
 import AddDocument from "./AddDocument.vue";
 import ConfirmationModalVue from "./ConfirmationModal.vue";
-import Document from "./DocumentViewer/Document.vue";
+import Document from "./DocumentDetails/Document.vue";
 const IsLoading = ref(false);
 const documents = ref([]);
 const filterText = ref("");

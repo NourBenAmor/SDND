@@ -30,7 +30,7 @@
         </button>
         <button @click="addAnnotation" class="btn btn-link text-secondary px-1 mb-0 mx-2">
           <i class="fas fa-pen text-primary me-1" aria-hidden="true"></i>
-          <a style="text-decoration: none; color: inherit" target="_blank">Add Annotations</a>
+          <a style="text-decoration: none; color: inherit" arget="_blank">Add Annotations</a>
         </button>
       </div>
     </div>
@@ -44,6 +44,7 @@
             <span class="sr-only m-0 p-0">Loading...</span>
           </div>
         </VuePDF>
+        <!-- <Signaturepdf /> -->
       </div>
     </div>
 
@@ -88,6 +89,7 @@
 </template>
 
 <script setup>
+// import Signaturepdf from "./Signaturepdf.vue";
 import { ref, computed } from "vue";
 import BaseApiService from "../../../services/apiService";
 import { useStore } from "vuex";
@@ -151,6 +153,13 @@ const fitParent = ref(false);
 // const showSignatureToolbar = () => {
 //   SignatureToolbar.value = !SignatureToolbar.value;
 // }; -->
+const addAnnotation = () => {
+  // Encode the URL to ensure proper handling of special characters
+  const encodedUrl = encodeURIComponent(src.value);
+  console.log(encodedUrl);
+  window.location.href = `http://127.0.0.1:5500/web/viewer.html?file=${encodedUrl}`;
+};
+
 const downloadDocument = async () => {
   try {
     const response = await BaseApiService("Document/Download").get(
@@ -200,8 +209,10 @@ const downloadDocument = async () => {
 }
 
 .tool-bar {
-  background: #474747;
-  color: #fff;
+  background: #f9f9fb;
+  backdrop-filter: 1px;
+  box-shadow: 1 1 0 #d4d4d7;
+  color: #585858;
   padding: 1rem;
   width: 100%;
   height: 60px;
@@ -231,7 +242,7 @@ const downloadDocument = async () => {
 }
 
 .file-container {
-  background: #00000041;
+  background: #d4d4d7;
   color: #fff;
   width: 100%;
   display: flex;
@@ -243,10 +254,12 @@ const downloadDocument = async () => {
 }
 
 .file-container::-webkit-scrollbar {
-  background-color: #0000001a;
+  background-color: #f9f9fa;
 }
 
 .file-container::-webkit-scrollbar-thumb {
-  background-color: #474747;
+  background-color: #d4d4d498;
+  border-left: 1px solid #f9f9fa;
+  border-right: 1px solid #f9f9fa;
 }
 </style>

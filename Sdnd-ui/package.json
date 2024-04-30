@@ -32,6 +32,7 @@
     "jquery": "^3.7.1",
     "lichen-annotate-pdf": "^2.0.35",
     "lodash": "^4.17.21",
+    "pdf-annotate-sdnd": "^0.1.8",
     "pdf-annotate-vue": "^1.0.2",
     "pdfjs-dist": "^2.16.105",
     "pdfjs-viewer-element": "^2.6.3",

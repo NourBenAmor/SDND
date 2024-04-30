@@ -65,7 +65,6 @@ public class DocumentController : ControllerBase
         
         return Ok(documents);
     }
-    
     [HttpGet("{id}")]
     public async Task<ActionResult<OneDocumentResponseDto>> GetDocumentById(Guid id)
     {

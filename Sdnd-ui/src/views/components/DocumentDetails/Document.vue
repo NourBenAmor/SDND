@@ -79,7 +79,7 @@
             </div>
           </div>
         </form>
-      </div>fg
+      </div>
       <div v-if="activeitem == 1">
         <DocumentEdit :document-id="documentId" docuemnt-states:documentStates />
       </div>
@@ -93,24 +93,11 @@
           </template>
         </Timeline>
       </div>
-      <div v-if="activeitem === 4">
-        <div class="m-5">
-          <h2>Shared With Me</h2>
-          <form @submit.prevent="shareDocument" class="share-form">
-            <div class="form-group">
-              <label for="username">Username to share with:</label>
-              <!-- Autocomplete input -->
-              <input type="text" class="form-control smaller-input" v-model="sharedUsername" @input="filterUsernames">
-              <!-- Autocomplete dropdown -->
-              <div v-if="isFetched && filteredUsernames.length" class="autocomplete-dropdown">
-                <div v-for="(username, index) in filteredUsernames" :key="index" @click="selectUsername(username)">
-                  {{ username }}
-                </div>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Share Document</button>
-          </form>
-        </div>
+      <div class="comment-section mx-5" v-if="activeitem === 3">
+        <CommentsComponent />
+      </div>
+      <div class="m-5" v-if="activeitem === 4">
+        <CollaborationWindow />
       </div>
     </SplitterPanel>
     <SplitterPanel class="flex align-items-center justify-content-center ">
@@ -124,7 +111,8 @@
 //import VuePdfjs from './VuePdfjs.vue';
 import FileView from './FileView.vue';
 //import PdfViewer from "./PdfViewer.vue";
-
+import CollaborationWindow from './CollaborationWindow.vue';
+import CommentsComponent from './CommentsComponent.vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
@@ -139,7 +127,7 @@ import TabMenu from "primevue/tabmenu";
 import BaseApiService from "../../../services/apiService";
 import { onMounted } from "vue";
 import { useStore } from "vuex";
-import { toast } from "vue3-toastify";
+;
 
 //const router = useRouter();
 //const route = useRoute();
@@ -170,10 +158,8 @@ const events = ref([
 const store = useStore();
 const documentId = computed(() => store.state.documentId);
 const isFetched = ref("false");
-const sharedUsername = ref('');
-const shareResult = ref('');
-const usernames = ref([]);
-const filteredUsernames = ref([]);
+
+
 const activePdf = ref(0);
 const pdfSources = ref([]);
 const DocumentDetails = ref(null);
@@ -200,16 +186,7 @@ const getDocumentStateString = (documentState) => {
       return "Archived";
   }
 };
-const filterUsernames = () => {
-  filteredUsernames.value = usernames.value.filter(username => {
-    return username.toLowerCase().includes(sharedUsername.value.toLowerCase());
-  });
-};
 
-const selectUsername = username => {
-  sharedUsername.value = username;
-  filteredUsernames.value = [];
-};
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleDateString();
@@ -229,32 +206,8 @@ const fetchDocumentDetails = async (id) => {
     console.error("Error fetching document:", error);
   }
 };
-const fetchUsernames = async () => {
-  try {
-    const response = await BaseApiService(`Account/usernames`).list();
-    console.log(response.data);
-    usernames.value = response.data;
-    isFetched.value = true;
-  } catch (error) {
-    console.error('Error fetching usernames:', error);
-  }
-};
-const shareDocument = async () => {
-  try {
-    const newDoc = { documentId: documentId.value, username: sharedUsername.value };
-    const response = await BaseApiService('Document/Share').create(newDoc);
-    shareResult.value = response.data;
 
-    // Use the toast object to show a success message
-    toast.success("Document Shared Successfully !", {
-      duration: 1000, // Auto-close duration in milliseconds
-      position: "bottom-right", // Position of the toast message
-    });
-  } catch (error) {
-    shareResult.value = 'Error sharing document';
-    console.error('Error sharing document:', error);
-  }
-};
+
 const activeitem = ref(0);
 const items = ref([
   {
@@ -272,21 +225,21 @@ const items = ref([
     },
   },
   {
-    label: "Version History",
+    label: "History",
     icon: "fas fa-history",
     command: () => {
       activeitem.value = 2;
     },
   },
   {
-    label: "Discussions",
+    label: "comments",
     icon: "fa-solid fa-comments",
     command: () => {
       activeitem.value = 3;
     },
   },
   {
-    label: "Shared With",
+    label: "Collaboration",
     icon: "fa-solid fa-user-group",
     command: () => {
       activeitem.value = 4;
@@ -319,6 +272,10 @@ const editFile = (file) => {
   console.log('Editing file:', file);
 };
 
+
+
+
+//const isDocumentAuthor = ref(true);
 const viewFile = (file) => {
   // Implement file viewing logic here
   activePdf.value = pdfSources.value.indexOf(file.id);
@@ -331,10 +288,26 @@ watch(pdfSources, async (NewVal, OldVal) => {
 watch(activePdf, async (NewVal, OldVal) => {
   console.log("selectedPdf changed from ", OldVal, 'to', NewVal);
 });
-onMounted(fetchUsernames);
+
+
+// const revokeAccess = async (userId) => {
+//   try {
+//     await axios.post('/api/revoke-access', {
+//       userId,
+//       documentId: currentDocument.id,
+//     });
+
+//     // After the API call is successful, remove the user from the local sharedUsers array
+//     sharedUsers.value = sharedUsers.value.filter(user => user.id !== userId);
+//   } catch (error) {
+//     console.error('Error revoking access:', error);
+//   }
+// };
+// toggleDropdown(userId) {
+//   this.dropdownUserId = this.dropdownUserId === userId ? null : userId;
+// }
 
 </script>
-
 <style lang="scss" scoped>
 .details {
   max-width: 400px;
@@ -431,32 +404,50 @@ onMounted(fetchUsernames);
   font-size: 14px;
 }
 
-.autocomplete-dropdown {
-  position: absolute;
-  background-color: white;
-  border: 1px solid #ccc;
-  max-height: 150px;
-  overflow-y: auto;
-}
 
-.autocomplete-dropdown div {
-  padding: 5px;
-  cursor: pointer;
-}
 
-.smaller-input {
-  width: 300px;
-}
+
 
 .splitter::-webkit-scrollbar {
-  background-color: #f3f3f3;
+  background-color: #f9f9fa;
 }
 
 .splitter::-webkit-scrollbar-thumb {
-  background-color: #dbdbdbce;
+  background-color: #d4d4d498;
+  border-left: 1px solid #f9f9fa;
+  border-right: 1px solid #f9f9fa;
 }
 
 .splitter {
   margin-right: 5px;
+}
+
+
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.form-group label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.comment-section,
+.share-section {
+  background-color: #f3f6f8;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
 }
 </style>

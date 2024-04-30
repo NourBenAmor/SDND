@@ -74,6 +74,7 @@ public class FileController : ControllerBase
             FileSize = file.Length,
             DocumentId = documentId
         };
+        
         var result = await _fileService.UploadFile(newDocFile, file);
         if (result == "file not selected" || result == "file Already Exists")
             return BadRequest("File Not Uploaded");
