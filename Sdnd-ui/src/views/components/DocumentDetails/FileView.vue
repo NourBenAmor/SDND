@@ -24,10 +24,6 @@
         <button @click="downloadDocument" class="btn btn-link text-secondary px-1 mb-0 mx-2">
           <i class="fas fa-download text-primary me-1" aria-hidden="true"></i>Download
         </button>
-        <button type="button" class="btn btn-link text-secondary px-1 mb-0 mx-2" data-bs-toggle="modal"
-          data-bs-target="#exampleModalMessage">
-          <i class="fas fa-share text-primary me-1" aria-hidden="true"></i>Share
-        </button>
         <button @click="addAnnotation" class="btn btn-link text-secondary px-1 mb-0 mx-2">
           <i class="fas fa-pen text-primary me-1" aria-hidden="true"></i>
           <a style="text-decoration: none; color: inherit" arget="_blank">Add Annotations</a>
@@ -48,8 +44,8 @@
       </div>
     </div>
 
-
-    <div class="modal fade dark" id="exampleModalMessage" tabindex="-1" role="dialog"
+    <!-- share a document modal -->
+    <!-- <div class="modal fade dark" id="exampleModalMessage" tabindex="-1" role="dialog"
       aria-labelledby="exampleModalMessageTitle" aria-hidden="true" data-bs-backdrop="false">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -84,19 +80,18 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </main>
 </template>
 
 <script setup>
 // import Signaturepdf from "./Signaturepdf.vue";
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import BaseApiService from "../../../services/apiService";
 import { useStore } from "vuex";
 import { VuePDF, usePDF } from "@tato30/vue-pdf";
 // const showModal = ref(false);
 const store = useStore();
-const username = ref("");
 const props = defineProps({
   pdfSources: Array,
   selected: Number
@@ -107,7 +102,25 @@ const src = ref('');
 const { pdf, pages } = usePDF(src);
 
 import { watch } from 'vue';
+onMounted(() => {
+  console.log('fichier', props.selected);
+  if (props.pdfSources && props.pdfSources.length > 0) {
+    const selectedSource = props.pdfSources[props.selected];
+    if (selectedSource) {
+      src.value = `https://localhost:7278/api/document/pdf/${selectedSource}`;
+      console.log(src.value);
 
+    }
+    else {
+      // Handle the case when props.selected is an invalid index
+      console.log('Invalid index:', props.selected);
+    }
+  }
+  else {
+    // Handle the case when props.pdfSources is an empty array
+    console.log('No PDF sources provided');
+  }
+});
 watch(() => props.selected, (newValue) => {
   console.log('fichier', newValue);
   if (props.pdfSources && props.pdfSources.length > 0) {

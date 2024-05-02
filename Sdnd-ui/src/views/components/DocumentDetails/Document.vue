@@ -1,9 +1,8 @@
 <template>
-  <Splitter style="height: 90vh; " class="m-0">
-    <SplitterPanel class="flex align-items-center justify-content-center overflow-auto  splitter">
+  <Splitter style="height: 90vh" class="m-0">
+    <SplitterPanel class="flex align-items-center justify-content-center overflow-auto splitter">
       <div class="d-flex justify-content-between">
-        <TabMenu :model="items">
-        </TabMenu>
+        <TabMenu :model="items"> </TabMenu>
       </div>
       <div v-if="activeitem == 0">
         <div class="m-5" v-if="!isFetched">
@@ -20,7 +19,9 @@
           </div>
           <div class="row">
             <div class="col-12 col-sm-2">Description</div>
-            <div class="col-12 col-sm-10">{{ DocumentDetails?.description }}</div>
+            <div class="col-12 col-sm-10">
+              {{ DocumentDetails?.description }}
+            </div>
           </div>
           <div class="row">
             <div class="col-12 col-sm-2">State</div>
@@ -48,10 +49,9 @@
           </div>
           <div class="row">
             <div v-if="DocumentDetails?.files.length > 0" class="document-files-container card">
-
-              <DataTable :value="DocumentDetails?.files">
+              <DataTable v-model:selection="selectedPdf" selection-mode="single" :value="DocumentDetails?.files">
                 <template #header>
-                  <div class="d-flex  align-items-center  justify-content-between">
+                  <div class="d-flex align-items-center justify-content-between">
                     <h6 class="text-xl font-bold p-0 m-0">Document Files</h6>
                     <Button icon="fas fa-plus" label="Add New File" severity="success" @click="fileInput.click()" />
                     <input type="file" ref="fileInput" class="d-none" @change="handleFileUpload" />
@@ -100,8 +100,7 @@
         <CollaborationWindow />
       </div>
     </SplitterPanel>
-    <SplitterPanel class="flex align-items-center justify-content-center ">
-
+    <SplitterPanel v-if="selectedPdf" class="flex align-items-center justify-content-center" style="width: 70%;">
       <FileView :selected="activePdf || 0" :pdfSources="pdfSources" />
     </SplitterPanel>
   </Splitter>
@@ -109,13 +108,13 @@
 
 <script setup>
 //import VuePdfjs from './VuePdfjs.vue';
-import FileView from './FileView.vue';
+import FileView from "./FileView.vue";
 //import PdfViewer from "./PdfViewer.vue";
-import CollaborationWindow from './CollaborationWindow.vue';
-import CommentsComponent from './CommentsComponent.vue';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Button from 'primevue/button';
+import CollaborationWindow from "./CollaborationWindow.vue";
+import CommentsComponent from "./CommentsComponent.vue";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import Button from "primevue/button";
 import Timeline from "primevue/timeline";
 import DocumentEdit from "../DocumentEdit.vue";
 import Skeleton from "primevue/skeleton";
@@ -127,8 +126,6 @@ import TabMenu from "primevue/tabmenu";
 import BaseApiService from "../../../services/apiService";
 import { onMounted } from "vue";
 import { useStore } from "vuex";
-;
-
 //const router = useRouter();
 //const route = useRoute();
 
@@ -154,24 +151,29 @@ const events = ref([
     color: "#607D8B",
   },
 ]);
+
 //const src = ref("https://localhost:7278/api/document/pdf/49c621f7-9749-46df-b419-aae1d45ce60c");
 const store = useStore();
 const documentId = computed(() => store.state.documentId);
 const isFetched = ref("false");
-
-
-const activePdf = ref(0);
+const selectedPdf = ref(null);
+const activePdf = ref(null);
 const pdfSources = ref([]);
 const DocumentDetails = ref(null);
 // const props = defineProps({
 //     documentId: String // Enforce string type for clarity and potential validation
 // });
+watch(() => selectedPdf.value, (newValue) => {
+  activePdf.value = pdfSources.value.indexOf(newValue.id);
+  console.log("selectedPdf changed to", newValue);
+});
 onMounted(async () => {
   isFetched.value = false;
   await fetchDocumentDetails(documentId.value);
   if (DocumentDetails.value.files.length > 0) {
-    pdfSources.value = DocumentDetails.value.files.map(file => file.id);
+    pdfSources.value = DocumentDetails.value.files.map((file) => file.id);
     console.log(pdfSources.value);
+    activePdf.value = pdfSources.value.indexOf(DocumentDetails.value.files[0].id);
   }
 });
 const getDocumentStateString = (documentState) => {
@@ -206,7 +208,6 @@ const fetchDocumentDetails = async (id) => {
     console.error("Error fetching document:", error);
   }
 };
-
 
 const activeitem = ref(0);
 const items = ref([
@@ -246,49 +247,45 @@ const items = ref([
     },
   },
 ]);
-const emit = defineEmits(['addfile-emit']);
+const emit = defineEmits(["addfile-emit"]);
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   console.log("file upload trigered", documentId.value, file.name);
-  emit('addfile-emit', documentId.value, file);
-  await new Promise(resolve => setTimeout(resolve, 100));
+  emit("addfile-emit", documentId.value, file);
+  await new Promise((resolve) => setTimeout(resolve, 100));
   await fetchDocumentDetails(documentId.value);
 };
 
 const FileColumns = [
-  { field: 'name', header: 'Name' },
-  { field: 'formattedFileSize', header: 'Size' },
-  { field: 'filePath', header: 'Path' },
-  { field: 'actions', header: 'Actions' }
+  { field: "name", header: "Name" },
+  { field: "formattedFileSize", header: "Size" },
+  { field: "filePath", header: "Path" },
+  { field: "actions", header: "Actions" },
 ];
 
 const deleteFile = (file) => {
   // Implement file deletion logic here
-  console.log('Deleting file:', file);
+  console.log("Deleting file:", file);
 };
 
 const editFile = (file) => {
   // Implement file editing logic here
-  console.log('Editing file:', file);
+  console.log("Editing file:", file);
 };
-
-
-
 
 //const isDocumentAuthor = ref(true);
 const viewFile = (file) => {
   // Implement file viewing logic here
   activePdf.value = pdfSources.value.indexOf(file.id);
-  console.log('newactiveval', activePdf.value);
-  console.log('Viewing file:', file);
+  console.log("newactiveval", activePdf.value);
+  console.log("Viewing file:", file);
 };
 watch(pdfSources, async (NewVal, OldVal) => {
-  console.log("pdfSources changed from ", OldVal, 'to', NewVal);
+  console.log("pdfSources changed from ", OldVal, "to", NewVal);
 });
 watch(activePdf, async (NewVal, OldVal) => {
-  console.log("selectedPdf changed from ", OldVal, 'to', NewVal);
+  console.log("selectedPdf changed from ", OldVal, "to", NewVal);
 });
-
 
 // const revokeAccess = async (userId) => {
 //   try {
@@ -306,7 +303,6 @@ watch(activePdf, async (NewVal, OldVal) => {
 // toggleDropdown(userId) {
 //   this.dropdownUserId = this.dropdownUserId === userId ? null : userId;
 // }
-
 </script>
 <style lang="scss" scoped>
 .details {
@@ -315,8 +311,6 @@ watch(activePdf, async (NewVal, OldVal) => {
   background-color: #f5f5f5;
   border-radius: 10px;
 }
-
-
 
 @media (max-width: 768px) {
   .row {
@@ -329,8 +323,6 @@ watch(activePdf, async (NewVal, OldVal) => {
     /* Allow details to take up to 50% width */
   }
 }
-
-
 
 .row {
   margin-bottom: 1.5rem;
@@ -358,9 +350,6 @@ watch(activePdf, async (NewVal, OldVal) => {
   border-radius: 50%;
   margin-right: 1rem;
 }
-
-
-
 
 .document-files-container {
   border: 1px solid #ddd;
@@ -404,10 +393,6 @@ watch(activePdf, async (NewVal, OldVal) => {
   font-size: 14px;
 }
 
-
-
-
-
 .splitter::-webkit-scrollbar {
   background-color: #f9f9fa;
 }
@@ -421,8 +406,6 @@ watch(activePdf, async (NewVal, OldVal) => {
 .splitter {
   margin-right: 5px;
 }
-
-
 
 .form-group {
   display: flex;
