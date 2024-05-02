@@ -2,8 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Dashboard from "../views/Dashboard.vue";
 import Tables from "../views/Tables.vue";
 import Profile from "../views/Profile.vue";
-import Signup from "../views/Signup.vue";
-import Signin from "../views/Signin.vue";
+import signin from "../views/Signin.vue";
 import AddDocument from "../views/components/AddDocument.vue";
 import Permissions from "../views/components/Permissions.vue";
 import SharedDocuments from "../views/components/SharedDocuments.vue";
@@ -34,12 +33,7 @@ const routes = [
   {
     path: "/signin",
     name: "Signin",
-    component: Signin,
-  },
-  {
-    path: "/signup",
-    name: "Signup",
-    component: Signup,
+    component: signin,
   },
   {
     path: "/users",
@@ -66,7 +60,7 @@ const router = createRouter({
   linkActiveClass: "active",
 });
 router.beforeEach((to, from, next) => {
-  const publicPages = ["/signin", "/signup"];
+  const publicPages = ["/signin"];
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem("user");
 
