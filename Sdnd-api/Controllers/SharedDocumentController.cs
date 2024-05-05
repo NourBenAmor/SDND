@@ -32,12 +32,10 @@ public class ShareController : ControllerBase
         {
             return NotFound("Document not found.");
         }
-        
         IEnumerable<SharedDocument> sharedDocuments = _context.SharedDocuments
-            .Where(d => d.DocumentId == documentId);
-
+            .Where(d => d.DocumentId == documentId).Include(sharedDocument => sharedDocument.Permissions);
         List<SharedUserDto> sharedUsers = new List<SharedUserDto>();
-        foreach (var sharedDocument in sharedDocuments )
+        foreach (var sharedDocument in sharedDocuments)
         {
             var user = await _userManager.FindByIdAsync(sharedDocument.SharedWithUserId.ToString());
             sharedUsers.Add(new SharedUserDto
@@ -45,7 +43,9 @@ public class ShareController : ControllerBase
                 Id = user.Id,
                 Username = user.UserName,
                 Email = user.Email,
-                ProfilePictureUrl = user.ProfilePictureUrl
+                ProfilePictureUrl = user.ProfilePictureUrl,
+                Permissions = sharedDocument.Permissions.Select(p => p.Id).ToList(),
+                Tasks = await _context.DocTasks.Where(t => t.SharedDocumentId == documentId && t.AssignedUserId == user.Id).ToListAsync()
             });
         }
 
@@ -60,7 +60,7 @@ public class ShareController : ControllerBase
         var userToShareTo = await _userManager.FindByNameAsync(userName: sharedDoc.username);
         var currentUser =   _userAccessor.GetCurrentUser();
         if (currentUser == null)
-            return BadRequest("Login First");
+            return Unauthorized("Login First");
         var document = await _context.Documents.FindAsync(sharedDoc.documentId);
         if (userToShareTo == null || currentUser.Id == userToShareTo.Id )
             return NotFound("Invalid username");
@@ -68,20 +68,43 @@ public class ShareController : ControllerBase
             return NotFound("Document not found.");
         if (document.OwnerId != currentUser.Id)
             return Unauthorized("You are not authorized to make this operation");
+        var sharedDocumentExists = await _context.SharedDocuments
+            .AnyAsync(d => d.DocumentId == sharedDoc.documentId && d.SharedWithUserId == userToShareTo.Id);
+        if (sharedDocumentExists)
+            return BadRequest("Document already shared with this user");
+        
+        // Retrieve the permissions from the database
+        var permissions = await  _context.SharingPermissions
+            .Where(p => sharedDoc.permissionIds.Any(id => id == p.Id))
+            .ToListAsync();
+        // Create a new Task
+        DocTask docTask = null;
+        if (sharedDoc.TaskDescription != "")
+        {
+            docTask = new DocTask
+            {
+                Description = sharedDoc.TaskDescription,
+                State = TaskState.Pending,
+                SharedDocumentId = sharedDoc.documentId,
+                AssignedUserId = userToShareTo.Id
+            };  
+        }
         SharedDocument sharedDocument = new SharedDocument
         {
             DocumentId = document.Id,
-            SharedWithUserId = userToShareTo.Id
+            SharedWithUserId = userToShareTo.Id,
+            Permissions = permissions
         };
         try
         {
             await _context.SharedDocuments.AddAsync(sharedDocument);
+            if (docTask != null) await _context.DocTasks.AddAsync(docTask);
             await _context.SaveChangesAsync();
             return Ok("Success");
         }
-        catch (Exception e)
+        catch (System.Exception e)
         {
-            return BadRequest(e.ToString());
+            return BadRequest(e);
         }
         
         
@@ -92,19 +115,27 @@ public class ShareController : ControllerBase
     public async Task<IActionResult> GetSharedDocument()
     {
         var currentUser = _userAccessor.GetCurrentUser();
+        if (currentUser == null)
+            return Unauthorized("Login First");
         IEnumerable<SharedDocument> sharedDocuments = await _context.SharedDocuments
-            .Where(d => d.SharedWithUserId == currentUser.Id)
+            .Where(d => d.SharedWithUserId == currentUser.Id).Include(sharedDocument => sharedDocument.Permissions)
             .ToListAsync();
 
-        List<Document> documents = new List<Document>();
+        List<SharedDocumentDto> documents = new List<SharedDocumentDto>();
         foreach (var sharedDocument in sharedDocuments)
         {
             var document = await _context.Documents.FirstOrDefaultAsync(x => x.Id == sharedDocument.DocumentId);
-            documents.Add(document);
+            var owner = await _userManager.FindByIdAsync(document.OwnerId.ToString());
+            documents.Add(new SharedDocumentDto
+            {
+                Name = document.Name,
+                Description = document.Description,
+                OwnerUsername = owner.UserName,
+                OwnerEmail = owner.Email,
+                OwnerProfilePictureUrl = owner.ProfilePictureUrl,
+                Permissions = sharedDocument.Permissions.Select(p => p.Id).ToList()
+            });
         }
-
         return Ok(documents);
     }
-
-
 }

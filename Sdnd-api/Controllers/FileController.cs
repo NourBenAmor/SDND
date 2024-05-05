@@ -41,7 +41,7 @@ public class FileController : ControllerBase
         return Ok(docFiles);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetDocFileById(Guid id)
     {
         if (string.IsNullOrEmpty(id.ToString()))

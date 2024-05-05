@@ -4,5 +4,6 @@ public class SharedDocRequestDto
 {
     public Guid documentId { get; set; }
     public string username { get; set; }
-    public string message { get; set; } = string.Empty;
+    public string TaskDescription { get; set; }= "";
+    public List<int> permissionIds { get; set; }
 }

@@ -17,6 +17,10 @@ namespace Sdnd_api.Data
         public virtual DbSet<Annotation> Annotations { get; set; }
         public virtual DbSet<SharedDocument> SharedDocuments { get; set; }
         public virtual DbSet<DocFile> DocFiles { get; set; }
+        
+        public virtual DbSet<SharingPermission> SharingPermissions { get; set; }
+        public virtual DbSet<Comment> Comments { get; set; }
+        public virtual DbSet<DocTask> DocTasks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -53,6 +57,14 @@ namespace Sdnd_api.Data
                     .WithOne()
                     .HasForeignKey(e => e.userId)
                     .OnDelete(DeleteBehavior.NoAction);
+                entity.HasMany<Comment>()
+                    .WithOne()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.NoAction);
+                entity.HasMany<DocTask>()
+                    .WithOne()
+                    .HasForeignKey(e => e.AssignedUserId)
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             builder.Entity<Document>(entity =>
@@ -70,11 +82,52 @@ namespace Sdnd_api.Data
                     .WithOne()
                     .HasForeignKey(e => e.DocumentId)
                     .OnDelete(DeleteBehavior.NoAction);
+                entity.HasMany<Comment>()
+                    .WithOne()
+                    .HasForeignKey(e => e.DocumentId)
+                    .OnDelete(DeleteBehavior.NoAction);
+                entity.HasMany<DocTask>()
+                    .WithOne()
+                    .HasForeignKey(e => e.SharedDocumentId)
+                    .OnDelete(DeleteBehavior.NoAction);
             });
+            // Create password hasher
+            var hasher = new PasswordHasher<User>();
 
-            
-          
+            // Create default user
+            var defaultUser = new User
+            {
+                Id = Guid.NewGuid(),
+                UserName = "admin",
+                NormalizedUserName = "ADMIN",
+                Email = "admin@example.com",
+                NormalizedEmail = "ADMIN@EXAMPLE.COM",
+                EmailConfirmed = true,
+                SecurityStamp = string.Empty,
+            };
 
+            // Hash the password and assign it to the user
+            defaultUser.PasswordHash = hasher.HashPassword(defaultUser, "Admin123!");
+
+            // Add the user to the Users table
+            builder.Entity<User>().HasData(defaultUser);
+
+            // Assign the admin role to the user
+            builder.Entity<IdentityUserRole<Guid>>().HasData(new IdentityUserRole<Guid>
+            {
+                RoleId = new Guid("f1f57e4f-616c-4422-8b83-5b6f5ca2915a"), // Admin role ID
+                UserId = defaultUser.Id
+            });
+            List<SharingPermission> SharingPermissions = new List<SharingPermission>
+            {
+                new SharingPermission(){Id = 1, Name = "view"},
+               new SharingPermission(){Id = 2, Name = "edit"},
+               new SharingPermission(){ Id = 3, Name = "share"},
+            };
+            builder.Entity<SharingPermission>().HasData(SharingPermissions);
+            builder.Entity<SharedDocument>()
+                .HasMany(s => s.Permissions)
+                .WithMany();
+        }
         }
     }
-}
