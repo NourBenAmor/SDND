@@ -17,8 +17,7 @@
         </div>
         <div class="modal-footer">
           <a class="btn btn-link text-dark px-3 mb-0" @click="updateRole">
-            <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i
-            >Update
+            <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Update
           </a>
           <button type="button" class="btn btn-secondary" @click="closeModal">
             Cancel
@@ -32,9 +31,7 @@
   <div class="users-table-container">
     <div class="card">
       <!-- Table header -->
-      <div
-        class="card-header d-flex justify-content-between align-items-center"
-      >
+      <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0">Users Table</h6>
       </div>
 
@@ -44,30 +41,22 @@
           <table class="table align-items-center mb-0">
             <thead>
               <tr>
-                <th
-                  class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                >
+                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                   Username
                 </th>
-                <th
-                  class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                >
+                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                   Email
                 </th>
-                <th
-                  class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                >
+                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                   Role
                 </th>
-                <th
-                  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                >
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody v-if="users.length > 0">
-              <tr v-for="(user, index) in users" :key="index">
+              <tr v-for="(user, index) in users" :key="index" :class="{ 'shadow-row': user.id === loggedInUserId }">
                 <td>
                   <div class="d-flex px-2 py-1">
                     <div class="d-flex flex-column justify-content-center">
@@ -82,20 +71,15 @@
                   <p class="text-xs font-weight-bold mb-0">{{ user.role }}</p>
                 </td>
                 <td class="align-middle">
-                  <div class="ms-auto text-end">
-                    <a
-                      class="btn btn-link text-green px-3 mb-0"
-                      @click="openModal(user.id)"
-                    >
-                      <i class="fas fa-pencil-alt me-1"></i> Update Role
-                    </a>
-                    <a
-                      class="btn btn-link text-danger text-gradient px-3 mb-0"
-                      @click="removeRole(user.id, user.role)"
-                    >
-                      <i class="far fa-trash-alt me-2"></i> Remove Role
-                    </a>
-                  </div>
+                  <a class="btn btn-link text-green px-3 mb-0" :class="{ 'disabled': user.id === loggedInUserId }"
+                    @click="openModal(user.id)">
+                    <i class="fas fa-pencil-alt me-1"></i> Update Role
+                  </a>
+                  <a class="btn btn-link text-danger text-gradient px-3 mb-0"
+                    :class="{ 'disabled': user.id === loggedInUserId }" @click="removeRole(user.id, user.role)">
+                    <i class="far fa-trash-alt me-2"></i> Remove Role
+                  </a>
+
                 </td>
               </tr>
             </tbody>
@@ -121,6 +105,8 @@ const isModalActive = ref(false);
 const newRole = ref("");
 const selectedUserId = ref(null);
 const users = ref([]);
+const currentUser = ref(null);
+const loggedInUserId = ref(null);
 
 const isLoggedIn = ref(false);
 const userRole = ref("");
@@ -143,11 +129,24 @@ const fetchUsers = async () => {
     users.value = response.data;
     isLoggedIn.value = true;
     userRole.value = response.data.role;
+
   } catch (error) {
     console.error("Error fetching users:", error);
   }
 };
+const fetchCurrentUser = async () => {
+  try {
+    const response = await axios.get("https://localhost:7278/api/me", {
+      headers: authHeader(),
+    });
+    currentUser.value = response.data;
+    isLoggedIn.value = true;
+    loggedInUserId.value = response.data.id; // Assign roles array to userRoles
 
+  } catch (error) {
+    console.error("Error fetching current user:", error);
+  }
+};
 const updateRole = async () => {
   try {
     const userId = selectedUserId.value;
@@ -208,6 +207,7 @@ const removeRole = async (userId, role) => {
 
 onMounted(() => {
   fetchUsers();
+  fetchCurrentUser(); 
 });
 </script>
 
@@ -220,5 +220,9 @@ onMounted(() => {
 
 .modal.is-active .modal-content {
   opacity: 1;
+}
+
+.shadow-row {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0,5);
 }
 </style>

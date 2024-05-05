@@ -92,7 +92,7 @@ public class AdminController : ControllerBase
         return NoContent();
     }*/
     [HttpPut("removeRole/{id}")]
-    public async Task<IActionResult> RemoveRole(Guid id, [FromBody] string role)
+    public async Task<IActionResult> RemoveRole(Guid id)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
         if (user == null)
@@ -100,20 +100,23 @@ public class AdminController : ControllerBase
             return NotFound();
         }
 
-        var roles = await _userManager.GetRolesAsync(user);
-        if (!roles.Contains(role))
-        {
-            return BadRequest("User does not have the specified role.");
-        }
-
-        var result = await _userManager.RemoveFromRoleAsync(user, role);
+        var result = await _userManager.RemoveFromRoleAsync(user, "Admin");
         if (!result.Succeeded)
         {
             return BadRequest(result.Errors);
         }
 
+        var roles = await _userManager.GetRolesAsync(user);
+        if (roles.Count == 0)
+        {
+            var addUtilisateurRoleResult = await _userManager.AddToRoleAsync(user, "User");
+            if (!addUtilisateurRoleResult.Succeeded)
+            {
+                return BadRequest(addUtilisateurRoleResult.Errors);
+            }
+        }
+
         return NoContent();
     }
-
 
 }
