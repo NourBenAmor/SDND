@@ -38,57 +38,60 @@ class _SignupPageState extends State<SignupPage> {
             child: Column(
               children: [
                 Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
+
                   child: Column(
                     children: [
                       const PageHeading(title: 'Sign-up',),
                       const SizedBox(height: 16,),
-                      CustomInputField(
-                        labelText: 'Name',
-                        hintText: 'Your name',
-                        isDense: true,
-                        controller: _nameController,
-                        validator: (textValue) {
-                          if (textValue == null || textValue.isEmpty) {
-                            return 'Name field is required!';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16,),
-                      CustomInputField(
-                        labelText: 'Email',
-                        hintText: 'Your email id',
-                        isDense: true,
-                        controller: _emailController,
-                        validator: (textValue) {
-                          if (textValue == null || textValue.isEmpty) {
-                            return 'Email is required!';
-                          }
-                          if (!EmailValidator.validate(textValue)) {
-                            return 'Please enter a valid email';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16,),
-                      CustomInputField(
-                        labelText: 'Password',
-                        hintText: 'Your password',
-                        isDense: true,
-                        obscureText: true,
-                        controller: _passwordController,
-                        validator: (textValue) {
-                          if (textValue == null || textValue.isEmpty) {
-                            return 'Password is required!';
-                          }
-                          return null;
-                        },
-                        suffixIcon: true,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Column(
+                          children: [
+                            CustomInputField(
+                              labelText: 'Name',
+                              hintText: 'Your name',
+                              isDense: true,
+                              controller: _nameController,
+                              validator: (textValue) {
+                                if (textValue == null || textValue.isEmpty) {
+                                  return 'Name field is required!';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16,),
+                            CustomInputField(
+                              labelText: 'Email',
+                              hintText: 'Your email id',
+                              isDense: true,
+                              controller: _emailController,
+                              validator: (textValue) {
+                                if (textValue == null || textValue.isEmpty) {
+                                  return 'Email is required!';
+                                }
+                                if (!EmailValidator.validate(textValue)) {
+                                  return 'Please enter a valid email';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16,),
+                            CustomInputField(
+                              labelText: 'Password',
+                              hintText: 'Your password',
+                              isDense: true,
+                              obscureText: true,
+                              controller: _passwordController,
+                              validator: (textValue) {
+                                if (textValue == null || textValue.isEmpty) {
+                                  return 'Password is required!';
+                                }
+                                return null;
+                              },
+                              suffixIcon: true,
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 8,), // Add some spacing
                       Column(
@@ -154,7 +157,6 @@ class _SignupPageState extends State<SignupPage> {
       ),
     );
   }
-
   void _handleSignupUser() async {
     if (_signupFormKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(

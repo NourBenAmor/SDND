@@ -48,14 +48,13 @@ dependencies:
     git:
       url: https://github.com/yushulx/flutter_camera.git
   camera_windows:
-      git:
-        url: https://github.com/yushulx/flutter_camera_windows.git
+    git:
+      url: https://github.com/yushulx/flutter_camera_windows.git
   open_file: ^3.3.2
 
   url_launcher: ^6.2.5
   shared_preferences: ^2.2.2
   flutter_exif_rotation: ^0.5.1
-  share_plus: ^8.0.2
   pdf_render: ^1.4.6
   document_file_save_plus: ^2.0.0
   esys_flutter_share_plus: ^2.2.0
@@ -100,8 +99,8 @@ dev_dependencies:
   # rules and activating additional ones.
 
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
+  # For information on the generic Dart part of this file, see the
+  # following page: https://dart.dev/tools/pub/pubspec
 
   flutter_lints: '>=2.0.3 <4.0.0'
 

@@ -62,7 +62,7 @@ class _MultipleImageState extends State<MultipleImage> {
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Text(
-                    "  Cliquer  ici ",
+                    "  Click here ",
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 20.0,
