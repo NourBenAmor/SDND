@@ -160,6 +160,8 @@ class _LoginPageState extends State<LoginPage> {
                     }
                     return null; // Return null if the input is valid
                   },
+                  suffixIcon: true,
+
                 ),
                 const SizedBox(height: 20),
                 CustomFormButton(

@@ -28,7 +28,8 @@ class AirSafeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'airsafe',
+      debugShowCheckedModeBanner: false, // This line removes the debug banner
+      title: 'InnoScan',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

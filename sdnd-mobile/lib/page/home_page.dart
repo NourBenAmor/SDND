@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:airsafe/page/profile_page.dart';
 import 'package:airsafe/page/synchronisation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -12,7 +13,6 @@ import 'document_details.dart';
 import 'editing_page.dart';
 import 'file_list.dart';
 import 'multiple_image.dart';
-
 
 class Document {
   final String id;
@@ -174,6 +174,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _navigateToProfilePage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProfilePage(token: _token),
+      ),
+    );
+  }
+
   void _navigateToDocumentDetailsPage(
     BuildContext context,
     String documentId,
@@ -198,10 +207,11 @@ class _HomePageState extends State<HomePage> {
   void _navigateToCreateDocumentPage(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => CreateDocumentPage(createDocumentCallback: _createDocument)),
+      MaterialPageRoute(
+          builder: (context) =>
+              CreateDocumentPage(createDocumentCallback: _createDocument)),
     );
   }
-
 
   Future<void> _createDocument(String name, String description) async {
     if (name.isEmpty || description.isEmpty) {
@@ -345,18 +355,22 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-
   void _showFullDescriptionModal(BuildContext context, String description) {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      builder: (context) => SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            description,
-            style: TextStyle(fontSize: 18, color: Colors.black54),
-          ),
+      builder: (context) => AlertDialog(
+        title: Text('Full Description'),
+        content: SingleChildScrollView(
+          child: Text(description),
         ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Close'),
+          ),
+        ],
       ),
     );
   }
@@ -364,6 +378,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    FocusScope.of(context).unfocus();
     return Scaffold(
       appBar: AppBar(
         title: Text(''),
@@ -377,6 +392,12 @@ class _HomePageState extends State<HomePage> {
             },
             icon: Icon(Icons.settings),
           ),
+          IconButton(
+            onPressed: () {
+              _navigateToProfilePage(context);
+            },
+            icon: Icon(Icons.account_circle),
+          )
         ],
       ),
       body: Column(
@@ -434,7 +455,8 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     IconButton(
                       onPressed: () {
-                        _navigateToCreateDocumentPage(context); // Utilisez la nouvelle méthode
+                        _navigateToCreateDocumentPage(
+                            context); // Utilisez la nouvelle méthode
                       },
                       icon: Icon(Icons.create_new_folder),
                       tooltip: 'Create a new folder',
@@ -475,8 +497,7 @@ class _HomePageState extends State<HomePage> {
                           margin:
                               EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                                8),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           child: Container(
                             decoration: BoxDecoration(
