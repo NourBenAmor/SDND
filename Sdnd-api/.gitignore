@@ -13,7 +13,9 @@ BenchmarkDotNet.Artifacts/
 src/SignalR/clients/**/dist/
 modules/
 .ionide/
-
+Resource
+.vscode/
+Migrations/
 # File extensions
 *.aps
 *.binlog
