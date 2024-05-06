@@ -1,36 +1,36 @@
 <template>
     <div class="signature-container">
         <div class="button-container">
-            <button @click="save('image/jpeg')" class="action-button">
-                <i class="fas fa-save"></i> Save
+            <button @click="save()" class="action-button">
+                <i class="fas fa-save"></i>
             </button>
             <button @click="clear" class="action-button">
-                <i class="fas fa-eraser"></i> Clear
+                <i class="fas fa-eraser"></i>
             </button>
             <button @click="undo" class="action-button">
-                <i class="icon-undo"></i> Undo
+                <i class="fas fa-undo"></i>
             </button>
             <button @click="addWaterMark" class="action-button">
-                <i class="fas fa-stamp"></i> Add Watermark
+                <i class="fas fa-stamp"></i>
             </button>
             <button @click="fromDataURL" class="action-button">
-                <i class="fas fa-file-import"></i> From Data URL
+                <i class="fas fa-file-import"></i>
             </button>
             <button @click="handleDisabled" class="action-button">
-                <i class="fas fa-toggle-on"></i> Toggle Disabled
+                <i class="fas fa-toggle-on"></i>
             </button>
             <button @click="addText" class="action-button">
-                <i class="fas fa-font"></i> Add Text
+                <i class="fas fa-font"></i>
             </button>
         </div>
-        <Vue3Signature ref="signature1" :sigOption="state.option" :w="'1280px'" :h="'400px'" :disabled="state.disabled"
+        <Vue3Signature ref="signature1" :sigOption="state.option" :w="'100%'" :h="'100%'" :disabled="state.disabled"
             class="example"></Vue3Signature>
     </div>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-
+import { reactive, ref, defineProps } from 'vue';
+import BaseApiService from '../../../services/apiService';
 const state = reactive({
     count: 0,
     option: {
@@ -39,11 +39,26 @@ const state = reactive({
     },
     disabled: false
 })
-
+const props = defineProps(['source', 'page'])
 const signature1 = ref(null)
-
+const emit = defineEmits(['saveAnnotation']);
 const save = (t) => {
-    console.log(signature1.value.save(t))
+    let signImg = signature1.value.save(t).substring(22);
+    console.log(signImg);
+    console.log(props.source);
+    let fileId = props.source.substring(props.source.lastIndexOf('/') + 1);
+    console.log(fileId);
+    console.log(props.page)
+    const formData = new FormData();
+    formData.append("FileId", fileId);
+    formData.append("SignatureImg", signImg);
+    formData.append("PageNumber", props.page)
+    BaseApiService('annotation/NewVersion').create(formData).then((response) => {
+        console.log(response.data);
+        emit('saveAnnotation', response.data);
+    }).catch((error) => {
+        console.log(error);
+    });
 }
 
 const clear = () => {
@@ -102,22 +117,22 @@ const handleDisabled = () => {
 
 .button-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
     margin-bottom: 20px;
 }
 
 .action-button {
-    background-color: #4CAF50;
+    background-color: #ffffff00;
     /* Green */
     border: none;
-    color: white;
-    padding: 15px 32px;
+    color: rgb(0, 0, 0);
+    padding: 5px 5px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    margin: 4px 2px;
+    margin: 5px 12px;
     cursor: pointer;
 }
 
@@ -128,5 +143,6 @@ const handleDisabled = () => {
 .icon-data-url,
 .icon-disabled {
     margin-right: 10px;
+    font-size: larger;
 }
 </style>

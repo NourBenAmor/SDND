@@ -96,7 +96,7 @@
               : document.description
           }}
                       <span v-if="document.description.length > 42" class="view-all">
-                        <a href="#" @click="showFullDescription(document.description)">View All</a>
+                        <a href="#" @click="showFullDescription(document.description)">more</a>
                       </span>
                     </span>
                   </span>

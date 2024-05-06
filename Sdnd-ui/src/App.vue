@@ -47,7 +47,7 @@ const navClasses = computed(() => {
     <app-footer v-show="showFooter" />
 
     <configurator :toggle="toggleConfigurator" :class="[showConfig ? 'show' : '', hideConfigButton ? 'd-none' : '']" />
-   
+
   </main>
 </template>
 <style scoped>
@@ -65,5 +65,13 @@ const navClasses = computed(() => {
   bottom: 0;
   left: 0;
   right: 0;
+}
+
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
 }
 </style>

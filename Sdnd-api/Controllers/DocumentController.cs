@@ -185,13 +185,37 @@ public class DocumentController : ControllerBase
 
     // pdf sous forme de url
 
-    [AllowAnonymous]
-    [HttpGet("pdf/{id}")]
-    public IActionResult Get(Guid id)
-    {
-        var stream = new FileStream($"Resource/AllFiles/{id.ToString()}",  FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
-        return File(stream, "application/pdf");
-    }
+    
+        [AllowAnonymous]
+        [HttpGet("pdf/{id}")]
+        public IActionResult Get(Guid id)
+        {
+            var folderName = Path.Combine("Resource", "AllFiles");
+            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+
+            // Use a regular expression to remove any existing version number from the filename
+            var fileName = id.ToString();
+
+            // Get all files that start with the same id
+            var files = Directory.GetFiles(pathToSave, $"{fileName}*");
+
+            // Extract version numbers from filenames
+            var versionNumbers = files.Select(file =>
+            {
+                var versionString = Path.GetFileNameWithoutExtension(file).Replace(fileName, "").Replace("_*", "");
+                int version;
+                return int.TryParse(versionString, out version) ? version : 0;
+            });
+
+            // Determine the highest version number
+            var latestVersionNumber = versionNumbers.Any() ? versionNumbers.Max() : 1;
+
+            // Append the version number to the filename
+            var fullPath = Path.Combine(pathToSave, $"{fileName}_*{latestVersionNumber}");
+
+            var stream = new FileStream(fullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
+            return File(stream, "application/pdf");
+        }
 
     [AllowAnonymous]
     [HttpGet("pdf/second/{id}")]

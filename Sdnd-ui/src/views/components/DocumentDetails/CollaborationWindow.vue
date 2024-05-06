@@ -27,15 +27,18 @@
     <div class="share-form">
         <!-- Step 1: Select user -->
         <div class="first-step" v-if="step === 1">
-            <label for="username"> Who do you wanna collaborate with :</label>
-            <AutoComplete class="user-input" v-model="selectedUser" :suggestions="usernames" @complete="fetchUsernames"
-                placeholder="Enter a username" />
-            <!-- <input type="text" id="username" v-model="selectedUser" @input="filterUsernames"> -->
-            <button style="height: 40px; width: 280px; font-size: large" @click="step = 2">Next</button>
+            <div class="d-flex flex-column align-items-center">
+
+                <label for="username"> Who do you wanna collaborate with :</label>
+                <AutoComplete styleClass="autocomplete" v-model="selectedUser" :suggestions="usernames"
+                    @complete="fetchUsernames" placeholder="Enter a username" />
+                <!-- <input type="text" id="username" v-model="selectedUser" @input="filterUsernames"> -->
+                <button style="height: 40px; width: 280px; font-size: large;" @click="step = 2">Next</button>
+            </div>
         </div>
 
         <!-- Step 2: Select role -->
-        <div class="second-step" v-if="step === 2">
+        <div class="second-step " v-if="step === 2">
             <label for="selectedUser">Selected User:</label>
             <input type="text" id="selectedUser" v-model="selectedUser" disabled>
             <label for="role">Select a role:</label>
@@ -75,7 +78,6 @@ const roles = ref([
     { icon: 'fa-solid fa-pencil', name: 'Editor', code: 'Ed' }
 ]);
 // Other reactive properties...
-
 
 
 const fetchUsernames = async () => {
@@ -156,6 +158,9 @@ onMounted(fetchUsernames);
     position: relative;
 }
 
+.p-autocomplete-input {
+    width: 100%;
+}
 
 .profile-image {
     width: 50px;
@@ -170,6 +175,10 @@ onMounted(fetchUsernames);
     font-size: 20px;
     font-weight: bold;
     margin-right: 10px;
+}
+
+.p-stepper {
+    flex-basis: 40rem;
 }
 
 .user-info {
@@ -271,11 +280,12 @@ onMounted(fetchUsernames);
 
 
 
+
 .first-step,
 .second-step {
     display: flex;
     flex-direction: column;
-    margin: 0 138px;
+    margin: 0 10px;
 }
 
 .button-container {
@@ -322,6 +332,9 @@ onMounted(fetchUsernames);
 //     margin-bottom: 20px;
 // }
 
+.autocomplete {
+    width: 100% !important;
+}
 
 .autocomplete-dropdown {
     position: absolute;

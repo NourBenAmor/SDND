@@ -8,16 +8,11 @@
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<DockerfileContext>.</DockerfileContext>
 	</PropertyGroup>
-	<ItemGroup>
-		<Compile Remove="Resource\**" />
-		<Content Remove="Resource\**" />
-		<EmbeddedResource Remove="Resource\**" />
-		<None Remove="Resource\**" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CliWrap" Version="3.6.6" />
-		<PackageReference Include="itext7" Version="8.0.1" />
+		<PackageReference Include="itext" Version="8.0.2" />
+		<PackageReference Include="itext.bouncy-castle-adapter" Version="8.0.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
@@ -41,6 +36,25 @@
 	<ItemGroup>
 		<Folder Include="wwwroot\" />
 		<!-- Conservez uniquement un élément <Folder Include="wwwroot\" /> -->
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Resource\AllFiles\029e10b4-f79d-404c-a29b-48567c925b96" />
+	  <Content Include="Resource\AllFiles\02c0fd88-ef86-46ad-86a9-af37d8bba930" />
+	  <Content Include="Resource\AllFiles\082ae93e-9c9d-477d-bb2f-9a5ff3a0eb3f" />
+	  <Content Include="Resource\AllFiles\2c06a27a-08c3-422a-8b7d-0d7a3d2418d1" />
+	  <Content Include="Resource\AllFiles\4742a273-aea5-47fa-b33c-d319d76f7071" />
+	  <Content Include="Resource\AllFiles\53b4ac1b-b738-4215-9148-aec50c414e14" />
+	  <Content Include="Resource\AllFiles\5b4a76b1-6aa9-47d8-8bce-a5bd34a2ca1b" />
+	  <Content Include="Resource\AllFiles\8be14156-3fbf-4436-9fa0-47e0d4a38fb9" />
+	  <Content Include="Resource\AllFiles\96a1c756-2556-4553-8bc4-92e064b2272a" />
+	  <Content Include="Resource\AllFiles\aca2666b-3a5f-473c-99dc-4c21dd68e657" />
+	  <Content Include="Resource\AllFiles\d9299194-f4bc-425f-8652-b6f0f219dee5" />
+	  <Content Include="Resource\AllFiles\ec69ef7f-03eb-441c-8797-a8dad4b0280e" />
+	  <Content Include="Resource\AllFiles\f91e1470-768a-4ccb-80d1-daf571b0cc17" />
+	  <Content Include="Resource\sample.pdf" />
+	  <Content Include="Resource\signature.jpg" />
+	  <Content Include="Resource\signCertRsa01.p12" />
 	</ItemGroup>
 
 </Project>

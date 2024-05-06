@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sdnd_api.Data;
+using Sdnd_api.Dtos.QueryObjects;
 using Sdnd_api.Dtos.Requests;
 using Sdnd_api.Dtos.Responses;
 using Sdnd_api.Interfaces;
@@ -24,7 +25,7 @@ public class ShareController : ControllerBase
         _userManager = userManager;
     }
 
-    [HttpGet("{documentId}/shared-users")]
+    [HttpGet("{documentId:guid}/shared-users")]
     public async Task<IActionResult> GetSharedUsers(Guid documentId)
     {
         var document = await _context.Documents.FindAsync(documentId);
@@ -112,7 +113,7 @@ public class ShareController : ControllerBase
 
 
     [HttpGet("SharedWithMe")]
-    public async Task<IActionResult> GetSharedDocument()
+    public async Task<IActionResult> GetSharedDocument([FromQuery] DocumentQueryObject query)
     {
         var currentUser = _userAccessor.GetCurrentUser();
         if (currentUser == null)
@@ -128,14 +129,32 @@ public class ShareController : ControllerBase
             var owner = await _userManager.FindByIdAsync(document.OwnerId.ToString());
             documents.Add(new SharedDocumentDto
             {
+                Id = document.Id,
                 Name = document.Name,
                 Description = document.Description,
+                AddedDate = document.AddedDate,
+                UpdatedDate = document.UpdatedDate,
                 OwnerUsername = owner.UserName,
                 OwnerEmail = owner.Email,
-                OwnerProfilePictureUrl = owner.ProfilePictureUrl,
+                OwnerProfilePictureUrl = (string.IsNullOrEmpty(owner.ProfilePictureUrl) ? null : owner.ProfilePictureUrl),
                 Permissions = sharedDocument.Permissions.Select(p => p.Id).ToList()
             });
         }
+        if (!string.IsNullOrWhiteSpace(query.Name))
+            documents = (List<SharedDocumentDto>)documents.Where(s => s.Name.Contains(query.Name));
+        if (!string.IsNullOrWhiteSpace(query.Description))
+            documents = (List<SharedDocumentDto>)documents.Where(s => s.Description.Contains(query.Description));
+        if (query.DocumentState.HasValue)
+            documents = (List<SharedDocumentDto>)documents.Where(d => d.DocumentState == query.DocumentState.Value);
+        if (query.AddedDateBefore.HasValue)
+            documents = (List<SharedDocumentDto>)documents.Where(i => i.AddedDate.Date < query.AddedDateBefore);
+        if (query.AddedDateAfter.HasValue)
+            documents = (List<SharedDocumentDto>)documents.Where(i => i.AddedDate.Date > query.AddedDateAfter);
+        if (query.UpdatedDateBefore.HasValue)
+            documents = (List<SharedDocumentDto>)documents.Where(i => i.UpdatedDate.Date < query.UpdatedDateBefore);
+        if (query.UpdatedDateAfter.HasValue)
+            documents = (List<SharedDocumentDto>)documents.Where(i => i.UpdatedDate.Date > query.UpdatedDateAfter);
+
         return Ok(documents);
     }
 }

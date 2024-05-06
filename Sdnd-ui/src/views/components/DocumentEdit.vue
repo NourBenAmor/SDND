@@ -26,7 +26,7 @@
       <span v-if="error" class="text-danger">Error Updating document. Please try again.</span>
     </div>
   </div>
-  <div class="form-group">
+  <!-- <div class="form-group">
     <label for="fileInput" class="label">Attach File:</label>
     <div class="d-flex align-items-center">
       <input type="file" class="form-control" id="fileInput" style="display: none" @change="handleFileSelection">
@@ -35,7 +35,7 @@
       <button class="btn btn-primary" @click="attachSelectedFile">Save Attachment</button>
       <div id="notification" class="mt-2" style="display: none;"></div>
     </div>
-  </div>
+  </div> -->
 
 
 </template>

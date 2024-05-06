@@ -233,7 +233,7 @@ const items = ref([
     },
   },
   {
-    label: "comments",
+    label: "Comments",
     icon: "fa-solid fa-comments",
     command: () => {
       activeitem.value = 3;

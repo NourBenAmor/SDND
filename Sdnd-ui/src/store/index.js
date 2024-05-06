@@ -16,6 +16,7 @@ export default createStore({
     isAbsolute: false,
     showNavs: true,
     showOverlay: false,
+    SavingAnnotation: false,
     showSidenav: true,
     showNavbar: true,
     showFooter: true,
