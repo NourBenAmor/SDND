@@ -1,139 +1,52 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:airsafe/page/profile_page.dart';
-import 'package:airsafe/page/synchronisation.dart';
-import 'package:flutter/material.dart';
+import 'package:airsafe/View/DocumentDetailsView.dart';
+import 'package:airsafe/View/ProfilePageView.dart';
 import 'package:http/http.dart' as http;
+
+import 'package:airsafe/View/DashboardView.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'addDocument.dart';
-import 'camera_page.dart';
-import 'document_details.dart';
-import 'editing_page.dart';
-import 'file_list.dart';
-import 'multiple_image.dart';
+import '../Controller/DocumentController.dart';
+import '../Model/Document.dart';
+import '../page/addDocument.dart';
+import '../page/camera_page.dart';
+import '../page/editing_page.dart';
+import '../page/file_list.dart';
+import '../page/multiple_image.dart';
+import '../page/synchronisation.dart';
 
-class Document {
-  final String id;
-  final String documentId;
-  final String name;
-  final String description;
-  final String ownerId;
-  final DateTime addedDate;
-  final DateTime updatedDate;
-  final String documentState;
-  final List<String> files;
+class Home_PageView extends StatefulWidget {
+  final String token;
 
-  Document({
-    required this.id,
-    required this.documentId,
-    required this.name,
-    required this.description,
-    required this.ownerId,
-    required this.addedDate,
-    required this.updatedDate,
-    required this.documentState,
-    required this.files,
-  });
-}
-
-class DocumentQueryObject {
-  final String? name;
-  final String? description;
-  final State? documentState;
-  final DateTime? addedDateBefore;
-  final DateTime? addedDateAfter;
-  final DateTime? updatedDateBefore;
-  final DateTime? updatedDateAfter;
-
-  DocumentQueryObject({
-    this.name,
-    this.description,
-    this.documentState,
-    this.addedDateBefore,
-    this.addedDateAfter,
-    this.updatedDateBefore,
-    this.updatedDateAfter,
-  });
-}
-
-enum DocumentState {
-  Blank,
-  Filled,
-  Shared,
-  Archived,
-}
-
-class HomePage extends StatefulWidget {
-  final String token; // Define _token as a parameter for the HomePage widget
-
-  const HomePage({Key? key, required this.token}) : super(key: key);
+  const Home_PageView({Key? key, required this.token}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageViewState createState() => _HomePageViewState();
 }
 
-class _HomePageState extends State<HomePage> {
-  late String _token; // Define _token within the state class
-  List<Document> _documents = []; // State variable to store documents
-  List<String> folders = [];
+class _HomePageViewState extends State<Home_PageView> {
+  late DocumentController _controller;
+  List<Document> _documents = [];
+  late String token; // Declare _token variable
 
   @override
   void initState() {
     super.initState();
-    _token = widget.token;
-    _fetchDocuments(_token);
+    token = widget.token; // Assign the value of widget.token to token field
+    _controller = DocumentController(widget.token, context);
+    _fetchDocuments();
+    token = widget.token;
+
   }
 
-  Future<void> _fetchDocuments(String token) async {
-    final url = Uri.parse('https://10.0.2.2:7278/api/Document/me');
-
-    try {
-      final response = await http.get(
-        url,
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer $token',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final dynamic responseBody = jsonDecode(response.body);
-        if (responseBody != null && responseBody is List<dynamic>) {
-          final List<dynamic> data = responseBody;
-          setState(() {
-            _documents = data.map((doc) {
-              List<String> files = (doc['files'] as List<dynamic>?)
-                      ?.map<String>((file) => file['path'].toString())
-                      .toList() ??
-                  [];
-
-              return Document(
-                id: doc['id'].toString(),
-                // Convert GUID to String
-                documentId: doc['documentId'].toString(),
-                name: doc['name'],
-                description: doc['description'].toString() ?? '',
-                ownerId: doc['ownerId'].toString() ?? '',
-                addedDate: DateTime.parse(doc['addedDate'].toString()),
-                updatedDate: DateTime.parse(doc['updatedDate'].toString()),
-                documentState: doc['documentState'].toString(),
-                files: files,
-              );
-            }).toList();
-          });
-        } else {
-          print('Response body from API is null or not a List');
-        }
-      } else {
-        throw Exception(
-            'Failed to load documents (Status Code: ${response.statusCode})');
-      }
-    } on SocketException catch (e) {
-      print('Socket Exception: $e');
-    } catch (e) {
-      print('Exception: $e');
-    }
+  Future<void> _fetchDocuments() async {
+    List<Document> documents = await _controller.fetchDocuments();
+    setState(() {
+      _documents = documents;
+    });
   }
 
   Future<void> _pickImage() async {
@@ -153,7 +66,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> scanImage(BuildContext context, XFile photo) async {
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
       File rotatedImage =
-          await FlutterExifRotation.rotateImage(path: photo.path);
+      await FlutterExifRotation.rotateImage(path: photo.path);
       photo = XFile(rotatedImage.path);
     }
 
@@ -178,27 +91,31 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProfilePage(token: _token),
+        builder: (context) => ProfilePageView(token: token),
       ),
     );
   }
-
+  void _navigateToDashboardPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DashboardView(token: token)),
+    );
+  }
   void _navigateToDocumentDetailsPage(
-    BuildContext context,
-    String documentId,
-    String documentName,
-    String documentDescription,
-    List<String> documentFiles,
-  ) {
+      BuildContext context,
+      String documentId,
+      String documentName,
+      String documentDescription,
+      List<String> documentFiles,
+      ) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DocumentDetails(
+        builder: (context) => DocumentDetailsView(
           documentId: documentId,
           documentName: documentName,
           documentDescription: documentDescription,
-          documentFiles: documentFiles,
-          token: _token,
+          token: token,
         ),
       ),
     );
@@ -212,6 +129,7 @@ class _HomePageState extends State<HomePage> {
               CreateDocumentPage(createDocumentCallback: _createDocument)),
     );
   }
+
 
   Future<void> _createDocument(String name, String description) async {
     if (name.isEmpty || description.isEmpty) {
@@ -236,7 +154,7 @@ class _HomePageState extends State<HomePage> {
 
       if (response.statusCode == 200) {
         print('Document created successfully');
-        _fetchDocuments(widget.token);
+        _fetchDocuments();
       } else {
         print(
             'Failed to create document (Status Code: ${response.statusCode})');
@@ -248,7 +166,7 @@ class _HomePageState extends State<HomePage> {
 
   void _deleteDocument(BuildContext context, String documentId) async {
     final url =
-        Uri.parse('https://10.0.2.2:7278/api/Document/Delete/$documentId');
+    Uri.parse('https://10.0.2.2:7278/api/Document/Delete/$documentId');
 
     try {
       final response = await http.delete(
@@ -303,7 +221,7 @@ class _HomePageState extends State<HomePage> {
 
   void _searchDocuments(String searchQuery) async {
     if (searchQuery.isEmpty) {
-      _fetchDocuments(_token); // Reload all documents if search query is empty
+      _fetchDocuments(); // Reload all documents if search query is empty
       return;
     }
 
@@ -314,7 +232,7 @@ class _HomePageState extends State<HomePage> {
       final response = await http.get(
         url,
         headers: {
-          HttpHeaders.authorizationHeader: 'Bearer $_token',
+          HttpHeaders.authorizationHeader: 'Bearer $token',
         },
       );
 
@@ -325,8 +243,8 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             _documents = data.map((doc) {
               List<String> files = (doc['files'] as List<dynamic>?)
-                      ?.map<String>((file) => file['path'].toString())
-                      .toList() ??
+                  ?.map<String>((file) => file['path'].toString())
+                  .toList() ??
                   [];
 
               return Document(
@@ -375,14 +293,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).unfocus();
     return Scaffold(
       appBar: AppBar(
         title: Text(''),
         actions: [
+          IconButton(
+            onPressed: () {
+              _navigateToDashboardPage(context); // Call function to navigate to dashboard
+            },
+            icon: Icon(Icons.dashboard), // Icon for dashboard
+          ),
           IconButton(
             onPressed: () {
               Navigator.push(
@@ -456,7 +378,7 @@ class _HomePageState extends State<HomePage> {
                     IconButton(
                       onPressed: () {
                         _navigateToCreateDocumentPage(
-                            context); // Utilisez la nouvelle méthode
+                            context); // Utilize the new method
                       },
                       icon: Icon(Icons.create_new_folder),
                       tooltip: 'Create a new folder',
@@ -489,107 +411,104 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: _documents.isNotEmpty
                 ? ListView.builder(
-                    itemCount: _documents.length,
-                    itemBuilder: (context, index) {
-                      final document = _documents[index];
-                      return Card(
-                          elevation: 0,
-                          margin:
-                              EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+              itemCount: _documents.length,
+              itemBuilder: (context, index) {
+                final document = _documents[index];
+                return Card(
+                    elevation: 0,
+                    margin:
+                    EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 5,
+                            blurRadius: 10,
+                            offset: Offset(0, 0),
                           ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  // Set shadow color to yellow with opacity
-                                  spreadRadius: 5,
-                                  // Spread radius of the shadow
-                                  blurRadius: 10,
-                                  // Blur radius of the shadow
-                                  offset: Offset(0, 0), // Offset of the shadow
-                                ),
-                              ],
+                        ],
+                      ),
+                      child: ListTile(
+                        title: Text(
+                          document.name,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Description:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            child: ListTile(
-                              title: Text(
-                                document.name,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                            SizedBox(height: 5),
+                            Text(
+                              document.description.length > 50
+                                  ? '${document.description.substring(0, 50)}...'
+                                  : document.description,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            if (document.description.length > 50)
+                              TextButton(
+                                onPressed: () =>
+                                    _showFullDescriptionModal(
+                                      context,
+                                      document.description,
+                                    ),
+                                child: Text(
+                                  'View More',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Description:',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    document.description.length > 50
-                                        ? '${document.description.substring(0, 50)}...'
-                                        : document.description,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                  if (document.description.length > 50)
-                                    TextButton(
-                                      onPressed: () =>
-                                          _showFullDescriptionModal(
-                                        context,
-                                        document.description,
-                                      ),
-                                      child: Text(
-                                        'View More',
-                                        style: TextStyle(
-                                          color: Colors.blue,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.delete),
-                                    onPressed: () {
-                                      _showDeleteConfirmationDialog(
-                                          context, document.id);
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.share),
-                                    onPressed: () {
-                                      //_shareFolder(index);
-                                    },
-                                  ),
-                                ],
-                              ),
-                              onTap: () {
-                                _navigateToDocumentDetailsPage(
-                                  context,
-                                  document.id,
-                                  document.name,
-                                  document.description,
-                                  document.files,
-                                );
+                          ],
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () {
+                                _showDeleteConfirmationDialog(
+                                    context, document.id);
                               },
                             ),
-                          ));
-                    },
-                  )
+                            IconButton(
+                              icon: Icon(Icons.share),
+                              onPressed: () {
+                                //_shareFolder(index);
+                              },
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          _navigateToDocumentDetailsPage(
+                            context,
+                            document.id,
+                            document.name,
+                            document.description,
+                            document.files,
+                          );
+                        },
+                      ),
+                    ));
+              },
+            )
                 : Center(child: Text('No documents found')),
           ),
         ],
