@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pdf_thumbnail/pdf_thumbnail.dart';
 
-import 'package:airsafe/page/pdf_View.dart'; // Assurez-vous que ce package est correctement importé
 
 class ListPDFsScreen extends StatefulWidget {
   const ListPDFsScreen({Key? key}) : super(key: key);
@@ -16,6 +15,7 @@ class _ListPDFsScreenState extends State<ListPDFsScreen> {
   List<File> mypdfs = [];
 
   Future<void> _loadPdfFiles() async {
+    // Load PDF files from the device storage
     Directory downloadsDirectory = Directory('/storage/emulated/0/Download');
     List<FileSystemEntity> entities = downloadsDirectory.listSync(recursive: false);
     List<File> pdfFiles = [];
@@ -27,6 +27,11 @@ class _ListPDFsScreenState extends State<ListPDFsScreen> {
     setState(() {
       mypdfs = pdfFiles;
     });
+  }
+
+  Future<void> _handleFileSelection(String filePath) async {
+    // Return the selected file path to the previous screen
+    Navigator.pop(context, filePath);
   }
 
   @override
@@ -53,16 +58,8 @@ class _ListPDFsScreenState extends State<ListPDFsScreen> {
           itemBuilder: (context, index) {
             return InkWell(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PDFViewScreen(
-                      isNet: false,
-                      name: "PDF",
-                      path: mypdfs[index].path,
-                    ),
-                  ),
-                );
+                // Handle file selection when tapped
+                _handleFileSelection(mypdfs[index].path);
               },
               child: Container(
                 height: 50,

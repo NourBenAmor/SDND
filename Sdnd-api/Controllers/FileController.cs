@@ -170,6 +170,21 @@ public class FileController : ControllerBase
 
         return Ok(docFile);
     }
+    [HttpGet("files/total-count")]
+    public async Task<IActionResult> GetTotalNumberOfFiles()
+    {
+        try
+        {
+            // Retrieve the total count of files
+            var totalFilesCount = await _context.DocFiles.CountAsync();
+
+            return Ok(totalFilesCount);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving total files count: {ex.Message}");
+        }
+    }
 
 }
 

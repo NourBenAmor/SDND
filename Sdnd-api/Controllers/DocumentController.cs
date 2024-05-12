@@ -273,6 +273,80 @@ public class DocumentController : ControllerBase
         return Ok(docFiles);
     }
 
-   
+    [HttpGet("statistics")]
+    public IActionResult GetDocumentStatistics()
+    {
+        try
+        {
+            var totalDocuments = _context.Documents.Count();
+
+            var documentsByState = _context.Documents
+                .GroupBy(d => d.DocumentState)
+                .Select(g => new { State = g.Key, Count = g.Count() })
+                .ToList();
+
+
+
+            var statisticsResponse = new
+            {
+                TotalDocuments = totalDocuments,
+                DocumentsByState = documentsByState,
+            };
+
+            return Ok(statisticsResponse);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while fetching document statistics: {ex.Message}");
+        }
+    }
+
+    [HttpGet("added-document-stats")]
+    public async Task<IActionResult> GetDocumentAddedStats()
+    {
+        try
+        {
+            var currentUser = _userAccessor.GetCurrentUser();
+            if (currentUser == null)
+                return Unauthorized("Login first");
+
+            var addedDocuments = await _context.Documents
+                .Where(d => d.OwnerId == currentUser.Id)
+                .ToListAsync();
+
+            var monthlyDocumentUploads = addedDocuments
+                .GroupBy(d => new { Year = d.AddedDate.Year, Month = d.AddedDate.Month })
+                .Select(g => new { Year = g.Key.Year, Month = g.Key.Month, Count = g.Count() })
+                .OrderBy(g => g.Year)
+                .ThenBy(g => g.Month)
+                .ToList();
+
+            var monthlyDocumentAddedTable = new int[12];
+            foreach (var item in monthlyDocumentUploads)
+            {
+                monthlyDocumentAddedTable[item.Month - 1] += item.Count;
+            }
+
+            var stats = new
+            {
+                TotalDocumentUploads = addedDocuments.Count,
+                MonthlyDocumentUploadsTable = monthlyDocumentAddedTable,
+                MonthNames = new string[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" }
+            };
+
+            return Ok(stats);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving document upload stats: {ex.Message}");
+        }
+    }
+
+
+
+
+
+
+
 
 }

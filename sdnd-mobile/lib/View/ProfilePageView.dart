@@ -1,88 +1,37 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class User {
-  final String id;
-  final String username;
-  final String email;
+
+import '../Controller/UserController.dart';
+import '../Model/User.dart';
+
+class ProfilePageView extends StatefulWidget {
   final String token;
 
-  User(this.token, {required this.id, required this.username, required this.email});
-}
-
-class ProfilePage extends StatefulWidget {
-  final String token;
-
-  ProfilePage({required this.token});
+  ProfilePageView({required this.token});
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePageView> {
+  final UserController _userController = UserController();
   User? _currentUser;
-  bool _isLoading = false;
+  bool _isLoading = true;
   String _errorMessage = '';
 
   @override
   void initState() {
     super.initState();
-    _loadCurrentUser(widget.token);
+    _loadCurrentUser();
   }
 
-  Future<void> _loadCurrentUser(String token) async {
-    if (token.isEmpty) {
-      return;
-    }
-
+  Future<void> _loadCurrentUser() async {
+    final user = await _userController.getCurrentUser(widget.token);
     setState(() {
-      _isLoading = true;
+      _currentUser = user;
+      _isLoading = false;
     });
-
-    try {
-      final HttpClient httpClient = HttpClient();
-      final Uri uri = Uri.parse('https://10.0.2.2:7278/api/Account/me');
-      final HttpClientRequest request = await httpClient.getUrl(uri);
-      request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
-      final HttpClientResponse response = await request.close();
-
-      if (response.statusCode == HttpStatus.ok) {
-        final String responseBody = await response.transform(utf8.decoder)
-            .join();
-        final userData = jsonDecode(responseBody);
-        if (userData != null && userData is Map<String, dynamic>) {
-          final String id = userData['id'] ?? '';
-          final String username = userData['userName'] ?? '';
-          final String email = userData['email'] ?? '';
-          setState(() {
-            _currentUser =
-                User(token, id: id, username: username, email: email);
-            _isLoading = false;
-          });
-        }
-      } else if (response.statusCode == HttpStatus.unauthorized) {
-        setState(() {
-          _isLoading = false;
-          _errorMessage = 'Unauthorized';
-        });
-      } else {
-        setState(() {
-          _isLoading = false;
-          _errorMessage = 'Error: ${response.reasonPhrase}';
-        });
-      }
-
-      httpClient.close();
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = 'Error loading user data: $e';
-      });
-    }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -110,10 +59,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(height: 20),
                   CircleAvatar(
                     radius: 60,
-                    backgroundImage: AssetImage('images/compte.png'),
+                    backgroundImage: AssetImage('images/profile_image.jpg'),
                   ),
                   SizedBox(height: 20),
-                  _currentUser != null
+                  _isLoading
+                      ? CircularProgressIndicator()
+                      : _currentUser != null
                       ? Column(
                     children: [
                       SizedBox(height: 20),
@@ -142,11 +93,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         style: TextStyle(fontSize: 18),
                         initialValue: _currentUser!.email,
                       ),
-
                     ],
                   )
-                      : _isLoading
-                      ? CircularProgressIndicator()
                       : Text(
                     _errorMessage.isNotEmpty ? _errorMessage : 'Error loading user data',
                     style: TextStyle(color: Colors.red),

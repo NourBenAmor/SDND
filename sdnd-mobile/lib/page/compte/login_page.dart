@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:airsafe/View/DashboardView.dart';
+import 'package:airsafe/View/home_pageView.dart';
+import 'package:airsafe/page/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
@@ -10,7 +13,6 @@ import 'package:airsafe/page/commun/page_heading.dart';
 import 'package:airsafe/page/commun/custom_form_button.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../home_page.dart';
 
 const storage = FlutterSecureStorage();
 class LoadingWidget extends StatelessWidget {
@@ -63,6 +65,7 @@ class _LoginPageState extends State<LoginPage> {
         _isLoading = false; // Hide loading indicator after response
       });
       if (response.statusCode == 200) {
+        // Handle successful login
         final responseData = jsonDecode(response.body);
         print('User ID: ${responseData['id']}');
         print('Username: ${responseData['username']}');
@@ -71,49 +74,79 @@ class _LoginPageState extends State<LoginPage> {
         String token = responseData['token']; // Extract the token
         await storage.write(key: 'jwt_token', value: token);
 
-        // Show snackbar indicating successful login
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Align(
-              alignment: Alignment.center,
-              child: Text(
-                'Login successful',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            duration: Duration(seconds: 5),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            margin: EdgeInsets.symmetric(horizontal: 20.0),
-            padding: EdgeInsets.symmetric(vertical: 15.0),
-          ),
-        );
-
-        // Delay navigation to allow SnackBar display
-        await Future.delayed(Duration(seconds: 2)); // Adjust delay as needed
-
         // Navigate to homepage with the token
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePage(token: token), // Pass token to HomePage
+            builder: (context) => Home_PageView(token: token), // Pass token to HomePage
           ),
         );
       } else if (response.statusCode == 400) {
         // Bad request, probably validation error
         print('Failed to login: ${response.body}');
+        // Show error message in pop-up dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text('Incorrect username or password'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
         // Add further error handling logic here (e.g., displaying error message)
       } else {
         // Other errors
         print('Failed to login: ${response.statusCode}');
+        // Show error message in pop-up dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text('Username or Password is incorrect.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
         // Add further error handling logic here (e.g., displaying error message)
       }
     } catch (e) {
       // Exception occurred during HTTP request
       print('Error during login: $e');
+      // Show error message in pop-up dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('An error occurred during login. Please try again later.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
       // Add further error handling logic here (e.g., displaying error message)
     }
   }

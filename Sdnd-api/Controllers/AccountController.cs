@@ -176,7 +176,21 @@ public class AccountController : ControllerBase
         return Ok(usernames);
     }
 
+    [HttpGet("users/total-count")]
+    public async Task<IActionResult> GetTotalNumberOfUsers()
+    {
+        try
+        {
+            // Retrieve the total count of users
+            var totalUsersCount = await _context.Users.CountAsync();
 
+            return Ok(totalUsersCount);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving total users count: {ex.Message}");
+        }
+    }
 
 
 }
