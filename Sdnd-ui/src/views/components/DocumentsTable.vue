@@ -6,7 +6,7 @@
         <h6 class="mb-0">My Documents</h6>
         <div class="d-flex align-items-center">
           <Dropdown v-model="CurrentDocumentState" :options="DocumentStates" optionLabel="name"
-            placeholder="DocumentState" class="dropdown w-full md:w-14rem mt-3 mb-3" />
+            placeholder="Filter By Status" class="dropdown w-full md:w-14rem mt-3 mb-3" />
           <InputText class="searchInput" v-model="filterText" type="text" placeholder="Search" />
           <button class="btn btn-primary px-0 mb-0 d-flex align-items-center text-nowrap px-2 mx-2"
             @click="openAddDocumentView(document)" href="javascript:;">
@@ -23,7 +23,7 @@
                   Name
                 </th>
                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                  Document State
+                  Document Status
                 </th>
                 <th
                   class="text-uppercase text-secondary text-center align-middle text-xxs font-weight-bolder opacity-7">
@@ -115,18 +115,13 @@
                 <td class="align-middle d-flex">
                   <div class="ms-auto text-end">
                     <button class="btn btn-link text-green px-3 mb-0" @click="openDocumentView(document.id)">
-                      <i class="fas fa-eye text-green ms-2" aria-hidden="true"></i>{{ " " }}View
+                      <i class="fas fa-eye text-green ms-2" aria-hidden="true"></i>{{ " " }}Open
                     </button>
 
                     <Sidebar v-if="docDetailsVisible" v-model:visible="docDetailsVisible" header="Document Details"
                       :documentId="document.id" position="full">
                       <Document @addfile-emit="uploadFile" @refresh-documents="fetchDocuments" />
                     </Sidebar>
-
-                    <a class="btn btn-link text-dark px-3 mb-0" @click="openEditView(document.id)">
-                      <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit
-                    </a>
-
                     <a class="btn btn-link text-danger text-gradient px-3 mb-0" @click="showConfirmDeleteModal(index)"
                       href="javascript:;">
                       <i class="far fa-trash-alt me-2" aria-hidden="true"></i>Delete
@@ -193,7 +188,6 @@
 
 <script setup>
 import Skeleton from "primevue/skeleton";
-import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import Dropdown from "primevue/dropdown";
 import InputText from "primevue/inputtext";
@@ -224,7 +218,6 @@ const documentIndexToDelete = ref(null);
 const currentPage = ref(1);
 const documentsPerPage = 6;
 const sortBy = ref("asc");
-const router = useRouter();
 const store = useStore();
 const totalDocuments = computed(() => documents.value.length);
 const totalPages = computed(() =>
@@ -322,9 +315,7 @@ onMounted(() => {
   fetchDocuments();
 });
 
-const openEditView = (documentId) => {
-  router.push({ name: "EditView", params: { id: documentId } });
-};
+
 
 const openAddDocumentView = () => {
   showAddDocModal.value = true;

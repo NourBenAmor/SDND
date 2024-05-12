@@ -158,4 +158,30 @@ public class ShareController : ControllerBase
 
         return Ok(documents);
     }
+    
+    
+    // revoke access to a shared document of a user
+    [HttpDelete("RevokeAccess")]
+    public async Task<IActionResult> RevokeAccess([FromBody] RevokeAccessRequestDto revokeAccessRequest)
+    {
+        var currentUser = _userAccessor.GetCurrentUser();
+        if (currentUser == null)
+            return Unauthorized("Login First");
+        // get current User permissions on the document
+        var document = await _context.Documents.FindAsync(revokeAccessRequest.DocumentId);
+        if (document == null)
+            return NotFound("Document not found.");
+        var isOwner = document.OwnerId == currentUser.Id;
+        if (!isOwner)
+        {
+            return Unauthorized("You are not authorized to make this operation");
+        }
+        var sharedDocument = await _context.SharedDocuments
+            .FirstOrDefaultAsync(d => d.DocumentId == revokeAccessRequest.DocumentId && d.SharedWithUserId == revokeAccessRequest.UserId);
+        if (sharedDocument == null)
+            return NotFound("Document not shared with this user");
+        _context.SharedDocuments.Remove(sharedDocument);
+        await _context.SaveChangesAsync();
+        return Ok("Successfully removed access to the document.");
+    }
 }

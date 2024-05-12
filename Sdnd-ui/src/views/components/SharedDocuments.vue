@@ -138,7 +138,18 @@
                 </td>
                 <td class="align-middle d-flex">
                   <div class="ms-auto text-end">
-                    <button class="btn btn-link text-green px-3 mb-0" @click="openDocumentView(document.id)">
+                    <button class="btn btn-link text-green px-3 mb-0" @click="openDocumentView(document.id)"
+                      v-tooltip.bottom="{
+            value: 'open this Document',
+            pt: {
+              arrow: {
+                style: {
+                  borderBottomColor: 'var(--primary-color)'
+                }
+              },
+              text: 'bg-primary font-medium'
+            }
+          }" label="button">
                       <i class="fas fa-eye text-green ms-2 me-2" aria-hidden="true"></i>
                     </button>
 
@@ -146,10 +157,24 @@
                       :documentId="document.id" position="full">
                       <Document @addfile-emit="uploadFile" />
                     </Sidebar>
-                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" @click="showConfirmDeleteModal(index)"
-                      href="javascript:;">
+                    <button class="btn btn-link text-danger text-gradient px-3 mb-0"
+                      @click="showConfirmDeleteModal(index)" v-tooltip.bottom="{
+            value: 'delete this Document',
+            pt: {
+              arrow: {
+                style: {
+                  borderBottomColor: 'var(--danger-color)',
+
+                }
+              },
+              text: 'bg-primary font-medium'
+            },
+            style: {
+              backgroundColor: 'red',
+            }
+          }" label="button">
                       <i class="far fa-x me-2" aria-hidden="true"></i>
-                    </a>
+                    </button>
                   </div>
                 </td>
               </tr>

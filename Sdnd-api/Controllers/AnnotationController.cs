@@ -57,7 +57,12 @@ public class AnnotationController : ControllerBase
             var LastVersionFileName = model.FileId.ToString();
             // Use a regular expression to remove any existing version number from the filename
             var fileName = Regex.Replace(model.FileId.ToString(), @"_\*\d+$", "");
-
+            var user = await _context.Users.FindAsync(_userAccessor.GetCurrentUser().Id);
+            var fileModel = await _context.DocFiles.FirstOrDefaultAsync(f => f.Id == Guid.Parse(fileName));
+            var Document = await _context.Documents.FindAsync(fileModel?.DocumentId);
+            if (user?.Id != Document?.OwnerId && !await _context.SharedDocuments.AnyAsync(d =>
+                    d.DocumentId == Document.Id && d.SharedWithUserId == user.Id && d.Permissions.Any(p => p.Name == "edit")))
+                return Unauthorized("You are not authorized to update this document");
             // Get all files that start with the same FileId
             var files = Directory.GetFiles(pathToSave, $"{fileName}*");
 

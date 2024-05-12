@@ -220,13 +220,16 @@ public class DocumentController : ControllerBase
     public async Task<IActionResult> UpdateDocumentData(Guid id, [FromBody] DocumentUpdateModelDto model)
     {
         var document = await _context.Documents.FindAsync(id);
-
+        var CurrentUser = _userAccessor.GetCurrentUser();
+        if (CurrentUser == null)
+            return Unauthorized("Login first");
+        if (CurrentUser.Id != document.OwnerId && !await _context.SharedDocuments.AnyAsync(d =>
+                d.DocumentId == id && d.SharedWithUserId == CurrentUser.Id && d.Permissions.Any(p => p.Name == "edit")))
+            return Unauthorized("You are not authorized to update this document");
         if (document == null)
         {
             return NotFound($"Document with ID {id} not found.");
         }
-       
-
         document.Name = model.Name;
         document.Description = model.Description;
         try

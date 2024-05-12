@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sdnd_api.Data;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Sdnd_api.Dtos.Requests;
 using Sdnd_api.Interfaces;
 using Sdnd_api.Models;
@@ -62,9 +61,13 @@ public class FileController : ControllerBase
         var documentId = model.DocumentId;
         var file = model.File;
         var user = _userAccessor.GetCurrentUser();
+        
         if (user == null)
             return BadRequest("Login First");
         var Document = _context.Documents.FirstOrDefault(x => x.Id == documentId);
+        if (user.Id != Document.OwnerId && !await _context.SharedDocuments.AnyAsync(d =>
+                d.DocumentId == Document.Id && d.SharedWithUserId == user.Id && d.Permissions.Any(p => p.Name == "edit")))
+            return Unauthorized("You are not authorized to update this document by uploading a file");
         if (Document == null)
             return BadRequest("this Document doesn't exist ");
         

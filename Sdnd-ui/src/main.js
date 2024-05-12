@@ -9,6 +9,7 @@ import "./assets/css/nucleo-svg.css";
 import Vue3Signature from "vue3-signature";
 import ArgonDashboard from "./argon-dashboard";
 import PrimeVue from "primevue/config";
+import Tooltip from "primevue/tooltip";
 //in main.js
 import "primevue/resources/themes/aura-light-indigo/theme.css";
 const appInstance = createApp(App);
@@ -26,6 +27,6 @@ appInstance.use(PrimeVue, {
     tooltip: 110000, //tooltip
   },
 });
-appInstance.use(router);
+appInstance.directive("tooltip", Tooltip), appInstance.use(router);
 appInstance.use(ArgonDashboard);
 appInstance.mount("#app");
