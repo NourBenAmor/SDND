@@ -1,66 +1,72 @@
 <template>
     <div v-if="sharedUsers.length">
-        <div v-for="user in sharedUsers" :key="user.id" class="shared-user">
-            <div class="profile-image"
-                :style="user.profileImageUrl ? `background-image: url(${user.profileImageUrl})` : `background-color: #007bff`">
-                <span v-if="!user.profileImageUrl">{{ user.username[0].toUpperCase() }}</span>
+        <transition-group name="slide" tag="div">
+            <div v-for="user in sharedUsers" :key="user.id" class="shared-user">
+                <SharedUserComponent :user="user" />
             </div>
-            <!-- <img :src="user.profileImageUrl || 'defaultProfilePicture.png'" alt="User profile image"
-                class="profile-image"> -->
-            <div class="user-info">
-                <h3>{{ user.username }}</h3>
-                <p>Added on: {{ user.addedDate }}</p>
-            </div>
-            <span class="user-role mx-0 mt-2 d-flex align-items-center">
-                <p>{{ user.role }}</p>
-                <i class="fas fa-angle-down mb-3 mx-2"></i>
-            </span>
-            <!-- <span class="action-icon" @click="toggleDropdown(user.id)">
-                <i class="fas fa-ellipsis-v"></i>
-            </span>
-            <div v-if="dropdownUserId === user.id" class="dropdown-menu">
-                <button @click="revokeAccess(user.id)">Revoke Access</button>
-                <--Add more actions as needed -->
-        </div>
+        </transition-group>
     </div>
 
     <div class="share-form">
-        <!-- Step 1: Select user -->
-        <div class="first-step" v-if="step === 1">
-            <div class="d-flex flex-column align-items-center">
+        <div class="transition-container">
 
-                <label for="username"> Who do you wanna collaborate with :</label>
-                <AutoComplete styleClass="autocomplete" v-model="selectedUser" :suggestions="usernames"
-                    @complete="fetchUsernames" placeholder="Enter a username" />
-                <!-- <input type="text" id="username" v-model="selectedUser" @input="filterUsernames"> -->
-                <button style="height: 40px; width: 280px; font-size: large;" @click="step = 2">Next</button>
-            </div>
-        </div>
+            <!-- Step 1: Select user -->
+            <transition :name="transitionName" mode="out-in">
+                <div class="first-step" style="position:absolute; width:100%;" v-if="step === 1" key="step1">
 
-        <!-- Step 2: Select role -->
-        <div class="second-step " v-if="step === 2">
-            <label for="selectedUser">Selected User:</label>
-            <input type="text" id="selectedUser" v-model="selectedUser" disabled>
-            <label for="role">Select a role:</label>
-            <Dropdown v-model="selectedRole" :options="roles" optionLabel="name" placeholder="Please Select a Role"
-                class="w-full md:w-14rem" />
-            <div class="d-flex button-container">
-                <button @click="step = 1" class="styled-button">
-                    <i class="fas fa-arrow-left"></i> Back
-                </button>
-                <button @click="shareDocument" class="styled-button">
-                    <i class="fas fa-share"></i> Share
-                </button>
-            </div>
+                    <label for="username"> Who do you wanna collaborate with </label>
+                    <AutoComplete styleClass="autocomplete" v-model="sharingForm.userName" :suggestions="usernames"
+                        @complete="fetchUsernames" placeholder="Enter a username" />
+                    <button style="height: 40px; width: 280px; font-size: large;" @click="step = 2">Next</button>
+
+                </div>
+            </transition>
+
+            <!-- Step 2: Select role -->
+            <transition :name="transitionName" mode="out-in">
+                <div class="second-step" style="position:absolute; width:100%;" v-if="step === 2" key="step2">
+                    <label for="role">select the permissions you wanna add for this user</label>
+                    <SelectButton v-model="value" :options="options" optionLabel="name" optionValue="value" multiple />
+                    <div class="d-flex button-container">
+                        <button @click="step = 1" class="styled-button">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button @click="step = 3" class="styled-button">
+                            <i class="fas fa-arrow-right"></i> Next
+                        </button>
+                    </div>
+                </div>
+            </transition>
+
+            <transition :name="transitionName" mode="out-in">
+                <div class="third-step" style="position:absolute; width:100%;" v-if="step === 3" key="step3">
+                    <label width="100%" for="assignment">What should the user do with this document ? </label>
+                    <argon-textarea width="350px" v-model="TaskDescription" placeholder="Task details" />
+                    <div class="d-flex button-container">
+                        <button @click="step = 2" class="styled-button">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button @click="shareDocument" class="styled-button">
+                            <i class="fas fa-share"></i> Share
+                        </button>
+                    </div>
+                </div>
+            </transition>
         </div>
     </div>
 </template>
 
 <script setup>
+import ArgonTextarea from '../../../components/ArgonTextarea.vue';
+import SelectButton from 'primevue/selectbutton';
+import SharedUserComponent from './SharedUserComponent.vue';
 import AutoComplete from 'primevue/autocomplete';
-import { ref, computed, onMounted } from 'vue';
+import {
+    ref, computed,
+    watch,
+    onMounted
+} from 'vue';
 import { useStore } from 'vuex';
-import Dropdown from 'primevue/dropdown';
 import { toast } from "vue3-toastify";
 import BaseApiService from '../../../services/apiService';
 const store = useStore();
@@ -69,16 +75,33 @@ const shareResult = ref('');
 const usernames = ref([]);
 const documentId = computed(() => store.state.documentId);
 const filteredUsernames = ref([]);
-
 const step = ref(1);
-const selectedUser = ref('');
-const selectedRole = ref('');
-const roles = ref([
-    { icon: 'fas fa-eye', name: 'Viewer', code: 'Vi' },
-    { icon: 'fa-solid fa-pencil', name: 'Editor', code: 'Ed' }
-]);
-// Other reactive properties...
+const sharingForm = ref(
+    {
+        userName: '',
+        permissions: [],
+        taskDescription: ''
+    }
+);
+const value = ref(null);
+const transitionName = computed(() => {
+    return step.value < previousStep.value ? 'slide-reverse' : 'slide';
+});
+const previousStep = ref(1);
 
+watch(step, (newStep, oldStep) => {
+    previousStep.value = oldStep;
+});
+const options = ref([
+    { icon: 'fa-solid fa-eye', name: 'View', value: 1 },
+    { icon: 'fa-solid fa-pen-to-square', name: 'Edit', value: 2 },
+    { icon: 'fa-solid fa-share', name: 'Share', value: 3 },
+]);
+watch(() => value.value, (newValue) => {
+    console.log('permissionchanged to ', newValue);
+    sharingForm.value.permissions = newValue;
+});
+// Other reactive properties...
 
 const fetchUsernames = async () => {
     try {
@@ -94,62 +117,73 @@ const selectUsername = username => {
     sharedUsername.value = username;
     filteredUsernames.value = [];
 };
-const sharedUsers = ref([
-    {
-        id: 1,
-        username: 'John Doe',
-        addedDate: '2022-01-01',
-        role: 'Owner',
-        profileImageUrl: 'https://randomuser.me/api/portraits/men/1.jpg'
-    },
-    {
-        id: 2,
-        username: 'Jane Smith',
-        addedDate: '2022-01-15',
-        role: 'Viewer',
-        profileImageUrl: 'https://randomuser.me/api/portraits/women/2.jpg'
-    },
-    {
-        id: 3,
-        username: 'Robert Johnson',
-        addedDate: '2022-02-01',
-        role: 'Editor',
-        profileImageUrl: 'https://randomuser.me/api/portraits/men/3.jpg'
-    }, {
-        id: 4,
-        username: 'Robert Johnson',
-        addedDate: '2022-02-01',
-        role: 'Viewer',
+const sharedUsers = ref([]);
+const retrieveSharedUsers = async () => {
+    try {
+        const response = await BaseApiService(`Document/${documentId.value}/shared-users`).list();
+        sharedUsers.value = response.data;
+        console.log('shared users:', sharedUsers.value)
+    } catch (error) {
+        console.error('Error fetching shared users:', error);
+    }
+};
 
-
-    },
-    // Add more sample shared users as needed
-]);
+// Add more sample shared users as needed]);
+// const fetchsharedUsers = async () => {
+//     try {
+//         const response = await BaseApiService(`Document/${documentId.value}/SharedUsers`).list({
+//             params: {
+//                 documentId: documentId.value
+//             }
+//         });
+//         sharedUsers.value = response.data;
+//     } catch (error) {
+//         console.error('Error fetching shared users:', error);
+//     }
+// };
 const shareDocument = async () => {
     try {
-        const newDoc = { documentId: documentId.value, username: sharedUsername.value };
+        const newDoc = {
+            documentId: documentId.value,
+            username: sharingForm.value.userName,
+            taskDescription: sharingForm.value.taskDescription,
+            permissionIds: sharingForm.value.permissions,
+        };
         const response = await BaseApiService('Document/Share').create(newDoc);
         shareResult.value = response.data;
-
         // Use the toast object to show a success message
         toast.success("Document Shared Successfully !", {
             duration: 1000, // Auto-close duration in milliseconds
             position: "bottom-right", // Position of the toast message
         });
+        await retrieveSharedUsers();
         step.value = 1;
+        sharingForm.value = {
+            userName: '',
+            permissions: [],
+            taskDescription: ''
+        };
+
     } catch (error) {
-        shareResult.value = 'Error sharing document';
-        console.error('Error sharing document:', error);
+
+        // Use the toast object to show an error message
+        toast.error("Error sharing document !", {
+            duration: 1000, // Auto-close duration in milliseconds
+            position: "bottom-right", // Position of the toast message
+        });
     }
 };
-onMounted(fetchUsernames);
+
+onMounted(async () => {
+    await retrieveSharedUsers();
+    await fetchUsernames();
+    // let's preselect the vie item in the selectButton and make that view disabled
+    value.value = [1];
+});
 </script>
 
 <style lang="scss" scoped>
 .shared-user {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     background-color: #f5f5f5;
     padding: 10px;
     border-radius: 5px;
@@ -158,46 +192,21 @@ onMounted(fetchUsernames);
     position: relative;
 }
 
-.p-autocomplete-input {
+.share-form {
     width: 100%;
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    position: relative;
 }
 
-.profile-image {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-size: cover;
-    background-position: center;
-    color: #fff;
-    font-size: 20px;
-    font-weight: bold;
-    margin-right: 10px;
-}
-
-.p-stepper {
-    flex-basis: 40rem;
-}
-
-.user-info {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
-.user-info h3 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: #000;
-}
-
-.user-info p {
-    margin: 0;
-    font-size: 14px;
-    color: #666;
+.transition-container {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    /* Adjust the height as needed */
 }
 
 .action-icon {
@@ -225,7 +234,7 @@ onMounted(fetchUsernames);
 }
 
 .share-form button {
-    background-color: #0058b6;
+    background-color: #f5d34a;
     color: #fff;
     border: none;
     padding: 5px 10px;
@@ -235,7 +244,7 @@ onMounted(fetchUsernames);
     transition: background-color 0.3s ease;
 
     &:hover {
-        background-color: #00448b;
+        background-color: #a38d32;
     }
 }
 
@@ -260,6 +269,37 @@ onMounted(fetchUsernames);
 // }
 
 
+.slide-enter-active {
+    transition: transform 1s ease;
+}
+
+.slide-leave-active {
+    transition: transform 0.3s ease;
+}
+
+.slide-enter-from {
+    transform: translateX(100%);
+}
+
+.slide-leave-to {
+    transform: translateX(-100%);
+}
+
+.slide-reverse-enter-active {
+    transition: transform 1s ease;
+}
+
+.slide-reverse-leave-active {
+    transition: transform 0.3s ease;
+}
+
+.slide-reverse-enter-from {
+    transform: translateX(-100%);
+}
+
+.slide-reverse-leave-to {
+    transform: translateX(100%);
+}
 
 .share-form {
     // display: flex;
@@ -273,35 +313,32 @@ onMounted(fetchUsernames);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
-
-
-
-
-
-
-
-
 .first-step,
-.second-step {
+.second-step,
+.third-step {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     margin: 0 10px;
+    width: 70%;
+    height: 100%;
 }
 
 .button-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
 }
 
 .styled-button {
-    flex: 1;
     height: 40px;
-    margin: 5px;
+    width: 100px;
+    margin: 15px 30px;
     padding: 10px;
     border: none;
     border-radius: 4px;
-    background-color: #4CAF50;
+    background-color: #f3d148;
     color: white;
     cursor: pointer;
     text-align: center;
@@ -314,6 +351,8 @@ onMounted(fetchUsernames);
 .styled-button i {
     margin-right: 5px;
 }
+
+
 
 // .dropdown-menu {
 //     position: absolute;

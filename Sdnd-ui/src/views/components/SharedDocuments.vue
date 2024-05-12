@@ -107,7 +107,7 @@
                 <td class="align-middle">
                   <span class="text-secondary text-xs font-weight-bold d-flex">
                     <p v-for="permission in document.permissions" :key="permission"
-                      class="badge badge-md badge-pill bg-secondary fs-20 mx-auto my-auto">
+                      class="badge badge-md badge-pill bg-secondary fs-20 mx-2 my-auto">
                       {{ permission == 1 ? 'View' : '' }}
                       {{ permission == 2 ? 'Edit' : '' }}
                       {{ permission == 3 ? 'Share' : '' }}
@@ -139,7 +139,7 @@
                 <td class="align-middle d-flex">
                   <div class="ms-auto text-end">
                     <button class="btn btn-link text-green px-3 mb-0" @click="openDocumentView(document.id)">
-                      <i class="fas fa-eye text-green ms-2 me-2" aria-hidden="true"></i>Open
+                      <i class="fas fa-eye text-green ms-2 me-2" aria-hidden="true"></i>
                     </button>
 
                     <Sidebar v-if="docDetailsVisible" v-model:visible="docDetailsVisible" header="Document Details"
@@ -148,7 +148,7 @@
                     </Sidebar>
                     <a class="btn btn-link text-danger text-gradient px-3 mb-0" @click="showConfirmDeleteModal(index)"
                       href="javascript:;">
-                      <i class="far fa-x me-2" aria-hidden="true"></i>Unfollow
+                      <i class="far fa-x me-2" aria-hidden="true"></i>
                     </a>
                   </div>
                 </td>

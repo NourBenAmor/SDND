@@ -12,7 +12,7 @@ public class SharedDocumentDto
     public DateTime UpdatedDate { get; set; }
     public string OwnerUsername { get; set; }
     public string OwnerEmail { get; set; }
-    public string? OwnerProfilePictureUrl { get; set; }
+    public string? OwnerProfilePictureUrl => $"https://ui-avatars.com/api/?name={OwnerUsername}&size=128&background=f3d148&rounded=true&color=fff";    
     public List<int> Permissions { get; set; }
 }
 

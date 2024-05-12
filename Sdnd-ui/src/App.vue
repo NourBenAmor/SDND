@@ -67,6 +67,14 @@ const navClasses = computed(() => {
   right: 0;
 }
 
+.Toastify__toast-container {
+  z-index: 50000000;
+}
+
+:root {
+  --toastify-z-index: 50000000;
+}
+
 .loading {
   position: fixed;
   top: 50%;

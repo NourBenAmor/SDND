@@ -146,7 +146,7 @@ public class DocumentController : ControllerBase
     {
         var user = _userAccessor.GetCurrentUser();
         if (user == null)
-            return BadRequest("Login first");
+            return Unauthorized("Login first");
         Document document = new Document
         {
             Name = newDocument.Name,
@@ -157,34 +157,6 @@ public class DocumentController : ControllerBase
         await _context.SaveChangesAsync();
         return Ok(document);
     }
-
-
-
-
-    [HttpGet("filterByName")]
-    public IActionResult FilterByName([FromQuery] string Name)
-    {
-        if (string.IsNullOrEmpty(Name))
-        {
-            return BadRequest("Name filter parameter is required.");
-        }
-
-        var filteredDocuments = _context.Documents
-            .Where(d => d.Name.Contains(Name))
-            .ToList();
-
-        return Ok(filteredDocuments);
-    }
-
-
-
-
-
-
-
-
-    // pdf sous forme de url
-
     
         [AllowAnonymous]
         [HttpGet("pdf/{id}")]
@@ -257,9 +229,6 @@ public class DocumentController : ControllerBase
 
         document.Name = model.Name;
         document.Description = model.Description;
-        document.OwnerId = model.OwnerId;
-        document.DocumentState = model.DocumentState;
-
         try
         {
             await _context.SaveChangesAsync();

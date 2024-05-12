@@ -1,14 +1,23 @@
 <template>
-    <div v-if="comments.length">
-        <div v-for="comment in comments" :key="comment.id" class="comment">
+    <div v-if="comments.length" class="comment-wrapper">
+        <div v-for="comment in comments" :key="comment.id" class="comment ">
             <div class="comment-header">
                 <div class="profile-image"
-                    :style="comment.profileImageUrl ? `background-image: url(${comment.profileImageUrl})` : `background-color: #007bff`">
-                    <span v-if="!comment.profileImageUrl">{{ comment.username[0].toUpperCase() }}</span>
+                    :style="comment.profilePictureurl ? `background-image: url(${comment.profilePictureurl})` : `background-color: #007bff`">
+                    <span v-if="!comment.profilePictureurl">{{ comment.username[0].toUpperCase() }}</span>
                 </div>
-                <h3>{{ comment.username }}</h3>
+
+                <div class="d-flex flex-column justify-content-end align-items-start ">
+
+                    <h3 class="m-0 fs-7">{{ comment.username[0].toUpperCase() + comment.username.slice(1).toLowerCase()
+                        }}
+                    </h3>
+
+
+                </div>
             </div>
-            <p>{{ comment.text }}</p>
+            <p class="fs-15 text-secondary">{{ formatDateTime(comment.addedDate) }}</p>
+            <p>{{ comment.commentText }}</p>
         </div>
     </div>
     <div v-else>
@@ -21,38 +30,48 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-const comments = ref([
-    {
-        id: 1,
-        username: 'John Doe',
-        text: 'This document needs some revisions in the second paragraph.',
-        profileImageUrl: 'https://randomuser.me/api/portraits/men/1.jpg'
-    },
-    {
-        id: 2,
-        username: 'Jane Smith',
-        text: 'I have updated the financial figures in the report.',
-        profileImageUrl: 'https://randomuser.me/api/portraits/women/2.jpg'
-    },
-    {
-        id: 3,
-        username: 'Robert Johnson',
-        text: 'The final version of the document is ready for review.',
-        profileImageUrl: 'https://randomuser.me/api/portraits/men/3.jpg'
-    },
-    {
-        id: 4,
-        username: 'aosmaan khikhan',
-        text: 'The final version of the document is ready for review.',
-        // profileImageUrl: 'https://randomuser.me/api/portraits/men/3.jpg'
-    },
-    // Add more sample comments as needed
-]);
+import { computed, onMounted, ref } from 'vue';
+import BaseApiService from '../../../services/apiService';
+import { useStore } from 'vuex';
+const store = useStore();
+const documentId = computed(() => store.state.documentId);
+const comments = ref([]);
 const newComment = ref('');
-const addComment = () => {
+const addComment = async () => {
+    await BaseApiService('comment').create({ text: newComment.value, documentId: documentId.value });
+    await fetchComments();
     console.log('Adding comment:', newComment.value);
 }
+const fetchComments = async () => {
+    // Fetch comments from the server
+    await BaseApiService(`Comment`).list({
+        params: {
+            documentId: documentId.value
+        }
+    }).then(response => {
+        console.log(response);
+        comments.value = response.data;
+    }).catch(error => {
+        console.error('Error fetching comments:', error);
+    });
+    console.log(comments.value);
+}
+onMounted(() => {
+    fetchComments();
+});
+function formatDateTime(dateString) {
+    const date = new Date(dateString);
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true // Use 12-hour format (optional)
+    };
+    return date.toLocaleDateString('en-US', options);
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -77,6 +96,21 @@ const addComment = () => {
     border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
+}
+
+.comment-wrapper {
+    max-height: 90%;
+    overflow-y: auto;
+}
+
+.comment-wrapper::-webkit-scrollbar {
+    background-color: #f9f9fa;
+    width: 6px;
+}
+
+.comment-wrapper::-webkit-scrollbar-thumb {
+    background-color: #b1b1b198;
+    border-radius: 10px;
 }
 
 .comment h3 {

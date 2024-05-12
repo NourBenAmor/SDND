@@ -14,6 +14,7 @@ import "primevue/resources/themes/aura-light-indigo/theme.css";
 const appInstance = createApp(App);
 appInstance.use(Vue3Toasity, {
   autoClose: 3000,
+  clearOnUrlChange: false,
 });
 appInstance.use(Vue3Signature);
 appInstance.use(store);

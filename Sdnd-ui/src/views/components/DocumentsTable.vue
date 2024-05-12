@@ -120,7 +120,7 @@
 
                     <Sidebar v-if="docDetailsVisible" v-model:visible="docDetailsVisible" header="Document Details"
                       :documentId="document.id" position="full">
-                      <Document @addfile-emit="uploadFile" />
+                      <Document @addfile-emit="uploadFile" @refresh-documents="fetchDocuments" />
                     </Sidebar>
 
                     <a class="btn btn-link text-dark px-3 mb-0" @click="openEditView(document.id)">
@@ -351,7 +351,8 @@ async function addDocument(newDoc) {
     if (newDoc.files && newDoc.files.length > 0) {
       const documentId = response.data.id;
       for (const file of newDoc.files) {
-        await uploadFile(documentId, file);
+        const payload = { documentId, file };
+        await uploadFile(payload);
       }
     }
   } catch (e) {
@@ -359,8 +360,10 @@ async function addDocument(newDoc) {
   }
 }
 
-async function uploadFile(documentId, file) {
+async function uploadFile(payload) {
   try {
+    const documentId = payload.documentId;
+    const file = payload.file;
     console.log(documentId, file.name, "Ready to be added");
     const formData = new FormData();
     formData.append("DocumentId", documentId);

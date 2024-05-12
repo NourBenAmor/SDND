@@ -6,6 +6,4 @@ namespace Sdnd_api.Interfaces;
 public interface IUserAccessor
 {
     CurrentUserDto GetCurrentUser();
-
-
 }

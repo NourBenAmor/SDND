@@ -297,6 +297,8 @@ const toggleSignature = () => {
   height: 100%;
 }
 
+
+
 .file-container::-webkit-scrollbar {
   background-color: #f9f9fa;
 }

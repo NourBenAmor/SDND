@@ -72,8 +72,8 @@ public class AnnotationController : ControllerBase
             // Determine the new version number
             var newVersionNumber = versionNumbers.Any() ? versionNumbers.Max() + 1 : 1;
             
-            var fullPath = Path.Combine(pathToSave, LastVersionFileName);
-            // Append the version number to the filename
+            var fullPath = Path.Combine(pathToSave, fileName + "_*" + (newVersionNumber - 1));
+            // Append the version number to the filename 
             var fullNewPath = Path.Combine(pathToSave, $"{fileName}_*{newVersionNumber}");
 
             SignatureExample signatureExample = new SignatureExample();

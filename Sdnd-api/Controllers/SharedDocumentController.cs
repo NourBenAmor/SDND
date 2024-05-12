@@ -44,7 +44,7 @@ public class ShareController : ControllerBase
                 Id = user.Id,
                 Username = user.UserName,
                 Email = user.Email,
-                ProfilePictureUrl = user.ProfilePictureUrl,
+                //ProfilePictureUrl = user.ProfilePictureUrl,
                 Permissions = sharedDocument.Permissions.Select(p => p.Id).ToList(),
                 Tasks = await _context.DocTasks.Where(t => t.SharedDocumentId == documentId && t.AssignedUserId == user.Id).ToListAsync()
             });
@@ -60,15 +60,16 @@ public class ShareController : ControllerBase
     {
         var userToShareTo = await _userManager.FindByNameAsync(userName: sharedDoc.username);
         var currentUser =   _userAccessor.GetCurrentUser();
-        if (currentUser == null)
+        if (currentUser == null )
             return Unauthorized("Login First");
         var document = await _context.Documents.FindAsync(sharedDoc.documentId);
         if (userToShareTo == null || currentUser.Id == userToShareTo.Id )
             return NotFound("Invalid username");
         if (document == null)
             return NotFound("Document not found.");
-        if (document.OwnerId != currentUser.Id)
-            return Unauthorized("You are not authorized to make this operation");
+        
+        if (document.OwnerId != currentUser.Id && !await _context.SharedDocuments.AnyAsync(d => d.DocumentId == sharedDoc.documentId && d.SharedWithUserId == currentUser.Id && d.Permissions.Any(p => p.Name == "share")))
+                return Unauthorized("You are not authorized to make this operation");
         var sharedDocumentExists = await _context.SharedDocuments
             .AnyAsync(d => d.DocumentId == sharedDoc.documentId && d.SharedWithUserId == userToShareTo.Id);
         if (sharedDocumentExists)
@@ -136,7 +137,7 @@ public class ShareController : ControllerBase
                 UpdatedDate = document.UpdatedDate,
                 OwnerUsername = owner.UserName,
                 OwnerEmail = owner.Email,
-                OwnerProfilePictureUrl = (string.IsNullOrEmpty(owner.ProfilePictureUrl) ? null : owner.ProfilePictureUrl),
+               // OwnerProfilePictureUrl = (string.IsNullOrEmpty(owner.ProfilePictureUrl) ? null : owner.ProfilePictureUrl),
                 Permissions = sharedDocument.Permissions.Select(p => p.Id).ToList()
             });
         }
