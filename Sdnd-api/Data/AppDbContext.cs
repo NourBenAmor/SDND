@@ -48,23 +48,23 @@ namespace Sdnd_api.Data
                 entity.HasMany<Document>()
                     .WithOne()
                     .HasForeignKey(e => e.OwnerId)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .OnDelete(DeleteBehavior.Cascade);
                 entity.HasMany<SharedDocument>()
                     .WithOne()
                     .HasForeignKey(e => e.SharedWithUserId)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .OnDelete(DeleteBehavior.Cascade);
                 entity.HasMany<Annotation>()
                     .WithOne()
                     .HasForeignKey(e => e.userId)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .OnDelete(DeleteBehavior.Cascade);
                 entity.HasMany<Comment>()
                     .WithOne()
                     .HasForeignKey(e => e.UserId)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .OnDelete(DeleteBehavior.Cascade);
                 entity.HasMany<DocTask>()
                     .WithOne()
                     .HasForeignKey(e => e.AssignedUserId)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<Document>(entity =>
@@ -73,23 +73,23 @@ namespace Sdnd_api.Data
                 entity.HasMany<Annotation>()
                     .WithOne()
                     .HasForeignKey(e => e.documentId)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .OnDelete(DeleteBehavior.Cascade);
                 entity.HasMany<SharedDocument>()
                     .WithOne()
                     .HasForeignKey(e => e.DocumentId)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .OnDelete(DeleteBehavior.Cascade);
                 entity.HasMany<DocFile>()
                     .WithOne()
                     .HasForeignKey(e => e.DocumentId)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .OnDelete(DeleteBehavior.Cascade);
                 entity.HasMany<Comment>()
                     .WithOne()
                     .HasForeignKey(e => e.DocumentId)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .OnDelete(DeleteBehavior.Cascade);
                 entity.HasMany<DocTask>()
                     .WithOne()
                     .HasForeignKey(e => e.SharedDocumentId)
-                    .OnDelete(DeleteBehavior.NoAction);
+                    .OnDelete(DeleteBehavior.Cascade);
             });
             // Create password hasher
             var hasher = new PasswordHasher<User>();

@@ -2,7 +2,7 @@
     <div v-if="sharedUsers.length">
         <transition-group name="slide" tag="div">
             <div v-for="user in sharedUsers" :key="user.id" class="shared-user">
-                <SharedUserComponent :user="user" />
+                <SharedUserComponent @refetch-users="retrieveSharedUsers" :user="user" />
             </div>
         </transition-group>
     </div>
@@ -41,7 +41,7 @@
             <transition :name="transitionName" mode="out-in">
                 <div class="third-step" style="position:absolute; width:100%;" v-if="step === 3" key="step3">
                     <label width="100%" for="assignment">What should the user do with this document ? </label>
-                    <argon-textarea width="350px" v-model="TaskDescription" placeholder="Task details" />
+                    <argon-textarea width="350px" v-model="sharingForm.taskDescription" placeholder="Task details" />
                     <div class="d-flex button-container">
                         <button @click="step = 2" class="styled-button">
                             <i class="fas fa-arrow-left"></i> Back
@@ -69,12 +69,11 @@ import {
 import { useStore } from 'vuex';
 import { toast } from "vue3-toastify";
 import BaseApiService from '../../../services/apiService';
+
 const store = useStore();
-const sharedUsername = ref('');
 const shareResult = ref('');
 const usernames = ref([]);
 const documentId = computed(() => store.state.documentId);
-const filteredUsernames = ref([]);
 const step = ref(1);
 const sharingForm = ref(
     {
@@ -113,10 +112,7 @@ const fetchUsernames = async () => {
     }
 };
 
-const selectUsername = username => {
-    sharedUsername.value = username;
-    filteredUsernames.value = [];
-};
+
 const sharedUsers = ref([]);
 const retrieveSharedUsers = async () => {
     try {

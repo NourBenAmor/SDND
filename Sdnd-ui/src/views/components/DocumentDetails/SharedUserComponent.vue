@@ -39,6 +39,9 @@
                 <Tag v-if="task.state == 1" value="In Progress" severity="info" class="mx-2" />
             </div>
         </div>
+        <button v-if="isAuthor" class="revoke-button" @click="revokeAccess(user.id)">
+            <i class="fas fa-user-times"></i> Revoke Access
+        </button>
     </div>
     <!-- <p>{{ user.role }}</p> -->
     <!-- <span class="action-icon" @click="toggleDropdown(user.id)">
@@ -52,15 +55,41 @@
 <script setup>
 
 import Tag from 'primevue/tag';
-import { defineProps, watch, ref } from 'vue';
+import { defineProps, watch, ref, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useStore } from 'vuex';
+import BaseApiService from '../../../services/apiService';
+const store = useStore();
+const DocumentId = computed(() => store.state.documentId);
+const route = useRoute();
+const isAuthor = ref(false);
+isAuthor.value = route.path.includes('/tables');
+
+
 const showUserDetails = ref(false);
 const props = defineProps({
     user: Object
 })
-
+const emit = defineEmits(['refetchUsers']);
 watch(props, () => {
     console.log(props.user)
 })
+
+const revokeAccess = async (userId) => {
+    const doc = {
+        documentId: DocumentId.value,
+        userId: userId
+    }
+    console.log('Revoking access for user:', userId);
+    console.log('Document ID:', DocumentId.value);
+    await BaseApiService('Document/RevokeAccess').removeObj(doc).then(response => {
+        console.log('Access revoked:', response);
+        emit('refetchUsers');
+
+    }).catch(error => {
+        console.error('Error revoking access:', error);
+    });
+}
 
 </script>
 
@@ -115,6 +144,20 @@ watch(props, () => {
     font-size: 16px;
     font-weight: 600;
     color: #000;
+}
+
+.revoke-button {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    color: #000;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    top: 0;
+    right: 0;
 }
 
 h4 {

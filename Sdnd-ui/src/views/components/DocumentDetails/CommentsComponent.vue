@@ -30,6 +30,10 @@
 </template>
 
 <script setup>
+// login for getting what is our route endpoint write now 
+import { useRoute } from 'vue-router';
+const route = useRoute();
+console.log(route.path);
 import { computed, onMounted, ref } from 'vue';
 import BaseApiService from '../../../services/apiService';
 import { useStore } from 'vuex';
