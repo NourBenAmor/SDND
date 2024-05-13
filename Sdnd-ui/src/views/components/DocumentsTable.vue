@@ -122,6 +122,10 @@
                       :documentId="document.id" position="full">
                       <Document @addfile-emit="uploadFile" @refresh-documents="fetchDocuments" />
                     </Sidebar>
+
+                    <a class="btn btn-link text-dark px-3 mb-0" @click="shareDocument(document.id)">
+                      <i class="fas fa-share-alt text-dark me-2" aria-hidden="true"></i>Share
+                    </a>
                     <a class="btn btn-link text-danger text-gradient px-3 mb-0" @click="showConfirmDeleteModal(index)"
                       href="javascript:;">
                       <i class="far fa-trash-alt me-2" aria-hidden="true"></i>Delete
@@ -321,6 +325,22 @@ const openAddDocumentView = () => {
   showAddDocModal.value = true;
   store.state.showOverlay = true;
 };
+const shareDocument = (documentId, userId) => {
+  axios.post(`/api/document/${documentId}/share/${userId}`)
+  .then(response => {
+    console.log(response.data.message);
+    alert(response.data.message);
+  })
+  .catch(error => {
+    if (error.response && error.response.status === 404) {
+      console.error("Le document spécifié n'existe pas :", error);
+      alert("Le document spécifié n'existe pas.");
+    } else {
+      console.error("Erreur lors du partage du document :", error);
+      alert("Une erreur s'est produite lors du partage du document.");
+    }
+  });
+}
 
 async function addDocument(newDoc) {
   try {
