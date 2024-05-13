@@ -23,7 +23,7 @@ namespace FileUpload.Services
             var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
             if (!Directory.Exists(pathToSave))
                 Directory.CreateDirectory(pathToSave);
-            var fileName = docFile.Id.ToString()+"_*0";
+            var fileName = docFile.Id.ToString();
             var fullPath = Path.Combine(pathToSave, fileName);
             var dbPath = Path.Combine(folderName, fileName);
 
