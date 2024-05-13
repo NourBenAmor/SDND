@@ -57,7 +57,6 @@ axiosInstance.interceptors.response.use(
           zIndex: 50000,
         },
       });
-      showOverlay.value = true;
     }
     return Promise.reject(error);
   }
@@ -74,6 +73,8 @@ const BaseApiService = (resource) => {
       axiosInstance.patch(`${resource}/${id}`, payload, config),
     remove: (id, config = {}) =>
       axiosInstance.delete(`${resource}/${id}`, config),
+    removeObj: (payload, config = {}) =>
+      axiosInstance.delete(`${resource}`, { data: payload }, config),
   };
 };
 
