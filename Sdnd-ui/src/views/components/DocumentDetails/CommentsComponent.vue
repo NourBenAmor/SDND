@@ -31,9 +31,7 @@
 
 <script setup>
 // login for getting what is our route endpoint write now 
-import { useRoute } from 'vue-router';
-const route = useRoute();
-console.log(route.path);
+
 import { computed, onMounted, ref } from 'vue';
 import BaseApiService from '../../../services/apiService';
 import { useStore } from 'vuex';
@@ -44,7 +42,6 @@ const newComment = ref('');
 const addComment = async () => {
     await BaseApiService('comment').create({ text: newComment.value, documentId: documentId.value });
     await fetchComments();
-    console.log('Adding comment:', newComment.value);
 }
 const fetchComments = async () => {
     // Fetch comments from the server
@@ -53,12 +50,10 @@ const fetchComments = async () => {
             documentId: documentId.value
         }
     }).then(response => {
-        console.log(response);
         comments.value = response.data;
     }).catch(error => {
         console.error('Error fetching comments:', error);
     });
-    console.log(comments.value);
 }
 onMounted(() => {
     fetchComments();

@@ -159,8 +159,8 @@ public class DocumentController : ControllerBase
     }
     
         [AllowAnonymous]
-        [HttpGet("pdf/{id}")]
-        public IActionResult Get(Guid id)
+        [HttpGet("pdf/{id}/{version?}")]
+        public IActionResult Get(Guid id, int? version)
         {
             var folderName = Path.Combine("Resource", "AllFiles");
             var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
@@ -175,21 +175,55 @@ public class DocumentController : ControllerBase
             var versionNumbers = files.Select(file =>
             {
                 var versionString = Path.GetFileNameWithoutExtension(file).Replace(fileName, "").Replace("_*", "");
-                int version;
-                return int.TryParse(versionString, out version) ? version : 0;
+                int fileVersion;
+                return int.TryParse(versionString, out fileVersion) ? fileVersion : 0;
             });
 
             // Determine the highest version number
             var latestVersionNumber = versionNumbers.Any() ? versionNumbers.Max() : 1;
 
+            // If a version number is provided, use it. Otherwise, use the latest version number.
+            var selectedVersionNumber = version ?? latestVersionNumber;
+
             // Append the version number to the filename
-            var fullPath = Path.Combine(pathToSave, $"{fileName}_*{latestVersionNumber}");
+            var fullPath = Path.Combine(pathToSave, $"{fileName}_*{selectedVersionNumber}");
+
+            if (!System.IO.File.Exists(fullPath))
+            {
+                return NotFound("The requested version of the file does not exist.");
+            }
 
             var stream = new FileStream(fullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
             return File(stream, "application/pdf");
         }
 
-    [AllowAnonymous]
+        [AllowAnonymous]
+        [HttpGet("pdf/{id}/versions")]
+        public IActionResult GetVersions(Guid id)
+        {
+            var folderName = Path.Combine("Resource", "AllFiles");
+            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+
+            // Use a regular expression to remove any existing version number from the filename
+            var fileName = id.ToString();
+
+            // Get all files that start with the same id
+            var files = Directory.GetFiles(pathToSave, $"{fileName}*");
+
+            // Extract version numbers from filenames
+            var versionNumbers = files.Select(file =>
+            {
+                var versionString = Path.GetFileNameWithoutExtension(file).Replace(fileName, "").Replace("_*", "");
+                int fileVersion;
+                return int.TryParse(versionString, out fileVersion) ? fileVersion : 0;
+            })
+            .OrderBy(v => v)
+            .ToList();
+
+            return Ok(versionNumbers);
+        }
+
+        [AllowAnonymous]
     [HttpGet("pdf/second/{id}")]
     public IActionResult GetSecond(Guid id)
     {

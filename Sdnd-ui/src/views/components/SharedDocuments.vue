@@ -308,7 +308,6 @@ watch(CurrentDocumentState, (newVal) => {
   } else {
     filters.value.documentState = null; // Set to null or any appropriate value when state is not selected
   }
-  console.log(filters.value);
   fetchDocuments();
 });
 
@@ -347,7 +346,6 @@ const fetchDocuments = async () => {
     const response = await BaseApiService(`Document/SharedWithMe`).list({
       params: filters.value,
     });
-    console.log(response.data);
     documents.value = response.data;
     IsLoading.value = false;
   } catch (error) {
@@ -368,18 +366,15 @@ onMounted(() => {
 
 async function uploadFile(documentId, file) {
   try {
-    console.log(documentId, file.name, "Ready to be added");
     const formData = new FormData();
     formData.append("DocumentId", documentId);
     formData.append("File", file);
-    const response = await BaseApiService(`File/upload`).create(formData);
-    console.log(response.data);
+    await BaseApiService(`File/upload`).create(formData);
     toast.success(`"${file.FileName} Uploaded Successfully !"`, {
       autoClose: 1000,
       position: toast.POSITION.BOTTOM_RIGHT,
     });
   } catch (e) {
-    console.log(e);
     toast.error("Error Uploading File", {
       autoClose: 1000,
       position: toast.POSITION.BOTTOM_RIGHT,
@@ -390,12 +385,10 @@ async function openDocumentView(id) {
 
   store.state.documentId = id; // Update state
   await new Promise((resolve) => setTimeout(resolve, 0)); // Wait for a tick
-  console.log("store documentid ", store.state.documentId);
   docDetailsVisible.value = true;
 }
 
 const showConfirmDeleteModal = (index) => {
-  console.log(index)
   showDeleteModal.value = true;
   store.state.showOverlay = true;
   documentIndexToDelete.value = index;
@@ -415,8 +408,7 @@ const getDocumentStateString = (documentState) => {
 const handleDeleteConfirm = async () => {
   try {
     const documentId = documents.value[documentIndexToDelete.value].id;
-    const response = await BaseApiService(`Document/Delete`).remove(documentId);
-    console.log(response);
+    await BaseApiService(`Document/Delete`).remove(documentId);
     documents.value.splice(documentIndexToDelete.value, 1);
     hideDeleteModal();
     toast.error("Document Deleted !", {

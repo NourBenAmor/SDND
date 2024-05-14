@@ -1,5 +1,5 @@
 <template>
-  <div class="modal" :class="{ 'is-active': isModalActive }">
+  <div class="modal m-5" :class="{ 'is-active': isModalActive }">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -28,11 +28,11 @@
   </div>
 
   <!-- Users Table -->
-  <div class="users-table-container">
+  <div class="users-table-container m-4">
     <div class="card">
       <!-- Table header -->
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h6 class="mb-0">Users Table</h6>
+        <h6 class="mb-0">Role Management</h6>
       </div>
 
       <!-- Table body -->
@@ -207,7 +207,7 @@ const removeRole = async (userId, role) => {
 
 onMounted(() => {
   fetchUsers();
-  fetchCurrentUser(); 
+  fetchCurrentUser();
 });
 </script>
 
@@ -223,6 +223,6 @@ onMounted(() => {
 }
 
 .shadow-row {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0,5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0, 5);
 }
 </style>

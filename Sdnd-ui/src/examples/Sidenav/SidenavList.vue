@@ -44,17 +44,11 @@ const showUserList = computed(() => isAdmin.value);
 </script>
 
 <template>
-  <div
-    class="collapse navbar-collapse w-auto h-auto h-100"
-    id="sidenav-collapse-main"
-  >
+  <div class="collapse navbar-collapse w-auto h-auto h-100" id="sidenav-collapse-main">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <sidenav-item
-          to="/dashboard-default"
-          :class="getRoute() === 'dashboard-default' ? 'active' : ''"
-          :navText="isRTL ? 'لوحة القيادة' : 'Dashboard'"
-        >
+        <sidenav-item to="/dashboard-default" :class="getRoute() === 'dashboard-default' ? 'active' : ''"
+          :navText="isRTL ? 'لوحة القيادة' : 'Dashboard'">
           <template v-slot:icon>
             <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
           </template>
@@ -62,44 +56,23 @@ const showUserList = computed(() => isAdmin.value);
       </li>
 
       <li class="nav-item">
-        <sidenav-item
-          to="/tables"
-          :class="getRoute() === 'tables' ? 'active' : ''"
-          :navText="isRTL ? 'الجداول' : 'Documents'"
-        >
+        <sidenav-item to="/tables" :class="getRoute() === 'tables' ? 'active' : ''"
+          :navText="isRTL ? 'الجداول' : 'Documents'">
           <template v-slot:icon>
             <i class="fa fa-list text-warning text-sm opacity-10"></i>
           </template>
         </sidenav-item>
 
-        <sidenav-item
-          to="/shared-documents"
-          :class="getRoute() === 'shared-documents' ? 'active' : ''"
-          :navText="isRTL ? 'المستندات المشتركة' : 'Shared Documents'"
-        >
+        <sidenav-item to="/shared-documents" :class="getRoute() === 'shared-documents' ? 'active' : ''"
+          :navText="isRTL ? 'المستندات المشتركة' : 'Shared Documents'">
           <template v-slot:icon>
             <i class="fa fa-share-alt text-warning text-sm opacity-10"></i>
           </template>
         </sidenav-item>
       </li>
-
-      <li class="nav-item">
-        <sidenav-item
-          to="/permissions"
-          :class="getRoute() === 'permissions' ? 'active' : ''"
-          :navText="isRTL ? 'مسار تدقيق المستندات' : 'Documents audit trail'"
-        >
-          <template v-slot:icon>
-            <i class="fas fa-unlock-alt text-warning text-sm opacity-10"></i>
-          </template>
-        </sidenav-item>
-      </li>
       <li v-if="showUserList" class="nav-item">
-        <sidenav-item
-          to="/users"
-          :class="getRoute() === 'users' ? 'active' : ''"
-          :navText="isRTL ? 'حساب تعريفي' : 'User List'"
-        >
+        <sidenav-item to="/users" :class="getRoute() === 'users' ? 'active' : ''"
+          :navText="isRTL ? 'حساب تعريفي' : 'User List'">
           <template v-slot:icon>
             <i class="ni ni-settings-gear-65 text-dark text-sm opacity-10"></i>
           </template>
@@ -107,11 +80,8 @@ const showUserList = computed(() => isAdmin.value);
       </li>
 
       <li class="nav-item">
-        <sidenav-item
-          to="/profile"
-          :class="getRoute() === 'profile' ? 'active' : ''"
-          :navText="isRTL ? 'حساب تعريفي' : 'Profile'"
-        >
+        <sidenav-item to="/profile" :class="getRoute() === 'profile' ? 'active' : ''"
+          :navText="isRTL ? 'حساب تعريفي' : 'Profile'">
           <template v-slot:icon>
             <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
           </template>

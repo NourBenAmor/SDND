@@ -1,22 +1,15 @@
 <template>
   <main>
     <div class="container-fluid">
-      <div
-        class="page-header min-height-300"
-        style="margin-right: -24px; margin-left: -34%"
-      >
-        <span class="mask bg-gradient-success opacity-6"></span>
+      <div class="page-header min-height-300" style="margin-right: -24px; margin-left: -34%">
+        <span class="opacity-6"></span>
       </div>
-      <div class="card shadow-lg mt-n6">
-        <div class="card-body p-3">
+      <div class="card shadow-lg mt-n7 ">
+        <div class="card-body p-3 mr-5">
           <div class="row gx-4">
             <div class="col-auto">
               <div class="avatar avatar-xl position-relative">
-                <img
-                  src="../assets/img/team-1.jpg"
-                  alt="profile_image"
-                  class="shadow-sm w-100 border-radius-lg"
-                />
+                <img src="../assets/img/team-1.jpg" alt="profile_image" class="shadow-sm w-100 border-radius-lg" />
               </div>
             </div>
             <div class="col-auto my-auto">
@@ -36,11 +29,7 @@
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center justify-content-end">
-                <button
-                  class="btn btn-success"
-                  size="sm"
-                  @click="openEditUserView(currentUser.id)"
-                >
+                <button class="btn btn-success" size="sm" @click="openEditUserView(currentUser.id)">
                   <span>Edit Profile</span>
                 </button>
               </div>
@@ -139,5 +128,10 @@ onBeforeUnmount(() => {
 
 .user-info-item span {
   color: #6b6b6b;
+}
+
+.container-fluid {
+  margin-left: 30px;
+  margin-right: 30px;
 }
 </style>

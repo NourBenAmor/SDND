@@ -5,43 +5,27 @@
         <span class="mask bg-gradient opacity-6"></span>
       </div>
     </div>
-    <div class="py-4 container-fluid">
+    <div class="py-4 container-fluid mt-n9 ml-10">
       <div class="row">
         <div class="col-md-8">
           <div class="card">
             <div class="card-body">
               <p class="text-uppercase text-sm">Edit Profile</p>
               <div class="form-group">
-                <label for="userName" class="form-control-label"
-                  >Username:</label
-                >
+                <label for="userName" class="form-control-label">Username:</label>
 
-                <input
-                  type="text"
-                  id="userName"
-                  v-model="editedUser.userName"
-                  class="form-control"
-                />
+                <input type="text" id="userName" v-model="editedUser.userName" class="form-control" />
               </div>
               <div class="form-group">
                 <label for="email" class="form-control-label">Email:</label>
-                <input
-                  type="email"
-                  id="email"
-                  v-model="editedUser.email"
-                  class="form-control"
-                />
+                <input type="email" id="email" v-model="editedUser.email" class="form-control" />
               </div>
               <div class="form-group">
-                <button class="btn btn-success" @click="updateUser">
+                <button class="btn button-style btn-warning" @click="updateUser">
                   Save Changes
                 </button>
-                <span v-if="saved" class="text-success"
-                  >User updated successfully!</span
-                >
-                <span v-if="error" class="text-danger"
-                  >Error updating user. Please try again.</span
-                >
+                <span v-if="saved" class="text-success">User updated successfully!</span>
+                <span v-if="error" class="text-danger">Error updating user. Please try again.</span>
               </div>
             </div>
           </div>
@@ -134,10 +118,11 @@ onMounted(fetchUser);
 
 button {
   padding: 10px 20px;
-  background-color: #007bff;
-  color: #fff;
+  background-color: #f1c40f;
+  color: #f2f2f2;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-top: 20px;
 }
 </style>

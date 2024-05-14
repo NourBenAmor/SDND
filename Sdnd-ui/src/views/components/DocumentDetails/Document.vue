@@ -56,14 +56,17 @@
                   </div>
                 </template>
                 <Column v-for="col of FileColumns" :key="col.field" :field="col.field" :header="col.header">
-                  <template v-if="col.field === 'actions'" #body="slotProps">
-                    <div class="d-flex ml-0">
+                  <template #body="slotProps">
+                    <div v-if="col.field === 'actions'" class="d-flex ml-0">
                       <Button icon="fas fa-eye" class="p-button-rounded p-button-text"
                         @click="viewFile(slotProps.data)" />
-                      <Button icon="fas fa-pencil" class="p-button-rounded p-button-text"
-                        @click="editFile(slotProps.data)" />
-                      <Button icon="fas fa-trash" class="p-button-rounded p-button-text"
-                        @click="deleteFile(slotProps.data)" />
+                    </div>
+                    <div v-if="col.field == 'addedDate'">
+                      {{ advancedformatdate(slotProps.data.addedDate) }}
+                    </div>
+
+                    <div v-else>
+                      {{ slotProps.data[col.field] }}
                     </div>
                   </template>
                 </Column>
@@ -148,19 +151,16 @@ const documentDetails = ref(null);
 //     documentId: String // Enforce string type for clarity and potential validation
 // });
 const handleEmit = (payload) => {
-  console.log('payload from Document', payload)
   emits("addfile-emit", payload);
 }
 watch(() => selectedPdf.value, (newValue) => {
   activePdf.value = pdfSources.value.indexOf(newValue.id);
-  console.log("selectedPdf changed to", newValue);
 });
 onMounted(async () => {
   isFetched.value = false;
   await fetchdocumentDetails(documentId.value);
   if (documentDetails.value.files.length > 0) {
     pdfSources.value = documentDetails.value.files.map((file) => file.id);
-    console.log(pdfSources.value);
     activePdf.value = pdfSources.value.indexOf(documentDetails.value.files[0].id);
   }
 });
@@ -183,7 +183,27 @@ const getDocumentStateString = (documentState) => {
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString();
+  const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long', hour: 'numeric', minute: 'numeric' };
+  return date.toLocaleDateString(undefined, options);
+};
+const advancedformatdate = (dateString) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = now - date;
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (days > 1) {
+    return `${days} days ago`;
+  } else if (hours > 1) {
+    return `${hours} hours ago`;
+  } else if (minutes > 1) {
+    return `${minutes} minutes ago`;
+  } else {
+    return `${seconds} seconds ago`;
+  }
 };
 const fetchdocumentDetails = async (id) => {
   try {
@@ -192,7 +212,6 @@ const fetchdocumentDetails = async (id) => {
     }
 
     const response = await BaseApiService(`Document/${id}`).list();
-    console.log(response.data);
     documentDetails.value = response.data;
     isFetched.value = true;
   } catch (error) {
@@ -217,13 +236,13 @@ const items = ref([
       activeitem.value = 1;
     },
   },
-  {
-    label: "History",
-    icon: "fas fa-history",
-    command: () => {
-      activeitem.value = 2;
-    },
-  },
+  // {
+  //   label: "History",
+  //   icon: "fas fa-history",
+  //   command: () => {
+  //     activeitem.value = 2;
+  //   },
+  // },
   {
     label: "Comments",
     icon: "fa-solid fa-comments",
@@ -245,7 +264,8 @@ const items = ref([
 const FileColumns = [
   { field: "name", header: "Name" },
   { field: "formattedFileSize", header: "Size" },
-  { field: "filePath", header: "Path" },
+  { field: "id", header: "Id" },
+  { field: "addedDate", header: "Added Date" },
   { field: "actions", header: "Actions" },
 ];
 
@@ -255,15 +275,9 @@ const FileColumns = [
 const viewFile = (file) => {
   // Implement file viewing logic here
   activePdf.value = pdfSources.value.indexOf(file.id);
-  console.log("newactiveval", activePdf.value);
-  console.log("Viewing file:", file);
+
 };
-watch(pdfSources, async (NewVal, OldVal) => {
-  console.log("pdfSources changed from ", OldVal, "to", NewVal);
-});
-watch(activePdf, async (NewVal, OldVal) => {
-  console.log("selectedPdf changed from ", OldVal, "to", NewVal);
-});
+
 
 // const revokeAccess = async (userId) => {
 //   try {

@@ -10,7 +10,7 @@ public class SharedUserDto
     public string ProfilePictureUrl => $"https://ui-avatars.com/api/?name={Username}&size=128&background=f3d148&rounded=true&color=fff";
 
     public List<int> Permissions { get; set; } = [];
-    
+   
     public List<DocTask> Tasks { get; set; } = [];
     
 }

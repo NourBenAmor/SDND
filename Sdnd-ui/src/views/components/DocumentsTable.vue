@@ -263,7 +263,6 @@ watch(CurrentDocumentState, (newVal) => {
   } else {
     filters.value.documentState = null; // Set to null or any appropriate value when state is not selected
   }
-  console.log(filters.value);
   fetchDocuments();
 });
 
@@ -302,7 +301,6 @@ const fetchDocuments = async () => {
     const response = await BaseApiService(`Document/me`).list({
       params: filters.value,
     });
-    console.log(response.data);
     documents.value = response.data;
     IsLoading.value = false;
   } catch (error) {
@@ -325,26 +323,24 @@ const openAddDocumentView = () => {
   showAddDocModal.value = true;
   store.state.showOverlay = true;
 };
-const shareDocument = (documentId, userId) => {
-  axios.post(`/api/document/${documentId}/share/${userId}`)
-  .then(response => {
-    console.log(response.data.message);
-    alert(response.data.message);
-  })
-  .catch(error => {
-    if (error.response && error.response.status === 404) {
-      console.error("Le document spécifié n'existe pas :", error);
-      alert("Le document spécifié n'existe pas.");
-    } else {
-      console.error("Erreur lors du partage du document :", error);
-      alert("Une erreur s'est produite lors du partage du document.");
-    }
-  });
-}
+// const shareDocument = (documentId, userId) => {
+//   axios.post(`/api/document/${documentId}/share/${userId}`)
+//     .then(response => {
+//       alert(response.data.message);
+//     })
+//     .catch(error => {
+//       if (error.response && error.response.status === 404) {
+//         console.error("Le document spécifié n'existe pas :", error);
+//         alert("Le document spécifié n'existe pas.");
+//       } else {
+//         console.error("Erreur lors du partage du document :", error);
+//         alert("Une erreur s'est produite lors du partage du document.");
+//       }
+//     });
+// }
 
 async function addDocument(newDoc) {
   try {
-    console.log(newDoc);
     const formData = new FormData();
     formData.append("Name", newDoc.name);
     formData.append("Description", newDoc.description);
@@ -356,8 +352,6 @@ async function addDocument(newDoc) {
       position: toast.POSITION.BOTTOM_RIGHT,
     });
 
-    console.log(response.data);
-
 
     if (newDoc.files && newDoc.files.length > 0) {
       const documentId = response.data.id;
@@ -366,27 +360,23 @@ async function addDocument(newDoc) {
         await uploadFile(payload);
       }
     }
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.error("Error uploading file:", error);
   }
 }
-
 async function uploadFile(payload) {
   try {
     const documentId = payload.documentId;
     const file = payload.file;
-    console.log(documentId, file.name, "Ready to be added");
     const formData = new FormData();
     formData.append("DocumentId", documentId);
     formData.append("File", file);
-    const response = await BaseApiService(`File/upload`).create(formData);
-    console.log(response.data);
+    await BaseApiService(`File/upload`).create(formData);
     toast.success(`"${file.FileName} Uploaded Successfully !"`, {
       autoClose: 1000,
       position: toast.POSITION.BOTTOM_RIGHT,
     });
   } catch (e) {
-    console.log(e);
     toast.error("Error Uploading File", {
       autoClose: 1000,
       position: toast.POSITION.BOTTOM_RIGHT,
@@ -396,7 +386,6 @@ async function uploadFile(payload) {
 async function openDocumentView(id) {
   store.state.documentId = id; // Update state
   await new Promise((resolve) => setTimeout(resolve, 0)); // Wait for a tick
-  console.log("store documentid ", store.state.documentId);
   docDetailsVisible.value = true;
 }
 
@@ -420,8 +409,7 @@ const getDocumentStateString = (documentState) => {
 const handleDeleteConfirm = async () => {
   try {
     const documentId = documents.value[documentIndexToDelete.value].id;
-    const response = await BaseApiService(`Document/Delete`).remove(documentId);
-    console.log(response);
+    await BaseApiService(`Document/Delete`).remove(documentId);
     documents.value.splice(documentIndexToDelete.value, 1);
     hideDeleteModal();
     toast.error("Document Deleted !", {

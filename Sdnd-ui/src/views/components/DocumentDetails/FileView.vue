@@ -18,43 +18,35 @@
         <button @click="scale = 1" class="btn btn-link text-primary px-2 mb-0 mx-2">
           <i class="fa-solid fa-compress"></i>
         </button>
+        <div class="dropdown">
+          <button class="btn btn-link text-primary px-2 mb-0 mx-2" type="button" id="dropdownMenuButton1"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-history"></i>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li v-for="version in versions" :key="version.id">
+              <a class="dropdown-item" href="#" @click="onSaveAnnotation(version)">
+                version {{ " " }} {{ version }}
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div>
         <button @click="downloadDocument" class="btn btn-link text-secondary px-1 mb-0 mx-2">
           <i class="fas fa-download text-primary me-1" aria-hidden="true"></i>Download
         </button>
-        <button @click="addAnnotation" class="btn btn-link text-secondary px-1 mb-0 mx-2">
-          <i class="fas fa-pen text-primary me-1" aria-hidden="true"></i>
-          <a style="text-decoration: none; color: inherit" arget="_blank">Add Annotations</a>
-        </button>
       </div>
     </div>
     <div class="file-container">
-      <Loading v-model:active="savingAnnotations" />
+
       <div v-if="!pdfSources">
         <h1> No available Pdfs </h1>
       </div>
       <div v-else v-for="page in pages" :key="page">
-        <div style="position:relative">
-          <button class="toggleButton" @click="toggleSignature">
-            <svg width="20px" height="20px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg">
-              <g fill="#888888" fill-rule="evenodd" clip-rule="evenodd" stroke="none" stroke-width="1">
-                <path
-                  d="M1468.235 113v91.142L822.674 862.89a87.85 87.85 0 0 0-24.598 61.495l-.002 429.859c-.24.366-.477.736-.71 1.109-23.717 42.918-79.058 105.035-112.94 101.647-33.883-3.388-44.048-27.106-72.283-96-36.141-89.224-94.87-206.682-190.87-197.647-120.847 10.165-179.577 225.882-199.906 320.753-6.55 31.188 13.424 61.78 44.611 68.33 31.188 6.549 61.78-13.425 68.33-44.612a484.518 484.518 0 0 1 97.13-225.883s30.493 10.165 77.929 127.624c47.435 117.459 99.388 161.506 169.411 166.023h9.036c112.94 0 196.517-143.435 205.553-160.376 10.037-16.097 10.996-35.285 4.266-51.575h339.697a87.85 87.85 0 0 0 61.496-26.355l169.411-172.872v642.708H0V113h1468.235Zm-903.53 564.706H225.883v112.941h338.824V677.706Zm225.883-225.882H225.882v112.94h564.706v-112.94Z" />
-                <path
-                  d="m1903.059 468.765-225.883-225.883a56.47 56.47 0 0 0-80.188 0L919.341 920.53a56.476 56.476 0 0 0-15.813 39.53v282.353h282.354a56.47 56.47 0 0 0 39.53-16.941l677.647-677.647c21.523-21.959 21.523-57.101 0-79.06Zm-208.941 128.753-145.694-145.694 89.223-89.224 145.694 145.694-89.223 89.224Z" />
-              </g>
-            </svg>
-          </button>
-          <VuePDF :pdf="pdf" :scale="scale" :page="page" style="margin-bottom: 10px" :fit-parent="fitParent">
-            <div class="spinner-grow m-0 9-0" style="width:100%; height:100%;" role="status">
-              <span class="sr-only m-0 p-0">Loading...</span>
-            </div>
-          </VuePDF>
-          <Signaturepdf @save-annotation="onSaveAnnotation" :source="src" :page="page" v-if="showSignature"
-            style="position:absolute;left: 0; top: 0;  width: 100%; height: 100%;" />
-        </div>
+        <PageViewComponent :page="page" :scale="scale" :pdf="pdf" :src="src" :fit-parent="fitParent"
+          @refresh-annotation="refresh" />
       </div>
     </div>
 
@@ -99,13 +91,12 @@
 </template>
 
 <script setup>
-import Loading from 'vue-loading-overlay';
-import 'vue-loading-overlay/dist/css/index.css';
-import Signaturepdf from "./Signaturepdf.vue";
+import PageViewComponent from "./PageViewComponent.vue";
+
 import { ref, computed, onMounted } from "vue";
 import BaseApiService from "../../../services/apiService";
 import { useStore } from "vuex";
-import { VuePDF, usePDF } from "@tato30/vue-pdf";
+import { usePDF } from "@tato30/vue-pdf";
 // const showModal = ref(false);
 const store = useStore();
 const props = defineProps({
@@ -113,59 +104,60 @@ const props = defineProps({
   selected: Number
 });
 const documentId = computed(() => store.state.documentId);
-const savingAnnotations = ref(false);
+const selectedSource = ref('');
 const src = ref('');
 const { pdf, pages } = usePDF(src);
 import { watch } from 'vue';
 onMounted(() => {
-  console.log('fichier', props.selected);
   if (props.pdfSources && props.pdfSources.length > 0) {
-    const selectedSource = props.pdfSources[props.selected];
-    if (selectedSource) {
-      src.value = `https://localhost:7278/api/document/pdf/${selectedSource}`;
-      console.log(src.value);
+    selectedSource.value = props.pdfSources[props.selected];
+    if (selectedSource.value) {
+      src.value = `https://localhost:7278/api/document/pdf/${selectedSource.value}`;
 
     }
     else {
       // Handle the case when props.selected is an invalid index
-      console.log('Invalid index:', props.selected);
     }
-    savingAnnotations.value = false;
   }
   else {
     // Handle the case when props.pdfSources is an empty array
-    console.log('No PDF sources provided');
   }
+  fetchversions();
 });
 watch(() => props.selected, (newValue) => {
-  console.log('fichier', newValue);
   if (props.pdfSources && props.pdfSources.length > 0) {
-    const selectedSource = props.pdfSources[newValue];
-    if (selectedSource) {
-      src.value = `https://localhost:7278/api/document/pdf/${selectedSource}`;
-      console.log(src.value);
+    selectedSource.value = props.pdfSources[newValue];
+    if (selectedSource.value) {
+      src.value = `https://localhost:7278/api/document/pdf/${selectedSource.value}`;
 
     }
     else {
       // Handle the case when props.selected is an invalid index
-      console.log('Invalid index:', props.selected);
     }
   }
   else {
     // Handle the case when props.pdfSources is an empty array
-    console.log('No PDF sources provided');
   }
-  savingAnnotations.value = false;
 
 });
+const refresh = () => {
+  // force a component rerender
+  fetchversions();
+  src.value = `https://localhost:7278/api/document/pdf/${selectedSource.value}`;
+};
+const versions = ref([]);
+const fetchversions = async () => {
+  try {
+    const response = await BaseApiService(`Document/pdf/${src.value.split("/").pop()}/versions`).list();
+    versions.value = response.data;
+  } catch (error) {
+    console.error("Error fetching versions:", error);
+  }
+};
 const scale = ref(1);
 const fitParent = ref(false);
-const onSaveAnnotation = (fileId) => {
-  savingAnnotations.value = true;
-  src.value = `https://localhost:7278/api/document/pdf/${fileId}`;
-  setTimeout(() => {
-    savingAnnotations.value = false;
-  }, 2000);
+const onSaveAnnotation = (f) => {
+  src.value = `https://localhost:7278/api/document/pdf/${selectedSource.value}/${f}`;
 };
 // const SignatureToolbar = ref(false);
 //   const showShareModal = (index) => {
@@ -178,10 +170,10 @@ const onSaveAnnotation = (fileId) => {
 //       username: username.value,
 //       documentId: documentId.value,
 //     };
-//     console.log(ShareRequest);
+
 //     const response =
 //       await BaseApiService(`Document/Share`).create(ShareRequest);
-//     console.log(response.data);
+
 //     router.push("/shared-documents");
 //   } catch (e) {
 //     console.error(e);
@@ -190,12 +182,6 @@ const onSaveAnnotation = (fileId) => {
 // const showSignatureToolbar = () => {
 //   SignatureToolbar.value = !SignatureToolbar.value;
 // }; -->
-const addAnnotation = () => {
-  // Encode the URL to ensure proper handling of special characters
-  const encodedUrl = encodeURIComponent(src.value);
-  console.log(encodedUrl);
-  window.location.href = `http://127.0.0.1:5500/web/viewer.html?file=${encodedUrl}`;
-};
 
 
 
@@ -220,10 +206,7 @@ const downloadDocument = async () => {
   }
 };
 
-const showSignature = ref(false);
-const toggleSignature = () => {
-  showSignature.value = !showSignature.value;
-};
+
 </script>
 
 <style scoped>
@@ -307,18 +290,5 @@ const toggleSignature = () => {
   background-color: #d4d4d498;
   border-left: 1px solid #f9f9fa;
   border-right: 1px solid #f9f9fa;
-}
-
-.toggleButton {
-  background: #f9f9fb00;
-  color: #585858;
-  padding: 0px;
-  width: auto;
-  cursor: pointer;
-  border: none;
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 100;
 }
 </style>
