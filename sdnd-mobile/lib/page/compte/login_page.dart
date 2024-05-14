@@ -211,7 +211,7 @@ class _LoginPageState extends State<LoginPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  const ForgetPasswordPage())),
+                              const ForgetPasswordPage())),
                       child: const Text(
                         'Forget password?',
                         style: TextStyle(

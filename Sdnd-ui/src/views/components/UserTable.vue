@@ -93,6 +93,18 @@
       </div>
     </div>
   </div>
+  <div v-if="roleUpdated" class="modal-notification">
+    <div class="modal-notification-content">
+      <p>Role updated successfully!</p>
+      <button @click="dismissUpdateNotification" class="dismiss-button">-</button>
+    </div>
+  </div>
+  <div v-if="roleRemoved" class="modal-notification">
+    <div class="modal-notification-content">
+      <p>Role removed successfully!</p>
+      <button @click="dismissNotification" class="dismiss-button">-</button>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -110,7 +122,14 @@ const loggedInUserId = ref(null);
 
 const isLoggedIn = ref(false);
 const userRole = ref("");
-
+const roleRemoved = ref(false);
+const roleUpdated = ref(false);
+const dismissUpdateNotification = () => {
+  roleUpdated.value = false;
+};
+const dismissNotification = () => {
+  roleRemoved.value = false;
+};
 const openModal = (userId) => {
   console.log("Opening modal for user ID:", userId);
   selectedUserId.value = userId;
@@ -172,7 +191,7 @@ const updateRole = async () => {
       console.log("User role updated successfully!");
       closeModal();
       fetchUsers();
-    } else {
+      roleUpdated.value = true; 
       console.error("Unexpected response:", response);
     }
   } catch (error) {
@@ -187,7 +206,7 @@ const removeRole = async (userId, role) => {
       `"${role}"`,
       {
         headers: {
-          ...authHeader(), // Include authorization headers
+          ...authHeader(),
           "Content-Type": "application/json-patch+json",
           Accept: "*/*",
         },
@@ -197,6 +216,7 @@ const removeRole = async (userId, role) => {
     if (response.status === 204) {
       console.log("Role removed successfully!");
       fetchUsers();
+      roleRemoved.value = true;
     } else {
       console.error("Unexpected response:", response);
     }
@@ -204,6 +224,7 @@ const removeRole = async (userId, role) => {
     console.error("Error removing role:", error);
   }
 };
+
 
 onMounted(() => {
   fetchUsers();
@@ -224,5 +245,39 @@ onMounted(() => {
 
 .shadow-row {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0, 5);
+}
+.modal-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffcf32; /* Yellow color */
+  border-radius: 8px;
+  padding: 20px;
+  z-index: 1000;
+  color: #fff; /* White text */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3); /* Shadow effect */
+}
+
+.modal-notification-content {
+  text-align: center;
+}
+
+.dismiss-button {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 24px;
+  cursor: pointer;
+  position: absolute;
+  bottom: 10px; /* Adjust bottom position as needed */
+  left: 50%;
+  transform: translateX(-50%); /* Center the button horizontally */
+}
+
+
+.fade-enter-active {
+  transition: opacity 0.5s;
 }
 </style>
