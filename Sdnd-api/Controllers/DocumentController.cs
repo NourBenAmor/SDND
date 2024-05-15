@@ -309,6 +309,20 @@ public class DocumentController : ControllerBase
 
         return Ok(docFiles);
     }
+    [HttpGet("filterByName")]
+    public IActionResult FilterByName([FromQuery] string Name)
+    {
+        if (string.IsNullOrEmpty(Name))
+        {
+            return BadRequest("Name filter parameter is required.");
+        }
+
+        var filteredDocuments = _context.Documents
+            .Where(d => d.Name.Contains(Name))
+            .ToList();
+
+        return Ok(filteredDocuments);
+    }
 
     [HttpGet("statistics")]
     public IActionResult GetDocumentStatistics()
