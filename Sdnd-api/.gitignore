@@ -13,7 +13,7 @@ BenchmarkDotNet.Artifacts/
 src/SignalR/clients/**/dist/
 modules/
 .ionide/
-Resource
+Resource/AllFiles
 .vscode/
 Migrations/
 # File extensions
