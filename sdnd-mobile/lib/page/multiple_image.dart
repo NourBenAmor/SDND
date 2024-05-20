@@ -8,7 +8,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import 'base_layout.dart';
+
 class MultipleImage extends StatefulWidget {
+  final String token;
+
+  const MultipleImage({Key? key, required this.token}) : super(key: key);
+
   @override
   _MultipleImageState createState() => _MultipleImageState();
 }
@@ -16,6 +22,15 @@ class MultipleImage extends StatefulWidget {
 class _MultipleImageState extends State<MultipleImage> {
   final picker = ImagePicker();
   List<File> _image = [];
+  late String token;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.token != null) {
+      token = widget.token;
+    }
+  }
   final BoxDecoration _imageDecoration = BoxDecoration(
     border: Border.all(
       width: 1,
@@ -27,7 +42,10 @@ class _MultipleImageState extends State<MultipleImage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BaseLayout(
+        token: widget.token,
+        currentIndex: 3,
+        child: Scaffold(
       appBar: AppBar(
         title: Text(""),
         actions: [
@@ -75,8 +93,7 @@ class _MultipleImageState extends State<MultipleImage> {
             Expanded(
               child: _image.isNotEmpty
                   ? GridView.builder(
-                gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
@@ -120,7 +137,7 @@ class _MultipleImageState extends State<MultipleImage> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Future<void> pickImages() async {
@@ -165,7 +182,7 @@ class _MultipleImageState extends State<MultipleImage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SavingPage(pdfFile: saveFile),
+          builder: (context) => SavingPage(pdfFile: saveFile, token: widget.token),
         ),
       );
     } catch (e) {

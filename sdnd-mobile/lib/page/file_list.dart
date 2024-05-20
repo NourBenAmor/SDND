@@ -1,11 +1,18 @@
 import 'dart:io';
-
+import 'package:airsafe/page/synchronisation.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf_thumbnail/pdf_thumbnail.dart';
 
+import '../View/DashboardView.dart';
+import '../View/ProfilePageView.dart';
+import 'addDocument.dart';
+import 'base_layout.dart';
+import 'multiple_image.dart';
 
 class ListPDFsScreen extends StatefulWidget {
-  const ListPDFsScreen({Key? key}) : super(key: key);
+  final String token;
+
+  const ListPDFsScreen({Key? key, required this.token}) : super(key: key);
 
   @override
   State<ListPDFsScreen> createState() => _ListPDFsScreenState();
@@ -13,9 +20,19 @@ class ListPDFsScreen extends StatefulWidget {
 
 class _ListPDFsScreenState extends State<ListPDFsScreen> {
   List<File> mypdfs = [];
+  late String token;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.token != null) {
+      token = widget.token;
+      _loadPdfFiles();
+    }
+  }
+
 
   Future<void> _loadPdfFiles() async {
-    // Load PDF files from the device storage
     Directory downloadsDirectory = Directory('/storage/emulated/0/Download');
     List<FileSystemEntity> entities = downloadsDirectory.listSync(recursive: false);
     List<File> pdfFiles = [];
@@ -30,22 +47,46 @@ class _ListPDFsScreenState extends State<ListPDFsScreen> {
   }
 
   Future<void> _handleFileSelection(String filePath) async {
-    // Return the selected file path to the previous screen
     Navigator.pop(context, filePath);
   }
+  void _navigateToListPdfPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ListPDFsScreen(token: token,)),
+    );
+  }
+  void _navigateToDashboardPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DashboardView(token: token)),
+    );
+  }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadPdfFiles();
+
+
+  void _navigateToProfilePage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ProfilePageView(token: token)),
+    );
+  }
+
+  void _navigateToCreateDocumentPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CreateDocumentPage( createDocumentCallback: (String , description ) {  },)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return BaseLayout(
+        token: token,
+        currentIndex: 1, // Set currentIndex to 4 for ListPDFsScreen
+        child: Scaffold(
+        appBar: AppBar(
         title: Text("PDFs"),
-      ),
+    ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: GridView.builder(
@@ -58,7 +99,6 @@ class _ListPDFsScreenState extends State<ListPDFsScreen> {
           itemBuilder: (context, index) {
             return InkWell(
               onTap: () {
-                // Handle file selection when tapped
                 _handleFileSelection(mypdfs[index].path);
               },
               child: Container(
@@ -82,6 +122,10 @@ class _ListPDFsScreenState extends State<ListPDFsScreen> {
           },
         ),
       ),
-    );
+    ));
   }
 }
+
+
+
+

@@ -32,6 +32,8 @@
         </div>
       </div>
     </div>
+    <div v-if="validationError" class="text-danger">{{ validationError }}</div>
+
   </main>
 </template>
 
@@ -47,6 +49,7 @@ const router = useRouter();
 
 const saved = ref(false);
 const error = ref(false);
+const validationError = ref("");
 
 const currentUser = ref(null);
 const editedUser = ref({
@@ -76,7 +79,10 @@ const updateUser = async () => {
     const formData = new FormData();
     formData.append("username", editedUser.value.userName);
     formData.append("email", editedUser.value.email);
-
+    if (!editedUser.value.userName.trim() || !editedUser.value.email.trim()) {
+      validationError.value = "Username and email cannot be empty.";
+      return;
+    }
     if (!userId) {
       console.error("Cannot update user: User ID is undefined or null.");
       return;
@@ -97,6 +103,8 @@ const updateUser = async () => {
     saved.value = true;
 
     router.push("/profile");
+    validationError.value = "";
+
   } catch (error) {
     console.error("Error updating user:", error);
     error.value = true;

@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:airsafe/View/DocumentDetailsView.dart';
-import 'package:airsafe/View/ProfilePageView.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:airsafe/View/DashboardView.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -12,11 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import '../Controller/DocumentController.dart';
 import '../Model/Document.dart';
 import '../page/addDocument.dart';
-import '../page/camera_page.dart';
 import '../page/editing_page.dart';
-import '../page/file_list.dart';
-import '../page/multiple_image.dart';
-import '../page/synchronisation.dart';
+import '../page/base_layout.dart';
 
 class Home_PageView extends StatefulWidget {
   final String token;
@@ -38,8 +33,6 @@ class _HomePageViewState extends State<Home_PageView> {
     token = widget.token; // Assign the value of widget.token to token field
     _controller = DocumentController(widget.token, context);
     _fetchDocuments();
-    token = widget.token;
-
   }
 
   Future<void> _fetchDocuments() async {
@@ -47,20 +40,6 @@ class _HomePageViewState extends State<Home_PageView> {
     setState(() {
       _documents = documents;
     });
-  }
-
-  Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    XFile? pickedFile;
-
-    try {
-      pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-      if (pickedFile != null) {
-        await scanImage(context, pickedFile);
-      }
-    } catch (e) {
-      print("Error picking image: $e");
-    }
   }
 
   Future<void> scanImage(BuildContext context, XFile photo) async {
@@ -75,32 +54,18 @@ class _HomePageViewState extends State<Home_PageView> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditingPage(imageFile: File(photo.path)),
+        builder: (context) => EditingPage(imageFile: File(photo.path), token: token),
       ),
     );
   }
 
-  void _navigateToListPdfPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ListPDFsScreen()),
-    );
-  }
-
-  void _navigateToProfilePage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ProfilePageView(token: token),
-      ),
-    );
-  }
   void _navigateToDashboardPage(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => DashboardView(token: token)),
     );
   }
+
   void _navigateToDocumentDetailsPage(
       BuildContext context,
       String documentId,
@@ -129,7 +94,6 @@ class _HomePageViewState extends State<Home_PageView> {
               CreateDocumentPage(createDocumentCallback: _createDocument)),
     );
   }
-
 
   Future<void> _createDocument(String name, String description) async {
     if (name.isEmpty || description.isEmpty) {
@@ -295,129 +259,85 @@ class _HomePageViewState extends State<Home_PageView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(''),
-        actions: [
-          IconButton(
+    return BaseLayout(
+      token: widget.token,
+      currentIndex: 0,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Documents'),
+            actions: [
+            IconButton(
             onPressed: () {
-              _navigateToDashboardPage(context); // Call function to navigate to dashboard
-            },
-            icon: Icon(Icons.dashboard), // Icon for dashboard
-          ),
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SynchronizationPage()),
-              );
-            },
-            icon: Icon(Icons.settings),
-          ),
-          IconButton(
-            onPressed: () {
-              _navigateToProfilePage(context);
-            },
-            icon: Icon(Icons.account_circle),
-          )
-        ],
+      _navigateToDashboardPage(context); // Call function to navigate to dashboard
+      },
+        icon: Icon(Icons.dashboard), // Icon for dashboard
       ),
-      body: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height / 4,
-            child: Image.asset(
-              'images/image-document.png',
-              fit: BoxFit.cover,
+        ]),
+
+        body: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height / 4,
+              child: Image.asset(
+                'images/image-document.png',
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          Container(
-            padding: EdgeInsets.all(16.0),
-            color: Colors.grey[200]?.withOpacity(0.5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16.0),
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.yellow.withOpacity(0.5),
-                          spreadRadius: 1,
-                          blurRadius: 3,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.search),
-                        SizedBox(width: 8.0),
-                        Expanded(
-                          child: TextField(
-                            onChanged: (value) {
-                              _searchDocuments(value);
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Search',
-                              border: InputBorder.none,
+            Container(
+              padding: EdgeInsets.all(16.0),
+              color: Colors.grey[200]?.withOpacity(0.5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.yellow.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 3,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.search),
+                          SizedBox(width: 8.0),
+                          Expanded(
+                            child: TextField(
+                              onChanged: (value) {
+                                _searchDocuments(value);
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Search',
+                                border: InputBorder.none,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        _navigateToCreateDocumentPage(
-                            context); // Utilize the new method
-                      },
-                      icon: Icon(Icons.create_new_folder),
-                      tooltip: 'Create a new folder',
-                    ),
-                    SizedBox(width: 4),
-                    IconButton(
-                      onPressed: () {
-                        _navigateToListPdfPage(context);
-                      },
-                      icon: Icon(Icons.file_download_rounded),
-                      tooltip: 'Import a file',
-                    ),
-                    SizedBox(width: 4),
-                    IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => MultipleImage()),
-                        );
-                      },
-                      icon: Icon(Icons.photo_library),
-                      tooltip: 'Select Multiple Images',
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: _documents.isNotEmpty
-                ? ListView.builder(
-              itemCount: _documents.length,
-              itemBuilder: (context, index) {
-                final document = _documents[index];
-                return Card(
+            Expanded(
+              child: _documents.isNotEmpty
+                  ? ListView.builder(
+                itemCount: _documents.length,
+                itemBuilder: (context, index) {
+                  final document = _documents[index];
+                  return Card(
                     elevation: 0,
-                    margin:
-                    EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    margin: EdgeInsets.symmetric(
+                        vertical: 8, horizontal: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -442,7 +362,8 @@ class _HomePageViewState extends State<Home_PageView> {
                           ),
                         ),
                         subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Description:',
@@ -472,7 +393,8 @@ class _HomePageViewState extends State<Home_PageView> {
                                   style: TextStyle(
                                     color: Colors.blue,
                                     fontSize: 14,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight:
+                                    FontWeight.bold,
                                   ),
                                 ),
                               ),
@@ -506,54 +428,44 @@ class _HomePageViewState extends State<Home_PageView> {
                           );
                         },
                       ),
-                    ));
-              },
-            )
-                : Center(child: Text('No documents found')),
-          ),
-        ],
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CameraPage()),
-              );
-            },
-            backgroundColor: Colors.yellow[700],
-            child: Icon(Icons.camera_alt),
-          ),
-          SizedBox(height: 16),
-          FloatingActionButton(
-            onPressed: _pickImage,
-            backgroundColor: Colors.yellow[700],
-            child: Icon(Icons.image),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void showAlert(BuildContext context, String title, String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
+                    ),
+                  );
+                },
+              )
+                  : Center(child: Text('No documents found')),
             ),
           ],
-        );
-      },
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            _navigateToCreateDocumentPage(context);
+          },
+          backgroundColor: Colors.yellow[700],
+          label: Text('Add Document'),
+        ),
+
+      ),
+
     );
   }
+}
+
+void showAlert(BuildContext context, String title, String message) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
 }

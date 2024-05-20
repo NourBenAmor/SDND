@@ -127,9 +127,7 @@ const roleUpdated = ref(false);
 const dismissUpdateNotification = () => {
   roleUpdated.value = false;
 };
-const dismissNotification = () => {
-  roleRemoved.value = false;
-};
+
 const openModal = (userId) => {
   console.log("Opening modal for user ID:", userId);
   selectedUserId.value = userId;
@@ -215,8 +213,8 @@ const removeRole = async (userId, role) => {
 
     if (response.status === 204) {
       console.log("Role removed successfully!");
+      roleRemoved.value = true; // Set flag to true when role is removed successfully
       fetchUsers();
-      roleRemoved.value = true;
     } else {
       console.error("Unexpected response:", response);
     }
@@ -225,6 +223,9 @@ const removeRole = async (userId, role) => {
   }
 };
 
+const dismissNotification = () => {
+  roleRemoved.value = false; 
+};
 
 onMounted(() => {
   fetchUsers();

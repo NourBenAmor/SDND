@@ -8,7 +8,8 @@ import 'package:edge_detection/edge_detection.dart';
 import 'editing_page.dart';
 
 class CameraPage extends StatefulWidget {
-  const CameraPage({Key? key}) : super(key: key);
+  final String token;
+  const CameraPage({Key? key, required this.token}) : super(key: key);
 
   @override
   _CameraPageState createState() => _CameraPageState();
@@ -18,10 +19,12 @@ class _CameraPageState extends State<CameraPage> {
   late Future<void> _cameraFuture;
   late CameraController _cameraController;
   String? _imagePath;
+  late String token;
 
   @override
   void initState() {
     super.initState();
+    token = widget.token; // Initialize token in initState
     _cameraFuture = _initializeCameraAndDetectEdge();
   }
 
@@ -62,7 +65,7 @@ class _CameraPageState extends State<CameraPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => EditingPage(imageFile: File(capturedImage.path)),
+            builder: (context) => EditingPage(imageFile: File(capturedImage.path), token: token),
           ),
         );
       }

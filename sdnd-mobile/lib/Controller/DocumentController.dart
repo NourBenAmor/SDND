@@ -11,11 +11,11 @@ import '../Model/DocumentDetails.dart';
 import '../page/file_list.dart';
 
 class DocumentController {
-  final String _token;
+  final String token;
   final BuildContext _context;
   Map<String, String> documentFilesMap = {};
 
-  DocumentController(this._token, this._context);
+  DocumentController(this.token, this._context);
 
   Future<List<Document>> fetchDocuments() async {
     List<Document> documents = [];
@@ -26,7 +26,7 @@ class DocumentController {
       final response = await http.get(
         url,
         headers: {
-          HttpHeaders.authorizationHeader: 'Bearer $_token',
+          HttpHeaders.authorizationHeader: 'Bearer $token',
         },
       );
 
@@ -131,7 +131,7 @@ class DocumentController {
       // Navigate to the file list page to select a file
       String? selectedFilePath = await Navigator.push(
         _context,
-        MaterialPageRoute(builder: (context) => ListPDFsScreen()),
+        MaterialPageRoute(builder: (context) => ListPDFsScreen(token: token)),
       );
 
       if (selectedFilePath != null) {
@@ -140,7 +140,7 @@ class DocumentController {
         await _uploadFileToApi(selectedFile, documentId); // Pass documentId here
 
         // Fetch updated document files after uploading
-        await fetchDocumentFiles(documentId, _token);
+        await fetchDocumentFiles(documentId, token);
       } else {
         // User canceled the file picking
         print('User canceled file picking');
@@ -160,7 +160,7 @@ class DocumentController {
         await http.MultipartFile.fromPath('file', file.path, filename: file.path.split('/').last),
       );
       request.fields['DocumentId'] = documentId; // Use the documentId parameter
-      request.headers['Authorization'] = 'Bearer $_token';
+      request.headers['Authorization'] = 'Bearer $token';
 
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
@@ -171,7 +171,7 @@ class DocumentController {
             content: Text('File uploaded successfully', style: TextStyle(color: Colors.green)), // Green for success
           ),
         );
-        await fetchDocumentFiles(documentId, _token);
+        await fetchDocumentFiles(documentId, token);
 
 
         // Save the filename to shared preferences

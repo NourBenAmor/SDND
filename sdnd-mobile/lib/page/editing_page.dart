@@ -9,8 +9,9 @@ import 'saving.dart'; // Import the SavingPage
 
 class EditingPage extends StatefulWidget {
   final File? imageFile; // Change to nullable File
+  final String token;
 
-  const EditingPage({Key? key, this.imageFile}) : super(key: key);
+  const EditingPage({Key? key, this.imageFile, required this.token}) : super(key: key);
 
   @override
   _EditingPageState createState() => _EditingPageState();
@@ -19,16 +20,19 @@ class EditingPage extends StatefulWidget {
 class _EditingPageState extends State<EditingPage> {
   late TextRecognizer textRecognizer;
   String recognizedText = "";
+  late String token;
 
   @override
   void initState() {
     super.initState();
+    token = widget.token; // Initialize token in initState
     textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
     // Call doTextRecognition only if an image is provided
     if (widget.imageFile != null) {
       doTextRecognition();
     }
   }
+
 
   Future<void> doTextRecognition() async {
     if (widget.imageFile != null) {
@@ -69,7 +73,7 @@ class _EditingPageState extends State<EditingPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SavingPage(pdfFile: output),
+        builder: (context) => SavingPage(pdfFile: output, token: token),
       ),
     );
   }
@@ -81,7 +85,7 @@ class _EditingPageState extends State<EditingPage> {
       MaterialPageRoute(
         builder: (context) =>
             TextDisplayPage(
-                text: recognizedText), // Pass recognizedText instead of recognizedText object
+                text: recognizedText, token: token), // Pass recognizedText instead of recognizedText object
       ),
     );
   }
@@ -89,6 +93,7 @@ class _EditingPageState extends State<EditingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
         title: Text(''),
       ),
@@ -115,7 +120,7 @@ class _EditingPageState extends State<EditingPage> {
                 await generatePdf(context);
               },
               icon: Icon(Icons.file_upload),
-              label: Text('Import PDF'),
+              label: Text('Generate PDF'),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white, backgroundColor: Colors.yellow[700],
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),

@@ -17,7 +17,7 @@ class _DashboardViewState extends State<DashboardView> {
   late Future<DashboardData> _fileDataFuture;
   late Future<DashboardData> _userDataFuture;
   late Future<DocumentUploadStats> _documentUploadStatsFuture;
-  late Future<Map<String, dynamic>> _documentStatisticsFuture; // Add this line
+  late Future<Map<String, dynamic>> _documentStatisticsFuture;
 
   final DashboardController _controller = DashboardController();
 
@@ -26,11 +26,8 @@ class _DashboardViewState extends State<DashboardView> {
     super.initState();
     _fileDataFuture = _controller.fetchFileData(widget.token);
     _userDataFuture = _controller.fetchUserData(widget.token);
-    _documentUploadStatsFuture =
-        _controller.fetchDocumentUploadStats(widget.token);
-    _documentStatisticsFuture = _controller.fetchDocumentStatistics(
-        widget.token); // Initialize _documentStatisticsFuture
-
+    _documentUploadStatsFuture = _controller.fetchDocumentUploadStats(widget.token);
+    _documentStatisticsFuture = _controller.fetchDocumentStatistics(widget.token);
   }
 
   @override
@@ -38,29 +35,24 @@ class _DashboardViewState extends State<DashboardView> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dashboard'),
-        backgroundColor: Colors
-            .yellow[700], // Set app bar background color to yellow
+        backgroundColor: Colors.yellow[700],
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          // Adjust padding for better spacing
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            // Align items to the start of the column
             children: [
               SizedBox(height: 20),
-              // Add some space between the app bar and content
               Text(
-                'Overview', // Add a section title for better organization
+                'Overview',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.yellow[700], // Use yellow for emphasis
+                  color: Colors.yellow[700],
                 ),
               ),
               SizedBox(height: 20),
-              // Add space between section title and items
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -75,7 +67,6 @@ class _DashboardViewState extends State<DashboardView> {
                 ],
               ),
               SizedBox(height: 20),
-              // Add space between the rows
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -90,20 +81,17 @@ class _DashboardViewState extends State<DashboardView> {
                 ],
               ),
               SizedBox(height: 20),
-              // Add more space between the dashboard items and the chart
               Center(
                 child: Text(
-                  'Monthly Added Documents', // Add a title for the chart section
+                  'Monthly Added Documents',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.yellow[700], // Use yellow for emphasis
+                    color: Colors.yellow[700],
                   ),
                 ),
               ),
-
               SizedBox(height: 10),
-              // Add space between chart title and chart
               FutureBuilder<DocumentUploadStats>(
                 future: _documentUploadStatsFuture,
                 builder: (context, snapshot) {
@@ -128,221 +116,213 @@ class _DashboardViewState extends State<DashboardView> {
     Color? iconColor;
 
     if (title == 'Total Files') {
-      iconData = Icons.insert_drive_file; // File icon
+      iconData = Icons.insert_drive_file;
       iconColor = Colors.blue;
     } else if (title == 'Total Users') {
-      iconData = Icons.person; // User profile icon
+      iconData = Icons.person;
       iconColor = Colors.green;
     } else if (title == 'Total Documents') {
-      iconData = Icons.folder; // Folder icon
+      iconData = Icons.folder;
       iconColor = Colors.orange;
     }
 
-    return Expanded(
-      child: Card(
-        elevation: 4, // Add elevation for a raised effect
-        color: Colors.yellow[100], // Set card background color to light yellow
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: FutureBuilder<DashboardData>(
-            future: future,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else {
-                String dataText = '';
-                if (title == 'Total Files') {
-                  dataText = '${snapshot.data!.totalFiles}';
-                } else if (title == 'Total Users') {
-                  dataText = '${snapshot.data!.totalUsers}';
-                } else if (title == 'Total Documents') {
-                  dataText = '${snapshot.data!.totalDocuments}';
-                }
-                return Column(
-                  children: [
-                    if (iconData != null && iconColor !=
-                        null) // Check if iconData and iconColor are not null
-                      Icon(
-                        iconData,
-                        color: iconColor,
-                        size: 40,
-                      ),
-                    SizedBox(height: 10),
-                    ListTile(
-                      title: Text(
-                        title,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black, // Use black for text color
-                        ),
-                      ),
-                      subtitle: Text(
-                        dataText,
-                        style: TextStyle(
-                          color: Colors.black87, // Use a darker color for text
-                        ),
+    return Card(
+      elevation: 4,
+      color: Colors.yellow[100],
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: FutureBuilder<DashboardData>(
+          future: future,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              String dataText = '';
+              if (title == 'Total Files') {
+                dataText = '${snapshot.data!.totalFiles}';
+              } else if (title == 'Total Users') {
+                dataText = '${snapshot.data!.totalUsers}';
+              } else if (title == 'Total Documents') {
+                dataText = '${snapshot.data!.totalDocuments}';
+              }
+              return Column(
+                children: [
+                  if (iconData != null && iconColor != null)
+                    Icon(
+                      iconData,
+                      color: iconColor,
+                      size: 40,
+                    ),
+                  SizedBox(height: 10),
+                  ListTile(
+                    title: Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
                     ),
-                  ],
-                );
-              }
-            },
-          ),
+                    subtitle: Text(
+                      dataText,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+          },
         ),
       ),
     );
   }
 
   Widget _buildTotalDocumentsItem() {
-    return Expanded(
-      child: Card(
-        elevation: 4,
-        color: Colors.yellow[100],
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.folder,
-                size: 40,
-                color: Colors.orange,
+    return Card(
+      elevation: 4,
+      color: Colors.yellow[100],
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.folder,
+              size: 40,
+              color: Colors.orange,
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Total Documents',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
-              SizedBox(height: 10),
-              Text(
-                'Total Documents',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              SizedBox(height: 10),
-              FutureBuilder<Map<String, dynamic>>(
-                future: _documentStatisticsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    final totalDocuments = snapshot.data?['totalDocuments'];
-                    return Text(
-                      totalDocuments != null
-                          ? ' $totalDocuments'
-                          : 'No data available',
-                      style: TextStyle(fontSize: 16),
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
+            ),
+            SizedBox(height: 10),
+            FutureBuilder<Map<String, dynamic>>(
+              future: _documentStatisticsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  final totalDocuments = snapshot.data?['totalDocuments'];
+                  return Text(
+                    totalDocuments != null ? '$totalDocuments' : 'No data available',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
         ),
       ),
     );
   }
 
-
   Widget _buildDocumentsByStateItem() {
-    return Expanded(
-      child: Card(
-        elevation: 4,
-        color: Colors.yellow[100],
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: 10),
-              FutureBuilder<Map<String, dynamic>>(
-                future: _documentStatisticsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    final documentsByState = snapshot.data?['documentsByState'];
-                    return Column(
-                      children: documentsByState != null
-                          ? (documentsByState as List<dynamic>).map<Widget>((stateData) {
-                        final state = (() {
-                          int statusCode = stateData['state'];
-                          switch (statusCode) {
-                            case 0:
-                              return 'Blank';
-                            case 1:
-                              return 'Filled';
-                            case 2:
-                              return 'Shared';
-                            case 3:
-                              return 'Archived';
-                            default:
-                              return 'Unknown';
-                          }
-                        })();
-                        final count = stateData['count'];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Color(0xFFAA33),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  state,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Text(
-                                  '$count', // Append 'Document' after state
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold, // Set fontWeight to bold
-                                    color: Colors.black,
-                                  ),
-                                ),
-
-                              ],
-                            ),
+    return Card(
+      elevation: 4,
+      color: Colors.yellow[100],
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: 10),
+            FutureBuilder<Map<String, dynamic>>(
+              future: _documentStatisticsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  final documentsByState = snapshot.data?['documentsByState'];
+                  return Column(
+                    children: documentsByState != null
+                        ? (documentsByState as List<dynamic>).map<Widget>((stateData) {
+                      final state = (() {
+                        int statusCode = stateData['state'];
+                        switch (statusCode) {
+                          case 0:
+                            return 'Blank';
+                          case 1:
+                            return 'Filled';
+                          case 2:
+                            return 'Shared';
+                          case 3:
+                            return 'Archived';
+                          default:
+                            return 'Unknown';
+                        }
+                      })();
+                      final count = stateData['count'];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFAA33),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        );
-                      }).toList()
-                          : [Text('No data available')],
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                state,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                '$count',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList()
+                        : [Text('No data available')],
+                  );
+                }
+              },
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildLineChart(DocumentUploadStats documentUploadStats) {
-    double maxYValue = 12; // Default maximum value
+    double maxYValue = 6;
 
     if (documentUploadStats.monthlyDocumentUploads.isNotEmpty) {
-      // Calculate the maximum value from valid data
       maxYValue = documentUploadStats.monthlyDocumentUploads.reduce((a, b) => a > b ? a : b).toDouble() + 10;
     }
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[200], // Set background color for the chart
-        borderRadius: BorderRadius.circular(16), // Optional: Add border radius for a modern look
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(16),
       ),
       child: SizedBox(
         height: 300,
@@ -358,7 +338,7 @@ class _DashboardViewState extends State<DashboardView> {
                 barWidth: 4,
                 isStrokeCapRound: true,
                 belowBarData: BarAreaData(show: false),
-                dotData: FlDotData(show: false), // Hide dots
+                dotData: FlDotData(show: false),
               ),
             ],
             titlesData: FlTitlesData(
@@ -368,7 +348,7 @@ class _DashboardViewState extends State<DashboardView> {
                 getTitles: (value) {
                   int intValue = value.toInt();
                   if (intValue >= 0 && intValue < documentUploadStats.monthNames.length) {
-                    return documentUploadStats.monthNames[intValue].substring(0, 3); // Show abbreviated month names
+                    return documentUploadStats.monthNames[intValue].substring(0, 3);
                   }
                   return '';
                 },
@@ -381,7 +361,7 @@ class _DashboardViewState extends State<DashboardView> {
                 margin: 16,
               ),
             ),
-            borderData: FlBorderData(show: false), // Hide border
+            borderData: FlBorderData(show: false),
             minX: 0,
             maxX: documentUploadStats.monthNames.length.toDouble() - 1,
             minY: 0,
@@ -391,8 +371,4 @@ class _DashboardViewState extends State<DashboardView> {
       ),
     );
   }
-
 }
-
-
-

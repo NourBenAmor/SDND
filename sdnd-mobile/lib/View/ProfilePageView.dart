@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../Controller/UserController.dart';
 import '../Model/User.dart';
+import '../page/base_layout.dart';
 
 class ProfilePageView extends StatefulWidget {
   final String token;
@@ -14,7 +15,7 @@ class ProfilePageView extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePageView> {
-  final UserController _userController = UserController();
+  late UserController _userController;
   User? _currentUser;
   bool _isLoading = true;
   String _errorMessage = '';
@@ -22,14 +23,18 @@ class _ProfilePageState extends State<ProfilePageView> {
   @override
   void initState() {
     super.initState();
+    _userController = UserController(widget.token, context);
     _loadCurrentUser();
   }
 
   Future<void> _loadCurrentUser() async {
-    final user = await _userController.getCurrentUser(widget.token);
+    final user = await _userController.getCurrentUser();
     setState(() {
       _currentUser = user;
       _isLoading = false;
+      if (_currentUser == null) {
+        _errorMessage = 'Error loading user data';
+      }
     });
   }
 

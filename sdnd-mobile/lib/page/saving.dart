@@ -9,8 +9,9 @@ import 'file_list.dart'; // Importez votre page ListPdfPage
 
 class SavingPage extends StatefulWidget {
   final File pdfFile;
+  final String token;
 
-  const SavingPage({Key? key, required this.pdfFile}) : super(key: key);
+  const SavingPage({Key? key, required this.pdfFile, required this.token}) : super(key: key);
 
   @override
   _SavingPageState createState() => _SavingPageState();
@@ -20,6 +21,10 @@ class _SavingPageState extends State<SavingPage> {
   late PDFViewController _pdfViewController;
   int _currentPageNumber = 1;
   int _totalPages = 0;
+  @override
+  void initState() {
+    super.initState();
+  }
 
   Future<void> _downloadPdfToDevice(BuildContext context) async {
     if (await _requestStoragePermission()) {
@@ -39,7 +44,7 @@ class _SavingPageState extends State<SavingPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ListPDFsScreen(), // Remplacez ListPdfPage par votre nom de page
+            builder: (context) => ListPDFsScreen(token: widget.token), // Remplacez ListPdfPage par votre nom de page
           ),
         );
       } catch (e) {
