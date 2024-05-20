@@ -89,7 +89,9 @@ public class AnnotationController : ControllerBase
 
 public class SignatureExample
     {
-        public static readonly String CERT_PATH = "/home/mainuser/SDND/Sdnd-api/Resource/signCertRsa01.p12";
+        public static readonly String CERT_NAME = "signCertRsa01.p12";
+        public static readonly String Folder_Path = Path.Combine(Directory.GetCurrentDirectory(), "Resource");
+        public static readonly String CERT_PATH = Path.Combine(Folder_Path, CERT_NAME);
         public void TestSignatureExample(string dest,string src,string imageString,int pageNumber,int signatureNumber)
         {
             FileInfo file = new FileInfo(dest);
@@ -111,6 +113,27 @@ public class SignatureExample
         
         protected void SignDocumentSignature(string filePath, ElectronicSignatureInfoDTO signatureInfo, string src, string imageString, int signatureNumber)
         {
+                // Check if the source file exists
+                if (!System.IO.File.Exists(src))
+                {
+                    throw new FileNotFoundException($"The source PDF file was not found at: {src}");
+                }
+
+                // Attempt to open the PDF file to check if it's a valid PDF
+                try
+                {
+                    using (var reader = new PdfReader(src))
+                    {
+                        // If this point is reached, the file is a valid PDF
+                    }
+                }
+                catch (iText.IO.Exceptions.IOException ex)
+                {
+                    throw new Exception($"Failed to open the PDF file at {src}. It may not be a valid PDF or could be corrupted.", ex);
+                }
+
+                // Proceed with the signing process as before
+             
             PdfDocument pdfDoc = new PdfDocument(new PdfReader(src));
             Rectangle pageSize = pdfDoc.GetFirstPage().GetPageSize();
             PdfSigner pdfSigner = new PdfSigner(new PdfReader(src), new FileStream(filePath, FileMode.Create),

@@ -13,7 +13,6 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from "vue";
 
 const { show, message } = defineProps({
   show: Boolean,
@@ -38,8 +37,7 @@ const cancel = () => {
 /* Include Font Awesome CSS for icons */
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css");
 
-.modal {
-}
+.modal {}
 
 .modal-card {
   position: fixed;
@@ -83,9 +81,11 @@ button {
   transition: all 0.2s ease-in-out;
   /* Smooth hover effect */
 }
+
 .fas {
   font-size: 27px;
 }
+
 button:hover {
   color: #ff0000;
   /* Blue on hover */

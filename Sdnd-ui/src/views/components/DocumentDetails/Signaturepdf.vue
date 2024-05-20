@@ -3,28 +3,28 @@
         <Loading v-model:active="savingAnnotations" :can-cancel="false" :is-full-page="true" :color="'#f1c40f'"
             :background-color="'#fff'" :loader="'dots'" :width="100" :height="100" />
         <div class="button-container">
-            <button v-tooltip="'save your annotations'" @click="save()" class="action-button">
+            <button v-tooltip="'save your annotations'" @click="save()" class="action-button text-primary">
                 <i class="fas fa-save"></i>
             </button>
-            <button @click="clear" v-tooltip="'reset all annotations'" class="action-button">
+            <button @click="clear" v-tooltip="'reset all annotations'" class="action-button text-primary">
                 <i class="fas fa-eraser"></i>
             </button>
-            <button @click="undo" v-tooltip="'undo last change'" class="action-button">
+            <button @click="undo" v-tooltip="'undo last change'" class="action-button text-primary">
                 <i class="fas fa-undo"></i>
             </button>
-            <button @click="addWaterMark" v-tooltip="'add a watermark'" class="action-button">
+            <button @click="addWaterMark" v-tooltip="'add a watermark'" class="action-button text-primary">
                 <i class="fas fa-stamp"></i>
             </button>
-            <button @click="fromDataURL" v-tooltip="'import from desktop'" class="action-button">
+            <button @click="fromDataURL" v-tooltip="'import from desktop'" class="action-button text-primary">
                 <i class="fas fa-file-import"></i>
             </button>
-            <button @click="handleDisabled" v-tooltip="'disable it'" class="action-button">
+            <button @click="handleDisabled" v-tooltip="'disable it'" class="action-button text-primary">
                 <i class="fas fa-toggle-on"></i>
             </button>
             <div class="card flex justify-content-center">
                 <ColorPicker v-model="color" format="rgb" />
             </div>
-            <!-- <button @click="addText" class="action-button">
+            <!-- <button @click="addText" class="action-button text-primary">
                 <i class="fas fa-font"></i>
             </button> -->
 
@@ -39,7 +39,7 @@
 import ColorPicker from 'primevue/colorpicker';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
-import { reactive, ref, defineProps, computed } from 'vue';
+import { reactive, ref, computed } from 'vue';
 import { toast } from 'vue3-toastify';
 import BaseApiService from '../../../services/apiService';
 const color = ref({ r: 241, g: 196, b: 15 });
@@ -59,7 +59,9 @@ const signature1 = ref(null)
 const emit = defineEmits(['refresh-annotation']);
 const save = (t) => {
     savingAnnotations.value = true;
+    console.log(signature1.value.save(t));
     let signImg = signature1.value.save(t).substring(22);
+    console.log(signImg);
     let fileId = props.source.substring(props.source.lastIndexOf('/') + 1);
     const formData = new FormData();
     formData.append("FileId", fileId);
@@ -68,7 +70,7 @@ const save = (t) => {
     BaseApiService('annotation/NewVersion').create(formData).then(() => {
         setTimeout(() => {
             savingAnnotations.value = false;
-        }, 1500);
+        }, 1000);
         toast.success('Annotation saved successfully');
         emit('refresh-annotation');
     }).catch(() => {

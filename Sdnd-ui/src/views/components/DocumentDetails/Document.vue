@@ -102,9 +102,9 @@
         <CollaborationWindow />
       </div>
     </SplitterPanel>
-    <SplitterPanel v-if="selectedPdf" class="flex align-items-center justify-content-center overflow-none"
-      style="width: 70%;">
-      <FileView :selected="activePdf || 0" :pdfSources="pdfSources" />
+    <SplitterPanel v-if="selectedPdf" v-show="IsOpen"
+      class="flex align-items-center justify-content-center overflow-none" style="width: 70%;">
+      <FileView @close-button="close" :selected="activePdf || 0" :pdfSources="pdfSources" />
     </SplitterPanel>
   </Splitter>
 </template>
@@ -131,8 +131,6 @@ import { onMounted } from "vue";
 import { useStore } from "vuex";
 //const router = useRouter();
 //const route = useRoute();
-
-
 // const fileId = ref('e7171698-1f32-465a-b632-7223c0e09cc0');
 //const src = ref(`https://localhost:7278/api/document/pdf/${fileId.value}`);
 
@@ -146,20 +144,27 @@ const selectedPdf = ref(null);
 const emits = defineEmits(["refresh-documents", "addfile-emit"]);
 const activePdf = ref(null);
 const pdfSources = ref([]);
+const IsOpen = ref(false);
 const documentDetails = ref(null);
 // const props = defineProps({
 //     documentId: String // Enforce string type for clarity and potential validation
 // });
+
+const close = () => {
+  IsOpen.value = false;
+}
 const handleEmit = (payload) => {
   emits("addfile-emit", payload);
 }
 watch(() => selectedPdf.value, (newValue) => {
+  console.log('selectedPdf changed to ', newValue);
   activePdf.value = pdfSources.value.indexOf(newValue.id);
+  IsOpen.value = true;
 });
 onMounted(async () => {
   isFetched.value = false;
   await fetchdocumentDetails(documentId.value);
-  if (documentDetails.value.files.length > 0) {
+  if (documentDetails.value && documentDetails.value.files && documentDetails?.value?.files?.length > 0) {
     pdfSources.value = documentDetails.value.files.map((file) => file.id);
     activePdf.value = pdfSources.value.indexOf(documentDetails.value.files[0].id);
   }
@@ -272,10 +277,12 @@ const FileColumns = [
 
 
 //const isDocumentAuthor = ref(true);
-const viewFile = (file) => {
-  // Implement file viewing logic here
-  activePdf.value = pdfSources.value.indexOf(file.id);
+const viewFile = (data) => {
 
+  console.log(data);
+  // Implement file viewing logic here
+  IsOpen.value = true
+  selectedPdf.value = data.id;
 };
 
 

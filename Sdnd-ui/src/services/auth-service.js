@@ -3,7 +3,6 @@ const API_URL = "https://localhost:7278/api/Account/";
 
 class AuthService {
   login(user) {
-    console.log(user, "from auth-service");
     return axios
       .post(API_URL + "login", {
         username: user.username,
@@ -11,7 +10,6 @@ class AuthService {
       })
       .then((response) => {
         if (response.data.token) {
-          console.log("response of the login :", response.data);
           localStorage.setItem("user", JSON.stringify(response.data));
         }
 
@@ -20,7 +18,6 @@ class AuthService {
   }
 
   logout() {
-    console.log("out");
     localStorage.removeItem("user");
   }
 

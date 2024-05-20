@@ -97,7 +97,6 @@ const options = ref([
     { icon: 'fa-solid fa-share', name: 'Share', value: 3 },
 ]);
 watch(() => value.value, (newValue) => {
-    console.log('permissionchanged to ', newValue);
     sharingForm.value.permissions = newValue;
 });
 // Other reactive properties...
@@ -105,7 +104,6 @@ watch(() => value.value, (newValue) => {
 const fetchUsernames = async () => {
     try {
         const response = await BaseApiService(`Account/usernames`).list();
-        console.log(response.data);
         usernames.value = response.data;
     } catch (error) {
         console.error('Error fetching usernames:', error);
@@ -118,7 +116,6 @@ const retrieveSharedUsers = async () => {
     try {
         const response = await BaseApiService(`Document/${documentId.value}/shared-users`).list();
         sharedUsers.value = response.data;
-        console.log('shared users:', sharedUsers.value)
     } catch (error) {
         console.error('Error fetching shared users:', error);
     }
