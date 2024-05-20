@@ -1,6 +1,9 @@
 <template>
   <main class="container">
     <div class="tool-bar">
+      <button @click="closeTab" class="text-primary btn btn-link px-0 mb-0 mx-0">
+        <i class="fas fa-x"></i>
+      </button>
       <span class="page-info">
         Page <span id="page-num"></span> of <span id="page-count"></span>
       </span>
@@ -109,18 +112,21 @@ const src = ref('');
 const { pdf, pages } = usePDF(src);
 import { watch } from 'vue';
 onMounted(() => {
+  console.log(props.pdfSources);
   if (props.pdfSources && props.pdfSources.length > 0) {
     selectedSource.value = props.pdfSources[props.selected];
     if (selectedSource.value) {
       src.value = `https://localhost:7278/api/document/pdf/${selectedSource.value}`;
-
+      console.log('inmoutn', src.value);
     }
     else {
       // Handle the case when props.selected is an invalid index
+      console.log("Invalid index")
     }
   }
   else {
     // Handle the case when props.pdfSources is an empty array
+    console.log("Empty array")
   }
   fetchversions();
 });
@@ -129,16 +135,24 @@ watch(() => props.selected, (newValue) => {
     selectedSource.value = props.pdfSources[newValue];
     if (selectedSource.value) {
       src.value = `https://localhost:7278/api/document/pdf/${selectedSource.value}`;
-
+      fetchversions();
     }
     else {
       // Handle the case when props.selected is an invalid index
+      console.log("Invalid index")
     }
   }
   else {
     // Handle the case when props.pdfSources is an empty array
+    console.log("Empty array")
   }
 
+
+});
+watch(() => selectedSource.value, (newValue) => {
+  if (newValue) {
+    src.value = `https://localhost:7278/api/document/pdf/${newValue}`;
+  }
 });
 const refresh = () => {
   // force a component rerender
@@ -182,9 +196,11 @@ const onSaveAnnotation = (f) => {
 // const showSignatureToolbar = () => {
 //   SignatureToolbar.value = !SignatureToolbar.value;
 // }; -->
+const emit = defineEmits(["close-button"])
 
-
-
+const closeTab = () => {
+  emit('close-button')
+}
 const downloadDocument = async () => {
   try {
     const response = await BaseApiService("Document/Download").get(

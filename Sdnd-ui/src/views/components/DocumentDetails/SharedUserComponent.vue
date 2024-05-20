@@ -55,7 +55,7 @@
 <script setup>
 
 import Tag from 'primevue/tag';
-import { defineProps, watch, ref, computed } from 'vue';
+import { watch, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import BaseApiService from '../../../services/apiService';

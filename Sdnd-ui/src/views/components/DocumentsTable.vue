@@ -147,7 +147,6 @@
     <ConfirmationModalVue :show="showDeleteModal" message="Are you sure you want to delete this document ?"
       @confirm="handleDeleteConfirm" @cancel="hideAllModals" />
   </div>
-  <SignaturePdf />
   <nav aria-label="Page navigation example" class="d-flex justify-content-center">
     <ul class="pagination mt-3">
       <li class="page-item" :class="{ disabled: currentPage === 1 }">
