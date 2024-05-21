@@ -8,7 +8,6 @@ import { useVuelidate } from "@vuelidate/core";
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
 
-
 const body = document.getElementsByTagName("body")[0];
 const router = useRouter();
 const store = useStore();
@@ -16,6 +15,7 @@ const isSignUp = ref(false);
 const successful = ref(false);
 const message = ref("");
 const IsLoading = ref(false);
+const errorMessage = ref(""); // Add this line
 
 const registerForm = ref({
   username: "",
@@ -33,8 +33,6 @@ const loginrules = {
   password: { required }
 }
 const password = computed(() => registerForm.value.password);
-
-
 
 function passwordComplexity(value) {
   // The password must contain at least one number, one lowercase letter, one uppercase letter, and one special character
@@ -92,20 +90,18 @@ const handleRegisterSubmit = async () => {
 const login = async () => {
   const isFormCorrect = await v1$.value.$validate();
   if (isFormCorrect) {
-
-
+    errorMessage.value = ""; 
     try {
       IsLoading.value = true;
       await store.dispatch("auth/login", loginData.value);
       IsLoading.value = false;
       router.push("/");
     } catch (error) {
-      message.value = true;
-      const errorMessage =
+      errorMessage.value = 
         (error.response && error.response.data && error.response.data.message) ||
         error.message ||
         error.toString();
-      console.error(errorMessage);
+      console.error(errorMessage.value);
     } finally {
       IsLoading.value = false;
     }
@@ -135,18 +131,15 @@ onBeforeUnmount(() => {
   body.classList.add("bg-gray-100");
 });
 </script>
+
 <template>
   <div class="container mb-3" :class="{ 'right-panel-active': isSignUp }">
-    <div
-      class="form-container sign-in-container d-flex flex-column justify-content-center align-items-center text-center">
-      <div class="d-flex flex-column justify-content-center align-items-center text-center"
-        style="height: 70vh; width: 100%">
+    <div class="form-container sign-in-container d-flex flex-column justify-content-center align-items-center text-center">
+      <div class="d-flex flex-column justify-content-center align-items-center text-center" style="height: 70vh; width: 100%">
         <form @submit.prevent="login" style="width: 100%">
           <div class="pb-0 card-header text-start mb-3">
             <h5 class="font-weight-bold text-center">Sign In</h5>
-            <p class="mb-0 text-center">
-              Enter your username and password to sign in
-            </p>
+            <p class="mb-0 text-center">Enter your username and password to sign in</p>
           </div>
           <div class="mb-2" style="width: 45%">
             <argon-input v-model="loginData.username" type="text" placeholder="Username" name="username" size="lg" />
@@ -155,12 +148,12 @@ onBeforeUnmount(() => {
             </p>
           </div>
           <div class="mb-2" style="width: 45%">
-            <argon-input v-model="loginData.password" type="password" placeholder="Password" name="password" width="50%"
-              size="lg" />
+            <argon-input v-model="loginData.password" type="password" placeholder="Password" name="password" width="50%" size="lg" />
             <p class="mb-1 p-0 validation" v-for="error of v1$.password.$errors" :key="error.$uid">
               {{ error.$property }} {{}} {{ error.$message.split(' ').slice(1).join(' ') }}
             </p>
           </div>
+          <div v-if="errorMessage" class="text-danger mb-3">{{ errorMessage }}</div> <!-- Add this line -->
           <div class="text-center">
             <argon-button type="submit" class="mt-4" color="success" fullWidth size="lg">
               <span v-if="IsLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -181,41 +174,33 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <!-- Sign up form -->
-    <div
-      class="form-container sign-up-container d-flex flex-column justify-content-center align-items-center text-center">
-      <div class="d-flex flex-column justify-content-center align-items-center text-center"
-        style="height: 70vh; width: 100%">
+    <div class="form-container sign-up-container d-flex flex-column justify-content-center align-items-center text-center">
+      <div class="d-flex flex-column justify-content-center align-items-center text-center" style="height: 70vh; width: 100%">
         <form @submit.prevent="handleRegisterSubmit" style="width: 100%" novalidate>
           <div class="pb-0 card-header text-start mb-5">
             <h5 class="font-weight-bold text-center">Create An Account</h5>
-            <p class="mb-0 text-center">
-              Enter your username and email and password to create an account
-            </p>
+            <p class="mb-0 text-center">Enter your username and email and password to create an account</p>
           </div>
           <div class="mb-2" style="width: 45%">
-            <ArgonInput class="mb-1" id="name" type="text" placeholder="Name" aria-label="Name"
-              v-model="registerForm.username" />
+            <ArgonInput class="mb-1" id="name" type="text" placeholder="Name" aria-label="Name" v-model="registerForm.username" />
             <p class="m-0 p-0 validation" v-for="error of v$.username.$errors" :key="error.$uid">
               {{ error.$property }} {{}} {{ error.$message.split(' ').slice(1).join(' ') }}
             </p>
           </div>
           <div class="mb-2" style="width: 45%">
-            <ArgonInput class="mb-1" id="email" type="email" placeholder="Email" aria-label="Email"
-              v-model="registerForm.email" />
+            <ArgonInput class="mb-1" id="email" type="email" placeholder="Email" aria-label="Email" v-model="registerForm.email" />
             <p class="m-0 p-0 validation" v-for="error of v$.email.$errors" :key="error.$uid">
               {{ error.$property }} {{}} {{ error.$message.split(' ').slice(1).join(' ') }}
             </p>
           </div>
           <div class="mb-3" style="width: 45%">
-            <ArgonInput class="mb-1" id="password" type="password" placeholder="Password" aria-label="Password"
-              v-model="registerForm.password" />
+            <ArgonInput class="mb-1" id="password" type="password" placeholder="Password" aria-label="Password" v-model="registerForm.password" />
             <p class="m-0 p-0 validation" v-for="error of v$.password.$errors" :key="error.$uid">
               {{ error.$property }} {{}} {{ error.$message.split(' ').slice(1).join(' ') }}
             </p>
           </div>
           <div class="mb-3" style="width: 45%">
-            <ArgonInput class="mb-1" id="password" type="password" placeholder="Confirm Your Password"
-              aria-label="Password" v-model="registerForm.confirmPassword" />
+            <ArgonInput class="mb-1" id="password" type="password" placeholder="Confirm Your Password" aria-label="Password" v-model="registerForm.confirmPassword" />
             <p class="m-0 p-0 validation" v-for="error of v$.confirmPassword.$errors" :key="error.$uid">
               {{ error.$property }} {{}} {{ error.$message.split(' ').slice(1).join(' ') }}
             </p>
@@ -224,8 +209,7 @@ onBeforeUnmount(() => {
           <div class="text-center">
             <argon-button type="submit" color="success" fullWidth size="lg">
               <span v-if="IsLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              <span v-else>Sign
-                up</span></argon-button>
+              <span v-else>Sign up</span></argon-button>
           </div>
           <div class="px-1 pt-0 text-center card-footer px-lg-2 mt-1">
             <p class="mx-auto mb-4 text-sm">
@@ -253,6 +237,7 @@ onBeforeUnmount(() => {
     </div>
   </div>
 </template>
+
 <style scoped>
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,800");
 
