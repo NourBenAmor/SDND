@@ -35,16 +35,19 @@ class _EditingPageState extends State<EditingPage> {
 
 
   Future<void> doTextRecognition() async {
-    if (widget.imageFile != null) {
-      InputImage inputImage = InputImage.fromFile(widget.imageFile!);
-      final RecognizedText recognizedText =
-      await textRecognizer.processImage(inputImage);
+  if (widget.imageFile != null) {
+    InputImage inputImage = InputImage.fromFile(widget.imageFile!);
+    final RecognizedText recognizedText =
+        await textRecognizer.processImage(inputImage);
 
-      setState(() {
-        this.recognizedText = recognizedText.text;
-      });
-    }
+    setState(() {
+      this.recognizedText = recognizedText.text;
+    });
+
+    navigateToTextDisplayPage();
   }
+}
+
 
   Future<void> generatePdf(BuildContext context) async {
     final pdf = pdfLib.Document();

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-
-
 import '../Controller/UserController.dart';
 import '../Model/User.dart';
-import '../page/base_layout.dart';
 
 class ProfilePageView extends StatefulWidget {
   final String token;
@@ -11,10 +8,10 @@ class ProfilePageView extends StatefulWidget {
   ProfilePageView({required this.token});
 
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  _ProfilePageViewState createState() => _ProfilePageViewState();
 }
 
-class _ProfilePageState extends State<ProfilePageView> {
+class _ProfilePageViewState extends State<ProfilePageView> {
   late UserController _userController;
   User? _currentUser;
   bool _isLoading = true;
@@ -28,88 +25,193 @@ class _ProfilePageState extends State<ProfilePageView> {
   }
 
   Future<void> _loadCurrentUser() async {
-    final user = await _userController.getCurrentUser();
-    setState(() {
-      _currentUser = user;
-      _isLoading = false;
-      if (_currentUser == null) {
-        _errorMessage = 'Error loading user data';
-      }
-    });
+    try {
+      final user = await _userController.getCurrentUser();
+      setState(() {
+        _currentUser = user;
+        _isLoading = false;
+        if (_currentUser == null) {
+          _errorMessage = 'User data not found';
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Error loading user data: $e';
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Profile'),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height / 4,
-              child: Image.asset(
-                'images/image-document.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Column(
+        children: [
+          Expanded(flex: 2, child: _buildTopSection()),
+          Expanded(
+            flex: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _currentUser == null
+                  ? Center(child: Text(_errorMessage))
+                  : Column(
                 children: [
-                  SizedBox(height: 20),
-                  CircleAvatar(
-                    radius: 60,
-                    backgroundImage: AssetImage('images/profile_image.jpg'),
+                  Text(
+                    _currentUser!.username,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline6
+                        ?.copyWith(fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 20),
-                  _isLoading
-                      ? CircularProgressIndicator()
-                      : _currentUser != null
-                      ? Column(
+                  const SizedBox(height: 8),
+                  Text(
+                    _currentUser!.email,
+                    style: Theme.of(context)
+                        .textTheme
+                        .subtitle1
+                        ?.copyWith(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(height: 20),
-                      TextFormField(
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          labelText: 'Username',
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.yellow),
-                          ),
-                          prefixIcon: Icon(Icons.person),
-                        ),
-                        style: TextStyle(fontSize: 18),
-                        initialValue: _currentUser!.username,
+                      FloatingActionButton.extended(
+                        onPressed: () {},
+                        heroTag: 'follow',
+                        elevation: 0,
+                        label: const Text("Follow"),
+                        icon: const Icon(Icons.person_add_alt_1),
                       ),
-                      SizedBox(height: 10),
-                      TextFormField(
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.yellow),
-                          ),
-                          prefixIcon: Icon(Icons.email),
-                        ),
-                        style: TextStyle(fontSize: 18),
-                        initialValue: _currentUser!.email,
+                      const SizedBox(width: 16.0),
+                      FloatingActionButton.extended(
+                        onPressed: () {},
+                        heroTag: 'message',
+                        elevation: 0,
+                        backgroundColor: Colors.red,
+                        label: const Text("Message"),
+                        icon: const Icon(Icons.message_rounded),
                       ),
                     ],
-                  )
-                      : Text(
-                    _errorMessage.isNotEmpty ? _errorMessage : 'Error loading user data',
-                    style: TextStyle(color: Colors.red),
                   ),
+                  const SizedBox(height: 16),
+                  _ProfileInfoRow(
+                    items: [
+                      ProfileInfoItem("Posts", 900),
+                      ProfileInfoItem("Followers", 120),
+                      ProfileInfoItem("Following", 200),
+                    ],
+                  )
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+
+  Widget _buildTopSection() {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(bottom: 50),
+          decoration: const BoxDecoration(
+              color: Colors.yellow, // Changed background color to yellow
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(50),
+                bottomRight: Radius.circular(50),
+              )),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: SizedBox(
+            width: 150,
+            height: 150,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: AssetImage('images/profile-image.jpg'), // Using local image
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                    child: Container(
+                      margin: const EdgeInsets.all(8.0),
+                      decoration: const BoxDecoration(
+                          color: Colors.green, shape: BoxShape.circle),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ProfileInfoRow extends StatelessWidget {
+  final List<ProfileInfoItem> items;
+
+  const _ProfileInfoRow({Key? key, required this.items}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 80,
+      constraints: const BoxConstraints(maxWidth: 400),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: items
+            .map((item) => Expanded(
+            child: Row(
+              children: [
+                if (items.indexOf(item) != 0) const VerticalDivider(),
+                Expanded(child: _singleItem(context, item)),
+              ],
+            )))
+            .toList(),
+      ),
+    );
+  }
+
+  Widget _singleItem(BuildContext context, ProfileInfoItem item) => Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          item.value.toString(),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+      ),
+      Text(
+        item.title,
+        style: Theme.of(context).textTheme.caption,
+      )
+    ],
+  );
+}
+
+class ProfileInfoItem {
+  final String title;
+  final int value;
+  const ProfileInfoItem(this.title, this.value);
 }

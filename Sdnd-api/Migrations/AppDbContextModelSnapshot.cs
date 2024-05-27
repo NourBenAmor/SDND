@@ -150,7 +150,7 @@ namespace Sdnd_api.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = new Guid("0008720a-8cca-43af-b9df-0dcb8f242265"),
+                            UserId = new Guid("ba8f81f5-4dc9-444d-a0f2-098774331b95"),
                             RoleId = new Guid("f1f57e4f-616c-4422-8b83-5b6f5ca2915a")
                         });
                 });
@@ -491,15 +491,15 @@ namespace Sdnd_api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("0008720a-8cca-43af-b9df-0dcb8f242265"),
+                            Id = new Guid("ba8f81f5-4dc9-444d-a0f2-098774331b95"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d051846d-bf53-4250-abfe-e1dad0851466",
+                            ConcurrencyStamp = "63ac8cf1-3a5f-48d2-84d9-b80d05e4af43",
                             Email = "admin@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKuCOxw82oAcWcLw4NUQtUuvwpyFwddQ8PQilBPJg/fZjphLDqcXlLPLLfFoSJwAcg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECxjUsFEFnaICHtATSrOlSr2ZjM4lY5IYAC1dR9qkf56zfUImtmMCSA1GmeFGx1zkA==",
                             PhoneNumberConfirmed = false,
                             ProfilePictureUrl = "",
                             SecurityStamp = "",
@@ -579,7 +579,7 @@ namespace Sdnd_api.Migrations
                     b.HasOne("Sdnd_api.Models.Document", null)
                         .WithMany()
                         .HasForeignKey("DocumentId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -588,13 +588,13 @@ namespace Sdnd_api.Migrations
                     b.HasOne("Sdnd_api.Models.Document", null)
                         .WithMany()
                         .HasForeignKey("documentId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Sdnd_api.Models.User", null)
                         .WithMany()
                         .HasForeignKey("userId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -603,13 +603,13 @@ namespace Sdnd_api.Migrations
                     b.HasOne("Sdnd_api.Models.Document", null)
                         .WithMany()
                         .HasForeignKey("DocumentId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Sdnd_api.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -618,13 +618,13 @@ namespace Sdnd_api.Migrations
                     b.HasOne("Sdnd_api.Models.User", null)
                         .WithMany()
                         .HasForeignKey("AssignedUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Sdnd_api.Models.Document", null)
                         .WithMany()
                         .HasForeignKey("SharedDocumentId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -633,7 +633,7 @@ namespace Sdnd_api.Migrations
                     b.HasOne("Sdnd_api.Models.User", null)
                         .WithMany()
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -642,13 +642,13 @@ namespace Sdnd_api.Migrations
                     b.HasOne("Sdnd_api.Models.Document", null)
                         .WithMany()
                         .HasForeignKey("DocumentId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Sdnd_api.Models.User", null)
                         .WithMany()
                         .HasForeignKey("SharedWithUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -670,4 +670,3 @@ namespace Sdnd_api.Migrations
         }
     }
 }
-

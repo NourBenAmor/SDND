@@ -1,4 +1,4 @@
-# InnoScan
+# DocuStream
 
 A new Flutter project.
 

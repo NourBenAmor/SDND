@@ -110,9 +110,18 @@ public class DocumentController : ControllerBase
                 return NotFound($"Document with ID {id} not found.");
             }
 
+            // Find shared documents associated with the document
+            var sharedDocuments = await _context.SharedDocuments.Where(sd => sd.DocumentId == id).ToListAsync();
+
+            // Remove the associated shared documents
+            _context.SharedDocuments.RemoveRange(sharedDocuments);
+
+            // Delete associated files, if any
             await DeleteDocumentFiles(document.Id);
 
+            // Remove the document
             _context.Documents.Remove(document);
+
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -122,6 +131,9 @@ public class DocumentController : ControllerBase
             return StatusCode(500, $"An error occurred while deleting the document: {ex.Message}");
         }
     }
+
+
+
 
     private async Task DeleteDocumentFiles(Guid documentId)
     {
@@ -174,7 +186,7 @@ public class DocumentController : ControllerBase
             // Extract version numbers from filenames
             var versionNumbers = files.Select(file =>
             {
-                var versionString = Path.GetFileNameWithoutExtension(file).Replace(fileName, "").Replace("_*", "");
+                var versionString = Path.GetFileNameWithoutExtension(file).Replace(fileName, "").Replace("_", "");
                 int fileVersion;
                 return int.TryParse(versionString, out fileVersion) ? fileVersion : 0;
             });
@@ -186,7 +198,7 @@ public class DocumentController : ControllerBase
             var selectedVersionNumber = version ?? latestVersionNumber;
 
             // Append the version number to the filename
-            var fullPath = Path.Combine(pathToSave, $"{fileName}_*{selectedVersionNumber}");
+            var fullPath = Path.Combine(pathToSave, $"{fileName}_{selectedVersionNumber}");
 
             if (!System.IO.File.Exists(fullPath))
             {
@@ -213,7 +225,7 @@ public class DocumentController : ControllerBase
             // Extract version numbers from filenames
             var versionNumbers = files.Select(file =>
             {
-                var versionString = Path.GetFileNameWithoutExtension(file).Replace(fileName, "").Replace("_*", "");
+                var versionString = Path.GetFileNameWithoutExtension(file).Replace(fileName, "").Replace("_", "");
                 int fileVersion;
                 return int.TryParse(versionString, out fileVersion) ? fileVersion : 0;
             })
@@ -394,6 +406,7 @@ public class DocumentController : ControllerBase
     }
 
 
+    
 
 
 

@@ -33,21 +33,35 @@ public class ShareController : ControllerBase
         {
             return NotFound("Document not found.");
         }
-        IEnumerable<SharedDocument> sharedDocuments = _context.SharedDocuments
-            .Where(d => d.DocumentId == documentId).Include(sharedDocument => sharedDocument.Permissions);
-        List<SharedUserDto> sharedUsers = new List<SharedUserDto>();
+
+        var sharedDocuments = await _context.SharedDocuments
+            .Where(d => d.DocumentId == documentId)
+            .Include(sd => sd.Permissions)
+            .ToListAsync();
+
+        var userIds = sharedDocuments.Select(sd => sd.SharedWithUserId).Distinct().ToList();
+        var users = await _userManager.Users.Where(u => userIds.Contains(u.Id)).ToListAsync();
+
+        var sharedUsers = new List<SharedUserDto>();
+
         foreach (var sharedDocument in sharedDocuments)
         {
-            var user = await _userManager.FindByIdAsync(sharedDocument.SharedWithUserId.ToString());
-            sharedUsers.Add(new SharedUserDto
+            var user = users.FirstOrDefault(u => u.Id == sharedDocument.SharedWithUserId);
+            if (user != null)
             {
-                Id = user.Id,
-                Username = user.UserName,
-                Email = user.Email,
-                //ProfilePictureUrl = user.ProfilePictureUrl,
-                Permissions = sharedDocument.Permissions.Select(p => p.Id).ToList(),
-                Tasks = await _context.DocTasks.Where(t => t.SharedDocumentId == documentId && t.AssignedUserId == user.Id).ToListAsync()
-            });
+                var tasks = await _context.DocTasks
+                    .Where(t => t.SharedDocumentId == sharedDocument.Id && t.AssignedUserId == user.Id)
+                    .ToListAsync();
+
+                sharedUsers.Add(new SharedUserDto
+                {
+                    Id = user.Id,
+                    Username = user.UserName,
+                    Email = user.Email,
+                    Permissions = sharedDocument.Permissions.Select(p => p.Id).ToList(),
+                    Tasks = tasks
+                });
+            }
         }
 
         return Ok(sharedUsers);

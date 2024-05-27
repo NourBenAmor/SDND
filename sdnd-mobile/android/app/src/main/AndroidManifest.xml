@@ -5,7 +5,7 @@
 
 
     <application
-        android:label="InnoScan"
+        android:label="DocuStream"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

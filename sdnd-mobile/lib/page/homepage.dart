@@ -1,7 +1,8 @@
-import 'package:airsafe/page/compte/login_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
+
+import '../View/sign_in/sign_in_screen.dart';
 
 
 
@@ -86,7 +87,7 @@ class homePage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const LoginPage()),
+                            MaterialPageRoute(builder: (context) => const SignInScreen()),
                           );
                         },
                         style: ElevatedButton.styleFrom(

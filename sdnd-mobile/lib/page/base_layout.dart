@@ -114,11 +114,11 @@ class BaseLayout extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.file_download_rounded, size: 28),
-            label: 'PDF List',
+            label: 'File List',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.photo_camera, size: 28),
-            label: 'Camera',
+            label: 'Import Image',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.photo_library, size: 28),

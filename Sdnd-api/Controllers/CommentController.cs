@@ -33,22 +33,30 @@ namespace Sdnd_api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CommentResponseDto>>> GetAllComments(Guid documentId)
         {
-            
+            // Fetch comments first
             var comments = await _context.Comments
                 .Where(c => c.DocumentId == documentId)
-                .Select(c => new CommentResponseDto
-                {
-                    Id = c.Id,
-                    username = _userManager.FindByIdAsync(c.UserId.ToString()).Result.UserName,
-                    commentText = c.CommentText,
-                    addedDate = c.AddedDate
-                })
                 .ToListAsync();
 
-            return comments;
+            // Fetch user details
+            var userIds = comments.Select(c => c.UserId).Distinct().ToList();
+            var users = await _userManager.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToDictionaryAsync(u => u.Id, u => u.UserName);
+
+            // Map comments to DTOs with usernames
+            var commentsDto = comments.Select(c => new CommentResponseDto
+            {
+                Id = c.Id,
+                username = users.ContainsKey(c.UserId) ? users[c.UserId] : "Unknown User",
+                commentText = c.CommentText,
+                addedDate = c.AddedDate
+            }).ToList();
+
+            return Ok(commentsDto);
         }
 
-        
+
         // GET: api/Comment/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Comment>> GetComment(Guid id)

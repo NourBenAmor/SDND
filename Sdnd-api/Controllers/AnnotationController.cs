@@ -56,7 +56,7 @@ public class AnnotationController : ControllerBase
             var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
             var LastVersionFileName = model.FileId.ToString();
             // Use a regular expression to remove any existing version number from the filename
-            var fileName = Regex.Replace(model.FileId.ToString(), @"_\*\d+$", "");
+            var fileName = Regex.Replace(model.FileId.ToString(), @"_\\d+$", "");
             var user = await _context.Users.FindAsync(_userAccessor.GetCurrentUser().Id);
             var fileModel = await _context.DocFiles.FirstOrDefaultAsync(f => f.Id == Guid.Parse(fileName));
             var Document = await _context.Documents.FindAsync(fileModel?.DocumentId);
@@ -64,7 +64,7 @@ public class AnnotationController : ControllerBase
                     d.DocumentId == Document.Id && d.SharedWithUserId == user.Id && d.Permissions.Any(p => p.Name == "edit")))
                 return Unauthorized("You are not authorized to update this document");
             // Get all files that start with the same FileId
-            var files = Directory.GetFiles(pathToSave, $"{fileName}*");
+            var files = Directory.GetFiles(pathToSave, $"{fileName}");
 
             // Extract version numbers from filenames
             var versionNumbers = files.Select(file =>
@@ -77,13 +77,13 @@ public class AnnotationController : ControllerBase
             // Determine the new version number
             var newVersionNumber = versionNumbers.Any() ? versionNumbers.Max() + 1 : 1;
             
-            var fullPath = Path.Combine(pathToSave, fileName + "_*" + (newVersionNumber - 1));
+            var fullPath = Path.Combine(pathToSave, fileName + "_" + (newVersionNumber - 1));
             // Append the version number to the filename 
-            var fullNewPath = Path.Combine(pathToSave, $"{fileName}_*{newVersionNumber}");
+            var fullNewPath = Path.Combine(pathToSave, $"{fileName}_{newVersionNumber}");
 
             SignatureExample signatureExample = new SignatureExample();
             signatureExample.TestSignatureExample(fullNewPath, fullPath, model.SignatureImg, model.PageNumber,newVersionNumber);
-            return Ok($"{fileName}_*{newVersionNumber},newVersionNumber");
+            return Ok($"{fileName}_{newVersionNumber},newVersionNumber");
         }
    
 

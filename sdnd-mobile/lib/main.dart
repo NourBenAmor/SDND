@@ -29,7 +29,7 @@ class AirSafeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // This line removes the debug banner
-      title: 'InnoScan',
+      title: 'DocuStream',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

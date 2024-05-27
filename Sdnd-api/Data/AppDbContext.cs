@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Sdnd_api.Models;
 using Sdnd_Api.Models;
+using System.Reflection.Emit;
 
 namespace Sdnd_api.Data
 {
@@ -17,7 +18,7 @@ namespace Sdnd_api.Data
         public virtual DbSet<Annotation> Annotations { get; set; }
         public virtual DbSet<SharedDocument> SharedDocuments { get; set; }
         public virtual DbSet<DocFile> DocFiles { get; set; }
-        
+
         public virtual DbSet<SharingPermission> SharingPermissions { get; set; }
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<DocTask> DocTasks { get; set; }
@@ -60,7 +61,7 @@ namespace Sdnd_api.Data
                 entity.HasMany<Comment>()
                     .WithOne()
                     .HasForeignKey(e => e.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
                 entity.HasMany<DocTask>()
                     .WithOne()
                     .HasForeignKey(e => e.AssignedUserId)
@@ -69,11 +70,11 @@ namespace Sdnd_api.Data
 
             builder.Entity<Document>(entity =>
             {
-                
+
                 entity.HasMany<Annotation>()
                     .WithOne()
                     .HasForeignKey(e => e.documentId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
                 entity.HasMany<SharedDocument>()
                     .WithOne()
                     .HasForeignKey(e => e.DocumentId)
@@ -90,7 +91,13 @@ namespace Sdnd_api.Data
                     .WithOne()
                     .HasForeignKey(e => e.SharedDocumentId)
                     .OnDelete(DeleteBehavior.Cascade);
-            });
+                entity.HasMany<SharedDocument>()
+            .WithOne()
+            .HasForeignKey(e => e.DocumentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            }
+            );
             // Create password hasher
             var hasher = new PasswordHasher<User>();
 
@@ -129,5 +136,5 @@ namespace Sdnd_api.Data
                 .HasMany(s => s.Permissions)
                 .WithMany();
         }
-        }
     }
+}
